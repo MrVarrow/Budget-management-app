@@ -63,7 +63,43 @@ class CreateAccount:
         self.root = root
 
     def create_account_page(self):
-        ...
+        self.create_acc_page = Frame(self.root)
+        self.create_acc_page.grid(row=0, column=0, sticky=NSEW)
+
+        Label(self.create_acc_page, text="Create your account", font=('Arial', 40), bg='light gray')\
+            .grid(row=0, column=0, columnspan=3)
+        Label(self.create_acc_page, text="login:", font=('Arial', 40), bg='light gray')\
+            .grid(row=1, column=1)
+        self.login = Entry(self.create_acc_page)\
+            .grid(row=2,column=1)
+        Label(self.create_acc_page, text="password:", font=('Arial', 40), bg='light gray')\
+            .grid(row=3, column=1)
+        self.password = Entry(self.create_acc_page)\
+            .grid(row=4, column=1)
+        Label(self.create_acc_page, text="repeat password:", font=('Arial', 40), bg='light gray')\
+            .grid(row=5, column=1)
+        self.repeat_password = Entry(self.create_acc_page)\
+            .grid(row=6, column=1)
+        Label(self.create_acc_page, text="e-mail", font=('Arial', 40), bg='light gray')\
+            .grid(row=7, column=1)
+        self.email = Entry(self.create_acc_page)\
+            .grid(row=8, column=1)
+        Button(self.create_acc_page, text="create account")\
+            .grid(row=9, column=1)
+        Button(self.create_acc_page, text="exit")\
+            .grid(row=10, column=2)
+        Label(self.create_acc_page, text="How should password look:\n"
+                                         "-at least 8 characters\n"
+                                         "-at least one big letter\n"
+                                         "-at least one small letter\n"
+                                         "-at least one number")\
+            .grid(row=3, column=0, rowspan=7)
+        Label(self.create_acc_page, text="password strength:\n"
+                                         "-----------------\n"
+                                         "strong")\
+            .grid(row=4, column=1, rowspan=3, columnspan=2)
+        Checkbutton(self.create_acc_page, text="I want to get e-mail notifications about news")\
+            .grid(row=8, column=1, columnspan=2)
 
 
 class LoginUser:
@@ -71,7 +107,33 @@ class LoginUser:
         self.root = root
 
     def logged_user_page(self):
-        ...
+        self.logged_usr_page = Frame(self.root)
+        self.logged_usr_page.grid(row=0, column=0, sticky=NSEW)
+
+        Label(self.logged_usr_page, text="Main page", font=('Arial', 40), bg='light gray')\
+            .grid(row=0, column=0, columnspan=3)
+        Button(self.logged_usr_page, text="Manage budget", font=('Arial', 40), bg='light gray')\
+            .grid(row=1, column=0)
+        Button(self.logged_usr_page, text="Statistics", font=('Arial', 40), bg='light gray')\
+            .grid(row=2, column=0)
+        Button(self.logged_usr_page, text="Shopping list", font=('Arial', 40), bg='light gray')\
+            .grid(row=3, column=0)
+        Button(self.logged_usr_page, text="Savings", font=('Arial', 40), bg='light gray')\
+            .grid(row=1, column=1)
+        Button(self.logged_usr_page, text="Receipts", font=('Arial', 40), bg='light gray')\
+            .grid(row=2, column=1)
+        Button(self.logged_usr_page, text="Rate us!", font=('Arial', 40), bg='light gray')\
+            .grid(row=3, column=1)
+        Button(self.logged_usr_page, text="Mobile app", font=('Arial', 40), bg='light gray')\
+            .grid(row=4, column=0, columnspan=2)
+        Button(self.logged_usr_page, text="Logout", font=('Arial', 40), bg='light gray')\
+            .grid(row=4, column=2)
+        Button(self.logged_usr_page, text="Logout and Exit", font=('Arial', 40), bg='light gray')\
+            .grid(row=4, column=2)
+        Button(self.logged_usr_page, text="Account", font=('Arial', 40), bg='light gray')\
+            .grid(row=0, column=2, sticky=E)
+        Button(self.logged_usr_page, text="Rate us!", font=('Arial', 40), bg='light gray')\
+            .grid(row=0, column=2)
 
 
 def main():
