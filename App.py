@@ -1,7 +1,9 @@
+import requests
 from tkinter import *
 import tkinter
 from tkinter import messagebox
 from tkinter import ttk
+import re
 
 
 class StartPage:
@@ -99,16 +101,22 @@ class CreateAccount:
 
         Label(self.create_acc_page, text="password:", font=('Arial', 20)) \
             .grid(row=3, column=1, padx=450, sticky=W)
+
         self.password = Entry(self.create_acc_page, font=('Arial', 20))
         self.password.grid(row=4, column=1, padx=450, sticky=W, pady=10)
+
         Label(self.create_acc_page, text="repeat password:", font=('Arial', 20)) \
             .grid(row=5, column=1, padx=450, sticky=W)
-        self.repeat_password = Entry(self.create_acc_page, font=('Arial', 20)) \
-            .grid(row=6, column=1, padx=450, sticky=W, pady=10)
+
+        self.repeat_password = Entry(self.create_acc_page, font=('Arial', 20))
+        self.repeat_password.grid(row=6, column=1, padx=450, sticky=W, pady=10)
+
         Label(self.create_acc_page, text="e-mail:", font=('Arial', 20)) \
             .grid(row=7, column=1, padx=450, sticky=W)
-        self.email = Entry(self.create_acc_page, font=('Arial', 20)) \
-            .grid(row=8, column=1, padx=450, sticky=W, pady=10)
+
+        self.email = Entry(self.create_acc_page, font=('Arial', 20))
+        self.email.grid(row=8, column=1, padx=450, sticky=W, pady=10)
+
         Button(self.create_acc_page, text="create account", font=('Arial', 25), bg="light gray", command=self.create_acc) \
             .grid(row=9, column=1, pady=10)
         Button(self.create_acc_page, text="Back", font=('Arial', 20), bg="light gray",
@@ -120,9 +128,10 @@ class CreateAccount:
                                                                             "-at least 8 characters\n"
                                                                             "-at least one big letter\n"
                                                                             "-at least one small letter\n"
-                                                                            "-at least one number",
+                                                                            "-at least one number\n"
+                                                                            "-at least one special character except _",
               relief="solid") \
-            .grid(row=3, column=1, rowspan=7, sticky=NW, padx=150, pady=45, ipadx=20, ipady=20)
+            .grid(row=3, column=1, rowspan=7, sticky=NW, padx=120, pady=45, ipadx=20, ipady=20)
         Label(self.create_acc_page, font=('Arial', 12), borderwidth=2, relief="solid", text="password strength:\n"
                                                                                             "-----------------\n"
                                                                                             "strong") \
@@ -131,21 +140,67 @@ class CreateAccount:
             .grid(row=8, column=1, columnspan=2, sticky=E, padx=150)
 
     def create_acc(self):
-        # maybe make all errors with entry apper to user to make him saw what he did wrong but can be also step by step
         if len(self.login.get()) < 6:
             messagebox.showerror(title='Error', message="Your login is too short.")
-        elif len(self.password.get()) < 8:
-            messagebox.showerror(title='Error', message="Your password is too short.")
+
         else:
-            pass
+            if self.check_password_requirements():
+                print("yes")
+
+                if self.check_if_passwords_are_the_same():
+                    print("same")
+                    self.email_validate()
+                else:
+                    messagebox.showerror(title='Error', message="Passwords are not the same")
+
+            else:
+                pass
         # check if login is correct- done
         # check if there is the same login in database(later)
-        # check if password meets requirements
-        # check if passwords are the same
+        # check if password meets requirements - done
+        # check if passwords are the same -d done
         # check if e-mail is correct
         # check if user chcecked the check button to recive e-mails
         # send user an e-mail with information "you are succesfully registered"
         ...
+
+    def email_validate(self):
+        #to fix
+        email_address = str(self.email.get())
+        response = requests.get(
+            "https://verifalia.com/validate-email",
+            params={'email': email_address})
+
+        status = response.json()['status']
+        if status == "valid":
+            print("email is valid")
+        elif status == "invalid":
+            print("email is invalid")
+        else:
+            print("email was unknown")
+
+    def check_password_requirements(self):
+        if len(self.password.get()) < 8:
+            messagebox.showerror(title='Error', message="Your password is too short.")
+            return False
+        if not re.search("[a-z]", self.password.get()):
+            messagebox.showerror(title='Error', message="Your password is missing small letter.")
+            return False
+        if not re.search("[A-Z]", self.password.get()):
+            messagebox.showerror(title='Error', message="Your password is missing large letter.")
+            return False
+        if not re.search("[0-9]", self.password.get()):
+            messagebox.showerror(title='Error', message="Your password is missing digit.")
+            return False
+        if not re.search(r"\W", self.password.get()):
+            messagebox.showerror(title='Error', message="Your password is missing special character.")
+            return False
+        return True
+
+    def check_if_passwords_are_the_same(self):
+        if not self.password.get() == self.repeat_password.get():
+            return False
+        return True
 
     def exit_from_create_acc(self):
         result = tkinter.messagebox.askquestion(title='Warning', message="Do you want back to login page?")
