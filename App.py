@@ -4,6 +4,10 @@ import tkinter
 from tkinter import messagebox
 from tkinter import ttk
 import re
+from email_validator import validate_email, EmailNotValidError
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 
 class StartPage:
@@ -136,8 +140,12 @@ class CreateAccount:
                                                                                             "-----------------\n"
                                                                                             "strong") \
             .grid(row=4, column=1, rowspan=3, columnspan=2, sticky=SE, padx=300, pady=25, ipadx=20, ipady=20)
-        Checkbutton(self.create_acc_page, text="I want to get e-mail notifications about news", font=('Arial', 12)) \
+        self.notification_email_state = BooleanVar()
+        Checkbutton(self.create_acc_page, text="I want to get e-mail notifications about news", font=('Arial', 12),
+                    variable=self.notification_email_state, onvalue=True, offvalue=False) \
             .grid(row=8, column=1, columnspan=2, sticky=E, padx=150)
+
+
 
     def create_acc(self):
         if len(self.login.get()) < 6:
@@ -149,35 +157,62 @@ class CreateAccount:
 
                 if self.check_if_passwords_are_the_same():
                     print("same")
-                    self.email_validate()
+                    self.email_validate(self.email.get())
                 else:
                     messagebox.showerror(title='Error', message="Passwords are not the same")
 
             else:
                 pass
-        # check if login is correct- done
         # check if there is the same login in database(later)
-        # check if password meets requirements - done
-        # check if passwords are the same -d done
-        # check if e-mail is correct
-        # check if user chcecked the check button to recive e-mails
         # send user an e-mail with information "you are succesfully registered"
+        if self.notification_email_state.get():
+            self.send_confirm_email()
+            #add user to database of users with wants e-mails
+            print('email')
+        else:
+            self.send_confirm_email()
+            ...
         ...
 
-    def email_validate(self):
-        #to fix
-        email_address = str(self.email.get())
-        response = requests.get(
-            "https://verifalia.com/validate-email",
-            params={'email': email_address})
 
-        status = response.json()['status']
-        if status == "valid":
-            print("email is valid")
-        elif status == "invalid":
-            print("email is invalid")
-        else:
-            print("email was unknown")
+    def send_email(self, sender_email, sender_password, receiver_email, subject, message):
+        #dont work yet
+        smtp_server = 'smtp.poczta.onet.pl'
+        smtp_port = 465
+
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = receiver_email
+        msg['Subject'] = subject
+
+        msg.attach(MIMEText(message, 'plain'))
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        try:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, receiver_email, msg.as_string())
+            print("Email sent successfully!")
+        except Exception as e:
+            print(f"Failed to send email. Error: {str(e)}")
+        finally:
+            server.quit()
+
+    def send_confirm_email(self):
+        sender_email = 'budgetapp@onet.pl'
+        sender_password = '' #for safety reasons leaving empty
+        receiver_email = '{}'.format(self.email.get())
+        subject = 'Test Email'
+        message = 'This is a test email sent from Python.'
+
+        self.send_email(sender_email, sender_password, receiver_email, subject, message)
+
+    def email_validate(self, email):
+        try:
+            v = validate_email(email)
+            email = v.normalized
+            print("true")
+        except EmailNotValidError as e:
+            print(str(e))
 
     def check_password_requirements(self):
         if len(self.password.get()) < 8:
