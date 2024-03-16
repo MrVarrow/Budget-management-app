@@ -1,8 +1,6 @@
-import requests
 from tkinter import *
 import tkinter
 from tkinter import messagebox
-from tkinter import ttk
 import re
 from email_validator import validate_email, EmailNotValidError
 import smtplib
@@ -121,7 +119,8 @@ class CreateAccount:
         self.email = Entry(self.create_acc_page, font=('Arial', 20))
         self.email.grid(row=8, column=1, padx=450, sticky=W, pady=10)
 
-        Button(self.create_acc_page, text="create account", font=('Arial', 25), bg="light gray", command=self.create_acc) \
+        Button(self.create_acc_page, text="create account", font=('Arial', 25), bg="light gray",
+               command=self.create_acc) \
             .grid(row=9, column=1, pady=10)
         Button(self.create_acc_page, text="Back", font=('Arial', 20), bg="light gray",
                command=self.exit_from_create_acc) \
@@ -145,40 +144,39 @@ class CreateAccount:
                     variable=self.notification_email_state, onvalue=True, offvalue=False) \
             .grid(row=8, column=1, columnspan=2, sticky=E, padx=150)
 
-
-
     def create_acc(self):
-        if len(self.login.get()) < 6:
-            messagebox.showerror(title='Error', message="Your login is too short.")
+        # sending email is working but added temp as comments to avoid spam while testing app
+        if len(self.login.get()) >= 6:
 
-        else:
             if self.check_password_requirements():
-                print("yes")
 
                 if self.check_if_passwords_are_the_same():
-                    print("same")
-                    self.email_validate(self.email.get())
+
+                    if self.email_validate(self.email.get()):
+
+                        if self.notification_email_state.get():
+                            # self.send_confirm_email()
+                            # add user to database of users with wants e-mails
+                            self.back_to_login()
+                        else:
+                            # self.send_confirm_email()
+                            self.back_to_login()
+                    else:
+                        pass
                 else:
-                    messagebox.showerror(title='Error', message="Passwords are not the same")
+                    pass
 
             else:
                 pass
-        # check if there is the same login in database(later)
-        # send user an e-mail with information "you are succesfully registered"
-        if self.notification_email_state.get():
-            self.send_confirm_email()
-            #add user to database of users with wants e-mails
-            print('email')
-        else:
-            self.send_confirm_email()
-            ...
-        ...
+            # check if there is the same login in database(later)
 
+            ...
+        else:
+            messagebox.showerror(title='Error', message="Your login is too short.")
 
     def send_email(self, sender_email, sender_password, receiver_email, subject, message):
-        #dont work yet
-        smtp_server = 'smtp.poczta.onet.pl'
-        smtp_port = 465
+        smtp_server = 'smtp.gmail.com'
+        smtp_port = 587
 
         msg = MIMEMultipart()
         msg['From'] = sender_email
@@ -186,10 +184,11 @@ class CreateAccount:
         msg['Subject'] = subject
 
         msg.attach(MIMEText(message, 'plain'))
-        server = smtplib.SMTP(smtp_server, smtp_port)
+
         try:
+            server = smtplib.SMTP(smtp_server, smtp_port)
             server.starttls()
-            server.login(sender_email, sender_password)
+            server.login(sender_email, sender_password)  # You can omit this line
             server.sendmail(sender_email, receiver_email, msg.as_string())
             print("Email sent successfully!")
         except Exception as e:
@@ -198,11 +197,11 @@ class CreateAccount:
             server.quit()
 
     def send_confirm_email(self):
-        sender_email = 'budgetapp@onet.pl'
-        sender_password = '' #for safety reasons leaving empty
+        sender_email = 'budgetappofficial@gmail.com'
+        sender_password = ''  # for safety reasons leaving empty
         receiver_email = '{}'.format(self.email.get())
-        subject = 'Test Email'
-        message = 'This is a test email sent from Python.'
+        subject = 'Thanks for Registration!'
+        message = 'Your Registration to BudgetApp went successfully, now you can login to your account.'
 
         self.send_email(sender_email, sender_password, receiver_email, subject, message)
 
@@ -210,9 +209,10 @@ class CreateAccount:
         try:
             v = validate_email(email)
             email = v.normalized
-            print("true")
+            return True
         except EmailNotValidError as e:
-            print(str(e))
+            messagebox.showerror(title='Error', message=str(e))
+            return False
 
     def check_password_requirements(self):
         if len(self.password.get()) < 8:
@@ -234,8 +234,15 @@ class CreateAccount:
 
     def check_if_passwords_are_the_same(self):
         if not self.password.get() == self.repeat_password.get():
+            messagebox.showerror(title='Error', message="Passwords are not the same")
             return False
         return True
+
+    def back_to_login(self):
+        self.create_acc_page.destroy()
+        login_page = StartPage()
+        login_page.main_menu(self.root)
+        tkinter.messagebox.showinfo(title="Information", message="Your account has been created, now you can login")
 
     def exit_from_create_acc(self):
         result = tkinter.messagebox.askquestion(title='Warning', message="Do you want back to login page?")
@@ -248,6 +255,7 @@ class CreateAccount:
 
 
 class LoginUser:
+    #make classes for each button for readability of code
     def __init__(self, root):
         self.root = root
 
@@ -272,9 +280,11 @@ class LoginUser:
             .grid(row=1, column=1, pady=20)
         Button(self.logged_usr_page, text="Receipts", font=('Arial', 20), bg='light gray', width=15) \
             .grid(row=2, column=1, pady=20)
-        Button(self.logged_usr_page, text="Rate us!", font=('Arial', 20), bg='light gray', width=15) \
+        Button(self.logged_usr_page, text="Rate us!", font=('Arial', 20), bg='light gray', width=15,
+               command=self.rate_us) \
             .grid(row=3, column=1, pady=20)
-        Button(self.logged_usr_page, text="Mobile app", font=('Arial', 20), bg='light gray', width=15) \
+        Button(self.logged_usr_page, text="Mobile app", font=('Arial', 20), bg='light gray', width=15,
+               command=self.mobile_app) \
             .grid(row=4, column=0, columnspan=2, pady=65)
         Button(self.logged_usr_page, text="Logout", font=('Arial', 20), bg='light gray', command=self.logout) \
             .grid(row=4, column=2, sticky=NE, padx=20, pady=50, ipadx=10)
@@ -327,10 +337,81 @@ class LoginUser:
         ...
 
     def rate_us(self):
-        ...
+        self.empty_star = PhotoImage(file="empty_star.png")
+        self.empty_star = self.empty_star.subsample(20, 20)
+        self.full_star = PhotoImage(file="full_star.png")
+        self.full_star = self.full_star.subsample(20, 20)
+        self.rate_us_root = Toplevel(self.root)
+        self.rate_us_root.geometry("400x200")
+        self.rate_us_root.title("Rate us!")
+        self.star_list = ["1", "2", "3", "4", "5"]
+        Label(self.rate_us_root, text="Rate our app!", font=('Arial', 15)).grid(row=0, column=0, padx=135, pady=15, sticky=W)
+
+        i = 100
+        for star in self.star_list:
+            Button(self.rate_us_root, image=self.empty_star, bg="light gray", command=lambda user_rating=star: self.fill_stars(user_rating))\
+                .grid(row=1, column=0, padx=i, sticky=W)
+            i += 40
+
+        self.user_rate_widget = Label(self.rate_us_root, text="Your rating:\n", font=('Arial', 12))
+        self.user_rate_widget.grid(row=2, column=0, sticky=W, padx=150, pady=10)
+
+        Button(self.rate_us_root, text="Submit", font=('Arial', 15), width=7, bg="light gray", command=self.submit_rating).grid(row=3, column=0, sticky=W, padx=150)
+
+        self.rate_us_root.grab_set()
+
+    def submit_rating(self):
+        #sent final rating to me, maybe to database to create some statistic
+        print(self.final_rating)
+        self.rate_us_root.destroy()
+
+    def fill_stars(self, user_rating):
+    #maybe optimize with stars widget in frame so you can delete frame and create new one with no stacking button on top of each other
+    #in future add check if user rate us, limit one per acc with ability to change your rating
+        filled_star_list = []
+        unfilled_star_list = []
+        for i in range(0, int(user_rating)):
+            x = self.star_list[i]
+            filled_star_list.append(x)
+
+        for item in range(int(user_rating), len(self.star_list)):
+            x = self.star_list[item]
+            unfilled_star_list.append(x)
+
+        i = 100
+        for star in filled_star_list:
+            Button(self.rate_us_root, image=self.full_star, bg="light gray", command=lambda user_rating=star: self.fill_stars(user_rating))\
+                .grid(row=1, column=0, padx=i, sticky=W)
+            i += 40
+        for star in unfilled_star_list:
+            Button(self.rate_us_root, image=self.empty_star, bg="light gray",
+                   command=lambda user_rating=star: self.fill_stars(user_rating)) \
+                .grid(row=1, column=0, padx=i, sticky=W)
+            i += 40
+        self.user_rate_widget.configure(text="Your rating:\n {} star".format(user_rating))
+        self.final_rating = user_rating
 
     def mobile_app(self):
-        ...
+        self.copy_icon = PhotoImage(file="copy.png")
+        self.copy_icon = self.copy_icon.subsample(20, 20)
+        self.mobile_app_root = Toplevel(self.root)
+        self.mobile_app_root.geometry("400x200")
+        self.mobile_app_root.title("Download our mobile app")
+
+        Label(self.mobile_app_root, text="There is a link to our mobile app:\n"
+                                         "Link", font=('Arial', 15))\
+            .grid(row=0, column=0, pady=10)
+        Label(self.mobile_app_root, text="To download you have to click this link on your mobile device,\n"
+                                         "so type it in google\n"
+                                         "or copy and sent it to yourself then use on phone", borderwidth=2, relief="solid")\
+            .grid(row=1, column=0, pady=15, padx=30)
+        copy_icon_widget = Button(self.mobile_app_root, text="copy", image=self.copy_icon, bg="light gray")
+        copy_icon_widget.image = self.copy_icon
+        copy_icon_widget.grid(row=0, column=0, rowspan=2, sticky=NE, padx=10, pady=40)
+        Button(self.mobile_app_root, text="Close", font=('Arial', 15), command=self.mobile_app_root.destroy, bg="light gray")\
+            .grid(row=2, column=0)
+
+        self.mobile_app_root.grab_set()
 
 
 def main():
