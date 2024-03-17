@@ -300,10 +300,34 @@ class LoginUser:
         settings_icon_widget.grid(row=0, column=2, sticky=NW, padx=30, pady=10)
 
     def settings(self):
-        ...
+        self.logged_usr_page.destroy()
+        self.settings_page = Frame(self.root)
+        self.settings_page.grid(row=0, column=0, sticky=NSEW)
+
+        Label(self.settings_page, text="Settings").grid()
+        Checkbutton(self.settings_page, text="Dark mode").grid()
+        Button(self.settings_page, text="Support and Help").grid()
+        Button(self.settings_page, text="App version").grid()
+        Button(self.settings_page, text="Credits").grid()
+        Button(self.settings_page, text="About app").grid()
+        Button(self.settings_page, text="Close").grid()
+
+
 
     def your_acc(self):
-        ...
+        self.logged_usr_page.destroy()
+        self.acc_page = Frame(self.root)
+        self.acc_page.grid(row=0, column=0, sticky=NSEW)
+
+        Label(self.acc_page, text="Your account")
+        Button(self.acc_page, text="Change password").grid()
+        Button(self.acc_page, text="Verify e-mail").grid()
+        Button(self.acc_page, text="Change e-mail").grid()
+        Button(self.acc_page, text="Change e-mail notification settings").grid()
+        Button(self.acc_page, text="delete account").grid()
+        Button(self.acc_page, text="clear all data").grid()
+        Button(self.acc_page, text="Close").grid()
+
 
     def logout(self):
         result = tkinter.messagebox.askquestion(title='Warning', message="Do you want to logout from Budget manager?")
