@@ -146,33 +146,26 @@ class CreateAccount:
 
     def create_acc(self):
         # sending email is working but added temp as comments to avoid spam while testing app
-        if len(self.login.get()) >= 6:
+        if self.check_login_requirements() and \
+                self.check_password_requirements() and \
+                self.check_if_passwords_are_the_same() and \
+                self.email_validate(self.email.get()):
 
-            if self.check_password_requirements():
+            # self.send_confirm_email()
 
-                if self.check_if_passwords_are_the_same():
+            # Add user to database of users with wants e-mails if selected
+            if self.notification_email_state.get():
+                pass  # Add user to database(later)
 
-                    if self.email_validate(self.email.get()):
+            # Go back to login
+            self.back_to_login()
 
-                        if self.notification_email_state.get():
-                            # self.send_confirm_email()
-                            # add user to database of users with wants e-mails
-                            self.back_to_login()
-                        else:
-                            # self.send_confirm_email()
-                            self.back_to_login()
-                    else:
-                        pass
-                else:
-                    pass
-
-            else:
-                pass
-            # check if there is the same login in database(later)
-
-            ...
-        else:
+    def check_login_requirements(self):
+        if not len(self.login.get()) >= 6:
             messagebox.showerror(title='Error', message="Your login is too short.")
+            return False
+        # check if there is the same login in database(later)
+        return True
 
     def send_email(self, sender_email, sender_password, receiver_email, subject, message):
         smtp_server = 'smtp.gmail.com'
@@ -255,30 +248,33 @@ class CreateAccount:
 
 
 class LoginUser:
-    #make classes for each button for readability of code
     def __init__(self, root):
         self.root = root
-
-    def logged_user_page(self):
         self.acc_icon = PhotoImage(file="user.png")
         self.acc_icon = self.acc_icon.subsample(20, 20)
         self.settings_icon = PhotoImage(file="gear.png")
         self.settings_icon = self.settings_icon.subsample(20, 20)
 
+    def logged_user_page(self):
         self.logged_usr_page = Frame(self.root)
         self.logged_usr_page.grid(row=0, column=0, sticky=NSEW)
 
         Label(self.logged_usr_page, text="Main page", font=('Arial', 40), bg='light gray') \
             .grid(row=0, column=0, columnspan=2, sticky=EW, padx=225, pady=40, ipadx=210, ipady=50)
-        Button(self.logged_usr_page, text="Manage budget", font=('Arial', 20), bg='light gray', width=15) \
+        Button(self.logged_usr_page, text="Manage budget", font=('Arial', 20), bg='light gray', width=15,
+               command=self.manage_budget) \
             .grid(row=1, column=0, pady=20)
-        Button(self.logged_usr_page, text="Statistics", font=('Arial', 20), bg='light gray', width=15) \
+        Button(self.logged_usr_page, text="Statistics", font=('Arial', 20), bg='light gray', width=15,
+               command=self.stats) \
             .grid(row=2, column=0, pady=20)
-        Button(self.logged_usr_page, text="Shopping list", font=('Arial', 20), bg='light gray', width=15) \
+        Button(self.logged_usr_page, text="Shopping list", font=('Arial', 20), bg='light gray', width=15,
+               command=self.shopping_list) \
             .grid(row=3, column=0, pady=20)
-        Button(self.logged_usr_page, text="Savings", font=('Arial', 20), bg='light gray', width=15) \
+        Button(self.logged_usr_page, text="Savings", font=('Arial', 20), bg='light gray', width=15,
+               command=self.savings) \
             .grid(row=1, column=1, pady=20)
-        Button(self.logged_usr_page, text="Receipts", font=('Arial', 20), bg='light gray', width=15) \
+        Button(self.logged_usr_page, text="Receipts", font=('Arial', 20), bg='light gray', width=15,
+               command=self.receipts) \
             .grid(row=2, column=1, pady=20)
         Button(self.logged_usr_page, text="Rate us!", font=('Arial', 20), bg='light gray', width=15,
                command=self.rate_us) \
@@ -291,43 +287,56 @@ class LoginUser:
         Button(self.logged_usr_page, text="Exit", font=('Arial', 20), bg='light gray', command=self.exit) \
             .grid(row=4, column=2, sticky=SE, padx=20, pady=10, ipadx=30)
 
-        acc_icon_widget = Button(self.logged_usr_page, text="A", bg='light gray', image=self.acc_icon)
+        acc_icon_widget = Button(self.logged_usr_page, text="A", bg='light gray', image=self.acc_icon, command=self.settings_command)
         acc_icon_widget.image = self.acc_icon
         acc_icon_widget.grid(row=0, column=2, sticky=NE, padx=20, pady=10)
 
-        settings_icon_widget = Button(self.logged_usr_page, text="S", bg='light gray', image=self.settings_icon)
+        settings_icon_widget = Button(self.logged_usr_page, text="S", bg='light gray', image=self.settings_icon, command=self.your_acc)
         settings_icon_widget.image = self.settings_icon
         settings_icon_widget.grid(row=0, column=2, sticky=NW, padx=30, pady=10)
 
-    def settings(self):
+    def settings_command(self):
         self.logged_usr_page.destroy()
-        self.settings_page = Frame(self.root)
-        self.settings_page.grid(row=0, column=0, sticky=NSEW)
-
-        Label(self.settings_page, text="Settings").grid()
-        Checkbutton(self.settings_page, text="Dark mode").grid()
-        Button(self.settings_page, text="Support and Help").grid()
-        Button(self.settings_page, text="App version").grid()
-        Button(self.settings_page, text="Credits").grid()
-        Button(self.settings_page, text="About app").grid()
-        Button(self.settings_page, text="Close").grid()
-
-
+        settings = Settings(self.root)
+        settings.settings_layout()
 
     def your_acc(self):
         self.logged_usr_page.destroy()
-        self.acc_page = Frame(self.root)
-        self.acc_page.grid(row=0, column=0, sticky=NSEW)
+        your_acc = Account(self.root)
+        your_acc.account_layout()
 
-        Label(self.acc_page, text="Your account")
-        Button(self.acc_page, text="Change password").grid()
-        Button(self.acc_page, text="Verify e-mail").grid()
-        Button(self.acc_page, text="Change e-mail").grid()
-        Button(self.acc_page, text="Change e-mail notification settings").grid()
-        Button(self.acc_page, text="delete account").grid()
-        Button(self.acc_page, text="clear all data").grid()
-        Button(self.acc_page, text="Close").grid()
+    def manage_budget(self):
+        self.logged_usr_page.destroy()
+        manage_budget = ManageBudget(self.root)
+        manage_budget.manage_budget_layout()
 
+    def stats(self):
+        self.logged_usr_page.destroy()
+        statistics = Statistics(self.root)
+        statistics.statistics_layout()
+
+    def shopping_list(self):
+        self.logged_usr_page.destroy()
+        shopping_list = ShoppingList(self.root)
+        shopping_list.shopping_list_layout()
+
+    def savings(self):
+        self.logged_usr_page.destroy()
+        savings = Savings(self.root)
+        savings.savings_layout()
+
+    def receipts(self):
+        self.logged_usr_page.destroy()
+        receipts = Receipts(self.root)
+        receipts.receipts_layout()
+
+    def rate_us(self):
+        rate_us = RateUs(self.root)
+        rate_us.rate_us_layout()
+
+    def mobile_app(self):
+        mobile_app = MobileApp(self.root)
+        mobile_app.mobile_app_layout()
 
     def logout(self):
         result = tkinter.messagebox.askquestion(title='Warning', message="Do you want to logout from Budget manager?")
@@ -345,42 +354,112 @@ class LoginUser:
         elif result == "no":
             pass
 
-    def manage_budget(self):
+    def exit_to_logged_user_page(self, frame):
+        frame.destroy()
+        self.logged_user_page()
+
+
+class Receipts:
+    def __init__(self, root):
+        self.root = root
+
+    def receipts_layout(self):
         ...
 
-    def stats(self):
+
+class Savings:
+    def __init__(self, root):
+        self.root = root
+
+    def savings_layout(self):
         ...
 
-    def shopping_list(self):
+
+class ShoppingList:
+    def __init__(self, root):
+        self.root = root
+
+    def shopping_list_layout(self):
         ...
 
-    def savings(self):
+
+class Statistics:
+    def __init__(self, root):
+        self.root = root
+
+    def statistics_layout(self):
         ...
 
-    def receipts(self):
+
+class ManageBudget:
+    def __init__(self, root):
+        self.root = root
+
+    def manage_budget_layout(self):
         ...
 
-    def rate_us(self):
+
+class MobileApp:
+    def __init__(self, root):
+        self.root = root
+        self.copy_icon = PhotoImage(file="copy.png")
+        self.copy_icon = self.copy_icon.subsample(20, 20)
+
+    def mobile_app_layout(self):
+        self.mobile_app_root = Toplevel(self.root)
+        self.mobile_app_root.geometry("400x200")
+        self.mobile_app_root.title("Download our mobile app")
+
+        Label(self.mobile_app_root, text="There is a link to our mobile app:\n"
+                                         "Link", font=('Arial', 15)) \
+            .grid(row=0, column=0, pady=10)
+        Label(self.mobile_app_root, text="To download you have to click this link on your mobile device,\n"
+                                         "so type it in google\n"
+                                         "or copy and sent it to yourself then use on phone", borderwidth=2,
+              relief="solid") \
+            .grid(row=1, column=0, pady=15, padx=30)
+        copy_icon_widget = Button(self.mobile_app_root, text="copy", image=self.copy_icon, bg="light gray")
+        copy_icon_widget.image = self.copy_icon
+        copy_icon_widget.grid(row=0, column=0, rowspan=2, sticky=NE, padx=10, pady=40)
+        Button(self.mobile_app_root, text="Close", font=('Arial', 15), command=self.mobile_app_root.destroy,
+               bg="light gray") \
+            .grid(row=2, column=0)
+
+        self.mobile_app_root.grab_set()
+
+    def copy_app_link(self):
+        ...
+
+
+class RateUs:
+    def __init__(self, root):
+        self.root = root
         self.empty_star = PhotoImage(file="empty_star.png")
         self.empty_star = self.empty_star.subsample(20, 20)
         self.full_star = PhotoImage(file="full_star.png")
         self.full_star = self.full_star.subsample(20, 20)
+        self.star_list = ["1", "2", "3", "4", "5"]
+        self.final_rating = ""
+
+    def rate_us_layout(self):
         self.rate_us_root = Toplevel(self.root)
         self.rate_us_root.geometry("400x200")
         self.rate_us_root.title("Rate us!")
-        self.star_list = ["1", "2", "3", "4", "5"]
-        Label(self.rate_us_root, text="Rate our app!", font=('Arial', 15)).grid(row=0, column=0, padx=135, pady=15, sticky=W)
+        Label(self.rate_us_root, text="Rate our app!", font=('Arial', 15)).grid(row=0, column=0, padx=135, pady=15,
+                                                                                sticky=W)
 
         i = 100
         for star in self.star_list:
-            Button(self.rate_us_root, image=self.empty_star, bg="light gray", command=lambda user_rating=star: self.fill_stars(user_rating))\
+            Button(self.rate_us_root, image=self.empty_star, bg="light gray",
+                   command=lambda user_rating=star: self.fill_stars(user_rating)) \
                 .grid(row=1, column=0, padx=i, sticky=W)
             i += 40
 
         self.user_rate_widget = Label(self.rate_us_root, text="Your rating:\n", font=('Arial', 12))
         self.user_rate_widget.grid(row=2, column=0, sticky=W, padx=150, pady=10)
 
-        Button(self.rate_us_root, text="Submit", font=('Arial', 15), width=7, bg="light gray", command=self.submit_rating).grid(row=3, column=0, sticky=W, padx=150)
+        Button(self.rate_us_root, text="Submit", font=('Arial', 15), width=7, bg="light gray",
+               command=self.submit_rating).grid(row=3, column=0, sticky=W, padx=150)
 
         self.rate_us_root.grab_set()
 
@@ -415,27 +494,78 @@ class LoginUser:
         self.user_rate_widget.configure(text="Your rating:\n {} star".format(user_rating))
         self.final_rating = user_rating
 
-    def mobile_app(self):
-        self.copy_icon = PhotoImage(file="copy.png")
-        self.copy_icon = self.copy_icon.subsample(20, 20)
-        self.mobile_app_root = Toplevel(self.root)
-        self.mobile_app_root.geometry("400x200")
-        self.mobile_app_root.title("Download our mobile app")
 
-        Label(self.mobile_app_root, text="There is a link to our mobile app:\n"
-                                         "Link", font=('Arial', 15))\
-            .grid(row=0, column=0, pady=10)
-        Label(self.mobile_app_root, text="To download you have to click this link on your mobile device,\n"
-                                         "so type it in google\n"
-                                         "or copy and sent it to yourself then use on phone", borderwidth=2, relief="solid")\
-            .grid(row=1, column=0, pady=15, padx=30)
-        copy_icon_widget = Button(self.mobile_app_root, text="copy", image=self.copy_icon, bg="light gray")
-        copy_icon_widget.image = self.copy_icon
-        copy_icon_widget.grid(row=0, column=0, rowspan=2, sticky=NE, padx=10, pady=40)
-        Button(self.mobile_app_root, text="Close", font=('Arial', 15), command=self.mobile_app_root.destroy, bg="light gray")\
-            .grid(row=2, column=0)
+class Account:
+    def __init__(self, root):
+        self.root = root
+        self.exit_method = LoginUser(self.root)
 
-        self.mobile_app_root.grab_set()
+    def account_layout(self):
+        self.acc_page = Frame(self.root)
+        self.acc_page.grid(row=0, column=0, sticky=NSEW)
+
+        Label(self.acc_page, text="Your account")
+        Button(self.acc_page, text="Change password").grid()
+        Button(self.acc_page, text="Verify e-mail").grid()
+        Button(self.acc_page, text="Change e-mail").grid()
+        Button(self.acc_page, text="Change e-mail notification settings").grid()
+        Button(self.acc_page, text="delete account")\
+            .grid()
+        Button(self.acc_page, text="clear all data")\
+            .grid()
+        Button(self.acc_page, text="Close", command=lambda frame=self.acc_page: self.exit_method.exit_to_logged_user_page(frame)).grid()
+
+    def change_password(self):
+        ...
+
+    def verify_email(self):
+        ...
+
+    def change_email(self):
+        ...
+
+    def change_email_notifications(self):
+        ...
+
+    def delete_data(self):
+        ...
+
+    def clear_all_data(self):
+        ...
+
+
+class Settings:
+    def __init__(self, root):
+        self.root = root
+        self.exit_method = LoginUser(self.root)
+
+    def settings_layout(self):
+        self.settings_page = Frame(self.root)
+        self.settings_page.grid(row=0, column=0, sticky=NSEW)
+
+        Label(self.settings_page, text="Settings").grid()
+        Checkbutton(self.settings_page, text="Dark mode").grid()
+        Button(self.settings_page, text="Support and Help").grid()
+        Button(self.settings_page, text="App version").grid()
+        Button(self.settings_page, text="Credits").grid()
+        Button(self.settings_page, text="About app").grid()
+        Button(self.settings_page, text="Close",
+               command=lambda frame=self.settings_page: self.exit_method.exit_to_logged_user_page(frame)).grid()
+
+    def support_and_help(self):
+        ...
+
+    def app_version(self):
+        ...
+
+    def credits(self):
+        ...
+
+    def about_app(self):
+        ...
+
+    def dark_mode(self):
+        ...
 
 
 def main():
