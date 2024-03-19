@@ -2,28 +2,25 @@ from tkinter import *
 import tkinter
 from tkinter import messagebox
 import re
+import SendEmails
 from email_validator import validate_email, EmailNotValidError
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
 
 class StartPage:
-    def __init__(self):
-        ...
+    def __init__(self, root):
+        self.show_password_icon = PhotoImage(file="hide.png")
+        self.show_password_icon = self.show_password_icon.subsample(20, 20)
+        self.root = root
 
-    def create_root(self):
-        self.root = Tk()
+    def root_configure(self):
+
         self.root.configure(bg="light gray")
         self.root.geometry("1280x720")
         self.root.resizable(False, False)
         self.root.title("Budget")
-        self.main_menu(self.root)
+        self.main_menu()
 
-    def main_menu(self, root):
-        self.root = root
-        self.show_password_icon = PhotoImage(file="hide.png")
-        self.show_password_icon = self.show_password_icon.subsample(20, 20)
+    def main_menu(self):
 
         self.main_menu_frame = Frame(self.root)
         self.main_menu_frame.grid(row=0, column=0, sticky=NSEW)
@@ -73,13 +70,13 @@ class StartPage:
         new_page.create_account_page()
 
     def show_password(self):
-        show_password_icon_widget = Button(self.main_menu_frame, text="S", bg='light gray',
+        show_password_icon_widget = Button(self.main_menu_frame, bg='light gray',
                                            image=self.show_password_icon, command=self.hide_password)
         show_password_icon_widget.grid(row=4, column=0, padx=470, sticky=E)
         self.password_entry.config(show="")
 
     def hide_password(self):
-        show_password_icon_widget = Button(self.main_menu_frame, text="S", bg='light gray',
+        show_password_icon_widget = Button(self.main_menu_frame, bg='light gray',
                                            image=self.show_password_icon, command=self.show_password)
         show_password_icon_widget.grid(row=4, column=0, padx=470, sticky=E)
         self.password_entry.config(show="*")
@@ -151,7 +148,8 @@ class CreateAccount:
                 self.check_if_passwords_are_the_same() and \
                 self.email_validate(self.email.get()):
 
-            # self.send_confirm_email()
+            #SendEmails.send_confirm_email(self)
+
 
             # Add user to database of users with wants e-mails if selected
             if self.notification_email_state.get():
@@ -166,37 +164,6 @@ class CreateAccount:
             return False
         # check if there is the same login in database(later)
         return True
-
-    def send_email(self, sender_email, sender_password, receiver_email, subject, message):
-        smtp_server = 'smtp.gmail.com'
-        smtp_port = 587
-
-        msg = MIMEMultipart()
-        msg['From'] = sender_email
-        msg['To'] = receiver_email
-        msg['Subject'] = subject
-
-        msg.attach(MIMEText(message, 'plain'))
-
-        try:
-            server = smtplib.SMTP(smtp_server, smtp_port)
-            server.starttls()
-            server.login(sender_email, sender_password)  # You can omit this line
-            server.sendmail(sender_email, receiver_email, msg.as_string())
-            print("Email sent successfully!")
-        except Exception as e:
-            print(f"Failed to send email. Error: {str(e)}")
-        finally:
-            server.quit()
-
-    def send_confirm_email(self):
-        sender_email = 'budgetappofficial@gmail.com'
-        sender_password = ''  # for safety reasons leaving empty
-        receiver_email = '{}'.format(self.email.get())
-        subject = 'Thanks for Registration!'
-        message = 'Your Registration to BudgetApp went successfully, now you can login to your account.'
-
-        self.send_email(sender_email, sender_password, receiver_email, subject, message)
 
     def email_validate(self, email):
         try:
@@ -233,16 +200,16 @@ class CreateAccount:
 
     def back_to_login(self):
         self.create_acc_page.destroy()
-        login_page = StartPage()
-        login_page.main_menu(self.root)
+        login_page = StartPage(self.root)
+        login_page.main_menu()
         tkinter.messagebox.showinfo(title="Information", message="Your account has been created, now you can login")
 
     def exit_from_create_acc(self):
         result = tkinter.messagebox.askquestion(title='Warning', message="Do you want back to login page?")
         if result == "yes":
             self.create_acc_page.destroy()
-            login_page = StartPage()
-            login_page.main_menu(self.root)
+            login_page = StartPage(self.root)
+            login_page.main_menu()
         elif result == "no":
             pass
 
@@ -342,8 +309,8 @@ class LoginUser:
         result = tkinter.messagebox.askquestion(title='Warning', message="Do you want to logout from Budget manager?")
         if result == "yes":
             self.logged_usr_page.destroy()
-            login_page = StartPage()
-            login_page.main_menu(self.root)
+            login_page = StartPage(self.root)
+            login_page.main_menu()
         elif result == "no":
             pass
 
@@ -499,6 +466,7 @@ class Account:
     def __init__(self, root):
         self.root = root
         self.exit_method = LoginUser(self.root)
+        self.main_menu = StartPage(self.root)
 
     def account_layout(self):
         self.acc_page = Frame(self.root)
@@ -519,7 +487,33 @@ class Account:
         ...
 
     def verify_email(self):
-        ...
+        self.verify_email_root = Toplevel(self.root)
+        self.verify_email_root.geometry("400x200")
+        self.verify_email_root.title("E-mail verification")
+
+        Label(self.verify_email_root, text="To verify e-mail enter the code, that was send on your email:\n"
+                                      "user email").grid()
+        self.code_entry = Entry(self.verify_email_root)
+        self.code_entry.grid()
+        Button(self.verify_email_root, text="Resend e-mail").grid()
+        Button(self.verify_email_root, text="Submit code").grid()
+
+        self.receiver = ... #get from database(later)
+        self.code = ... #generate random code with 6 chars
+        SendEmails.send_email_verification(self, self.receiver, self.code)
+
+        self.verify_email_root.grab_set()
+
+    def resend_email(self):
+        SendEmails.send_email_verification(self, self.receiver, self.code)
+        tkinter.messagebox.showinfo(title="Information", message="E-mail has been sent")
+
+    def submit_code(self):
+        if self.code_entry == self.code:
+            tkinter.messagebox.showinfo(title="Information", message="Your account has been successfully verificated")
+            self.verify_email_root.destroy()
+        else:
+            tkinter.messagebox.showinfo(title="Information", message="Wrong code, try again")
 
     def change_email(self):
         ...
@@ -527,11 +521,22 @@ class Account:
     def change_email_notifications(self):
         ...
 
-    def delete_data(self):
-        ...
-
+    def delete_account(self):
+        result = tkinter.messagebox.askquestion(title='Warning', message="Do you want to DELETE YOUR ACCOUNT? This action is PERNAMENT.")
+        if result == "yes":
+            self.acc_page.destroy()
+            self.main_menu.main_menu()
+            ... #delete acc from database(later)
+            tkinter.messagebox.showinfo(title="Information", message="Your account has been deleted")
+        elif result == "no":
+            pass
     def clear_all_data(self):
-        ...
+        result = tkinter.messagebox.askquestion(title='Warning', message="Do you want to CLEAR ALL DATA? This action is PERNAMENT.")
+        if result == "yes":
+            ... #clear all data of user from database but not acc(later)
+            tkinter.messagebox.showinfo(title="Information", message="All of your data has been cleared")
+        elif result == "no":
+            pass
 
 
 class Settings:
@@ -569,8 +574,9 @@ class Settings:
 
 
 def main():
-    run_app = StartPage()
-    run_app.create_root()
+    root = Tk()
+    run_app = StartPage(root)
+    run_app.root_configure()
     mainloop()
 
 
