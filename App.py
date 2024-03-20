@@ -4,6 +4,7 @@ from tkinter import messagebox
 import re
 import SendEmails
 from email_validator import validate_email, EmailNotValidError
+import mysql.connector
 
 
 class StartPage:
@@ -11,9 +12,11 @@ class StartPage:
         self.show_password_icon = PhotoImage(file="hide.png")
         self.show_password_icon = self.show_password_icon.subsample(20, 20)
         self.root = root
+        self.connection = mysql.connector.connect(host="localhost", user="root", passwd="AkniLUAp01-",
+                                                  database="budgetappdatabase")
+        self.cursor = self.connection.cursor()
 
     def root_configure(self):
-
         self.root.configure(bg="light gray")
         self.root.geometry("1280x720")
         self.root.resizable(False, False)
@@ -21,36 +24,54 @@ class StartPage:
         self.main_menu()
 
     def main_menu(self):
-
+        # Frame creation
         self.main_menu_frame = Frame(self.root)
         self.main_menu_frame.grid(row=0, column=0, sticky=NSEW)
 
+        # Labels and Entries
         Label(self.main_menu_frame, text="Login to your budget manager", font=('Arial', 40), bg='light gray') \
             .grid(row=0, column=0, columnspan=2, sticky=EW, padx=80, pady=20, ipadx=220, ipady=50)
 
+        Label(self.main_menu_frame, text="You don't have an account?", font=('Arial', 15)) \
+            .grid(row=7, column=0, padx=530, sticky=W, pady=5)
+
         Label(self.main_menu_frame, text="login:", font=('Arial', 20)) \
             .grid(row=1, column=0, padx=500, sticky=W)
-        Entry(self.main_menu_frame, font=('Arial', 20)) \
-            .grid(row=2, column=0, padx=500, sticky=W, pady=10)
+        self.login_entry = Entry(self.main_menu_frame, font=('Arial', 20))
+        self.login_entry.grid(row=2, column=0, padx=500, sticky=W, pady=10)
+
         Label(self.main_menu_frame, text="password:", font=('Arial', 20)) \
             .grid(row=3, column=0, padx=500, sticky=W)
         self.password_entry = Entry(self.main_menu_frame, font=('Arial', 20), show="*")
         self.password_entry.grid(row=4, column=0, padx=500, sticky=W, pady=10)
 
+        # Show Password button
         show_password_icon_widget = Button(self.main_menu_frame, text="S", bg='light gray',
                                            image=self.show_password_icon, command=self.show_password)
         show_password_icon_widget.image = self.show_password_icon
         show_password_icon_widget.grid(row=4, column=0, padx=470, sticky=E)
 
+        # Forgot Password button
+        Button(self.main_menu_frame, text="Forgot your passoword?", fg='blue', font=('Arial', 10, 'underline'), bd=0,
+               command=self.forgot_password)\
+            .grid(row=5, column=0)
+
+        # Login button
         Button(self.main_menu_frame, text="Login", font=('Arial', 25), bg='light gray', command=self.login) \
-            .grid(row=5, column=0, padx=580, sticky=W, pady=50, ipadx=20)
-        Label(self.main_menu_frame, text="You don't have an account?", font=('Arial', 15)) \
-            .grid(row=6, column=0, padx=530, sticky=W, pady=5)
+            .grid(row=6, column=0, padx=580, sticky=W, pady=35, ipadx=20)
+
+        # Create account button
         Button(self.main_menu_frame, text="Create account", font=('Arial', 15), bg='light gray',
                command=self.create_acc) \
-            .grid(row=7, column=0)
+            .grid(row=8, column=0)
+        # Close button
         Button(self.main_menu_frame, text="Close", font=('Arial', 20), bg='light gray', command=self.exit_from_app) \
-            .grid(row=8, column=0, sticky=SE, padx=40, ipadx=20, pady=20)
+            .grid(row=9, column=0, sticky=SE, padx=40, ipadx=20, pady=20)
+
+    # Button methods
+    def forgot_password(self):
+        # via email password reminder
+        ...
 
     def exit_from_app(self):
         result = tkinter.messagebox.askquestion(title='Warning', message="Do you want to close Budget manager?")
@@ -60,13 +81,32 @@ class StartPage:
             pass
 
     def login(self):
-        self.main_menu_frame.destroy()
-        new_page = LoginUser(self.root)
-        new_page.logged_user_page()
+        username = self.login_entry.get()
+        password = self.password_entry.get()
+
+        if username == '' or password == '':
+            tkinter.messagebox.showinfo(title="Information", message="Please enter both username and password.")
+            return
+
+        self.cursor.execute("SELECT * FROM `user` WHERE username = %s", (username,))
+        row = self.cursor.fetchone()
+
+        if row is None:
+            tkinter.messagebox.showinfo(title="Information", message="User does not exist.")
+            return
+
+        stored_password = row[2]
+
+        if password == stored_password:
+            self.main_menu_frame.destroy()
+            new_page = LoginUser(self.root, row)
+            new_page.logged_user_page()
+        else:
+            tkinter.messagebox.showinfo(title="Information", message="Incorrect password.")
 
     def create_acc(self):
         self.main_menu_frame.destroy()
-        new_page = CreateAccount(self.root)
+        new_page = CreateAccount(self.root, self.connection, self.cursor)
         new_page.create_account_page()
 
     def show_password(self):
@@ -83,45 +123,21 @@ class StartPage:
 
 
 class CreateAccount:
-    def __init__(self, root):
+    def __init__(self, root, connection, cursor):
         self.root = root
+        self.connection = connection
+        self.cursor = cursor
+        self.notification_email_state = BooleanVar()
 
     def create_account_page(self):
+        # Frame creation
         self.create_acc_page = Frame(self.root)
         self.create_acc_page.grid(row=0, column=0, sticky=NSEW)
 
+        # Labels and Entries
         Label(self.create_acc_page, text="Create your account", font=('Arial', 40), bg='light gray') \
             .grid(row=0, column=0, columnspan=3, sticky=EW, padx=100, pady=10, ipadx=310, ipady=50)
-        Label(self.create_acc_page, text="login:", font=('Arial', 20)) \
-            .grid(row=1, column=1, padx=450, sticky=W)
 
-        self.login = Entry(self.create_acc_page, font=('Arial', 20))
-        self.login.grid(row=2, column=1, padx=450, sticky=W, pady=10)
-
-        Label(self.create_acc_page, text="password:", font=('Arial', 20)) \
-            .grid(row=3, column=1, padx=450, sticky=W)
-
-        self.password = Entry(self.create_acc_page, font=('Arial', 20))
-        self.password.grid(row=4, column=1, padx=450, sticky=W, pady=10)
-
-        Label(self.create_acc_page, text="repeat password:", font=('Arial', 20)) \
-            .grid(row=5, column=1, padx=450, sticky=W)
-
-        self.repeat_password = Entry(self.create_acc_page, font=('Arial', 20))
-        self.repeat_password.grid(row=6, column=1, padx=450, sticky=W, pady=10)
-
-        Label(self.create_acc_page, text="e-mail:", font=('Arial', 20)) \
-            .grid(row=7, column=1, padx=450, sticky=W)
-
-        self.email = Entry(self.create_acc_page, font=('Arial', 20))
-        self.email.grid(row=8, column=1, padx=450, sticky=W, pady=10)
-
-        Button(self.create_acc_page, text="create account", font=('Arial', 25), bg="light gray",
-               command=self.create_acc) \
-            .grid(row=9, column=1, pady=10)
-        Button(self.create_acc_page, text="Back", font=('Arial', 20), bg="light gray",
-               command=self.exit_from_create_acc) \
-            .grid(row=10, column=1, pady=10, ipadx=20, sticky=E, padx=5)
         Label(self.create_acc_page, font=('Arial', 12), borderwidth=2, text="How should login look:\n"
                                                                             "-at least 6 characters\n"
                                                                             "How should password look:\n"
@@ -136,11 +152,43 @@ class CreateAccount:
                                                                                             "-----------------\n"
                                                                                             "strong") \
             .grid(row=4, column=1, rowspan=3, columnspan=2, sticky=SE, padx=300, pady=25, ipadx=20, ipady=20)
-        self.notification_email_state = BooleanVar()
+
+        Label(self.create_acc_page, text="login:", font=('Arial', 20)) \
+            .grid(row=1, column=1, padx=450, sticky=W)
+        self.login = Entry(self.create_acc_page, font=('Arial', 20))
+        self.login.grid(row=2, column=1, padx=450, sticky=W, pady=10)
+
+        Label(self.create_acc_page, text="password:", font=('Arial', 20)) \
+            .grid(row=3, column=1, padx=450, sticky=W)
+        self.password = Entry(self.create_acc_page, font=('Arial', 20))
+        self.password.grid(row=4, column=1, padx=450, sticky=W, pady=10)
+
+        Label(self.create_acc_page, text="repeat password:", font=('Arial', 20)) \
+            .grid(row=5, column=1, padx=450, sticky=W)
+        self.repeat_password = Entry(self.create_acc_page, font=('Arial', 20))
+        self.repeat_password.grid(row=6, column=1, padx=450, sticky=W, pady=10)
+
+        Label(self.create_acc_page, text="e-mail:", font=('Arial', 20)) \
+            .grid(row=7, column=1, padx=450, sticky=W)
+        self.email = Entry(self.create_acc_page, font=('Arial', 20))
+        self.email.grid(row=8, column=1, padx=450, sticky=W, pady=10)
+
+        # Create account button
+        Button(self.create_acc_page, text="create account", font=('Arial', 25), bg="light gray",
+               command=self.create_acc) \
+            .grid(row=9, column=1, pady=10)
+
+        # Back button
+        Button(self.create_acc_page, text="Back", font=('Arial', 20), bg="light gray",
+               command=self.exit_from_create_acc) \
+            .grid(row=10, column=1, pady=10, ipadx=20, sticky=E, padx=5)
+
+        # E-mail notifications checkbutton
         Checkbutton(self.create_acc_page, text="I want to get e-mail notifications about news", font=('Arial', 12),
                     variable=self.notification_email_state, onvalue=True, offvalue=False) \
             .grid(row=8, column=1, columnspan=2, sticky=E, padx=150)
 
+    # Buttons methods
     def create_acc(self):
         # sending email is working but added temp as comments to avoid spam while testing app
         if self.check_login_requirements() and \
@@ -148,24 +196,45 @@ class CreateAccount:
                 self.check_if_passwords_are_the_same() and \
                 self.email_validate(self.email.get()):
 
-            #SendEmails.send_confirm_email(self)
+            insert_query = 'INSERT INTO `user` (username, email, password, EmailNotifications) VALUES (%s, %s, %s, %s)'
+            values_to_insert = (self.login.get(), self.email.get(), self.password.get(),
+                                '1' if self.notification_email_state.get() else '0')
 
+            try:
+                self.cursor.execute(insert_query, values_to_insert)
+                self.connection.commit()
+                # SendEmails.send_confirm_email(self)
+                self.back_to_login()
+            except Exception as e:
+                print("Error occurred:", e)
 
-            # Add user to database of users with wants e-mails if selected
-            if self.notification_email_state.get():
-                pass  # Add user to database(later)
+    def exit_from_create_acc(self):
+        result = tkinter.messagebox.askquestion(title='Warning', message="Do you want back to login page?")
+        if result == "yes":
+            self.create_acc_page.destroy()
+            login_page = StartPage(self.root)
+            login_page.main_menu()
+        elif result == "no":
+            pass
 
-            # Go back to login
-            self.back_to_login()
-
+    # Other methods
     def check_login_requirements(self):
         if not len(self.login.get()) >= 6:
             messagebox.showerror(title='Error', message="Your login is too short.")
             return False
-        # check if there is the same login in database(later)
+        self.cursor.execute(
+            "SELECT username, COUNT(*) FROM `user` WHERE username = %s",
+            (self.login.get(),))
+        row = self.cursor.fetchone()
+        row_count = row[1]
+        print(row_count)
+        if not row_count == 0:
+            messagebox.showerror(title='Error', message="This login already exists, try again")
+            return False
         return True
 
     def email_validate(self, email):
+        #maybe add check if email was registered already
         try:
             v = validate_email(email)
             email = v.normalized
@@ -204,72 +273,87 @@ class CreateAccount:
         login_page.main_menu()
         tkinter.messagebox.showinfo(title="Information", message="Your account has been created, now you can login")
 
-    def exit_from_create_acc(self):
-        result = tkinter.messagebox.askquestion(title='Warning', message="Do you want back to login page?")
-        if result == "yes":
-            self.create_acc_page.destroy()
-            login_page = StartPage(self.root)
-            login_page.main_menu()
-        elif result == "no":
-            pass
-
 
 class LoginUser:
-    def __init__(self, root):
+    def __init__(self, root, logged_user_info):
         self.root = root
+        self.logged_user_info = logged_user_info
         self.acc_icon = PhotoImage(file="user.png")
         self.acc_icon = self.acc_icon.subsample(20, 20)
         self.settings_icon = PhotoImage(file="gear.png")
         self.settings_icon = self.settings_icon.subsample(20, 20)
 
     def logged_user_page(self):
+        # Frame creation
         self.logged_usr_page = Frame(self.root)
         self.logged_usr_page.grid(row=0, column=0, sticky=NSEW)
 
+        # Labels
         Label(self.logged_usr_page, text="Main page", font=('Arial', 40), bg='light gray') \
             .grid(row=0, column=0, columnspan=2, sticky=EW, padx=225, pady=40, ipadx=210, ipady=50)
+
+        # Manage budget button
         Button(self.logged_usr_page, text="Manage budget", font=('Arial', 20), bg='light gray', width=15,
                command=self.manage_budget) \
             .grid(row=1, column=0, pady=20)
+
+        # Statistics button
         Button(self.logged_usr_page, text="Statistics", font=('Arial', 20), bg='light gray', width=15,
                command=self.stats) \
             .grid(row=2, column=0, pady=20)
+
+        # Shopping list button
         Button(self.logged_usr_page, text="Shopping list", font=('Arial', 20), bg='light gray', width=15,
                command=self.shopping_list) \
             .grid(row=3, column=0, pady=20)
+
+        # Savings button
         Button(self.logged_usr_page, text="Savings", font=('Arial', 20), bg='light gray', width=15,
                command=self.savings) \
             .grid(row=1, column=1, pady=20)
+
+        # Receipts button
         Button(self.logged_usr_page, text="Receipts", font=('Arial', 20), bg='light gray', width=15,
                command=self.receipts) \
             .grid(row=2, column=1, pady=20)
+
+        # Rate us button
         Button(self.logged_usr_page, text="Rate us!", font=('Arial', 20), bg='light gray', width=15,
                command=self.rate_us) \
             .grid(row=3, column=1, pady=20)
+
+        # Mobile app button
         Button(self.logged_usr_page, text="Mobile app", font=('Arial', 20), bg='light gray', width=15,
                command=self.mobile_app) \
             .grid(row=4, column=0, columnspan=2, pady=65)
+
+        # Logout button
         Button(self.logged_usr_page, text="Logout", font=('Arial', 20), bg='light gray', command=self.logout) \
             .grid(row=4, column=2, sticky=NE, padx=20, pady=50, ipadx=10)
+
+        # Exit button
         Button(self.logged_usr_page, text="Exit", font=('Arial', 20), bg='light gray', command=self.exit) \
             .grid(row=4, column=2, sticky=SE, padx=20, pady=10, ipadx=30)
 
+        # Account button
         acc_icon_widget = Button(self.logged_usr_page, text="A", bg='light gray', image=self.acc_icon, command=self.settings_command)
         acc_icon_widget.image = self.acc_icon
         acc_icon_widget.grid(row=0, column=2, sticky=NE, padx=20, pady=10)
 
+        # Settings button
         settings_icon_widget = Button(self.logged_usr_page, text="S", bg='light gray', image=self.settings_icon, command=self.your_acc)
         settings_icon_widget.image = self.settings_icon
         settings_icon_widget.grid(row=0, column=2, sticky=NW, padx=30, pady=10)
 
+    # Buttons methods
     def settings_command(self):
         self.logged_usr_page.destroy()
-        settings = Settings(self.root)
+        settings = Settings(self.root, self.logged_user_info)
         settings.settings_layout()
 
     def your_acc(self):
         self.logged_usr_page.destroy()
-        your_acc = Account(self.root)
+        your_acc = Account(self.root, self.logged_user_info)
         your_acc.account_layout()
 
     def manage_budget(self):
@@ -298,7 +382,7 @@ class LoginUser:
         receipts.receipts_layout()
 
     def rate_us(self):
-        rate_us = RateUs(self.root)
+        rate_us = RateUs(self.root, self.logged_user_info)
         rate_us.rate_us_layout()
 
     def mobile_app(self):
@@ -321,6 +405,7 @@ class LoginUser:
         elif result == "no":
             pass
 
+    # Other methods
     def exit_to_logged_user_page(self, frame):
         frame.destroy()
         self.logged_user_page()
@@ -399,8 +484,9 @@ class MobileApp:
 
 
 class RateUs:
-    def __init__(self, root):
+    def __init__(self, root, logged_user_info):
         self.root = root
+        self.logged_user_info = logged_user_info
         self.empty_star = PhotoImage(file="empty_star.png")
         self.empty_star = self.empty_star.subsample(20, 20)
         self.full_star = PhotoImage(file="full_star.png")
@@ -463,12 +549,14 @@ class RateUs:
 
 
 class Account:
-    def __init__(self, root):
+    def __init__(self, root, logged_user_info):
         self.root = root
-        self.exit_method = LoginUser(self.root)
+        self.logged_user_info = logged_user_info
+        self.exit_method = LoginUser(self.root, self.logged_user_info)
         self.main_menu = StartPage(self.root)
 
     def account_layout(self):
+        # Frame creation
         self.acc_page = Frame(self.root)
         self.acc_page.grid(row=0, column=0, sticky=NSEW)
 
@@ -540,11 +628,13 @@ class Account:
 
 
 class Settings:
-    def __init__(self, root):
+    def __init__(self, root, logged_user_info):
         self.root = root
-        self.exit_method = LoginUser(self.root)
+        self.logged_user_info = logged_user_info
+        self.exit_method = LoginUser(self.root, self.logged_user_info)
 
     def settings_layout(self):
+        # Frame creation
         self.settings_page = Frame(self.root)
         self.settings_page.grid(row=0, column=0, sticky=NSEW)
 
@@ -557,6 +647,7 @@ class Settings:
         Button(self.settings_page, text="Close",
                command=lambda frame=self.settings_page: self.exit_method.exit_to_logged_user_page(frame)).grid()
 
+    # Buttons methods
     def support_and_help(self):
         ...
 
@@ -572,6 +663,7 @@ class Settings:
     def dark_mode(self):
         ...
 
+    # Other methods
 
 def main():
     root = Tk()
