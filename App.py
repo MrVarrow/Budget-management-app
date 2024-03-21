@@ -5,6 +5,7 @@ import re
 import SendEmails
 from email_validator import validate_email, EmailNotValidError
 import mysql.connector
+import pyperclip
 
 
 class StartPage:
@@ -53,7 +54,7 @@ class StartPage:
 
         # Forgot Password button
         Button(self.main_menu_frame, text="Forgot your passoword?", fg='blue', font=('Arial', 10, 'underline'), bd=0,
-               command=self.forgot_password)\
+               command=self.forgot_password) \
             .grid(row=5, column=0)
 
         # Login button
@@ -70,8 +71,9 @@ class StartPage:
 
     # Button methods
     def forgot_password(self):
-        # via email password reminder
-        ...
+        receiver = self.email_in_database()[0]
+        password = self.email_in_database()[1]
+        SendEmails.forgot_password_email(self, receiver, password)
 
     def exit_from_app(self):
         result = tkinter.messagebox.askquestion(title='Warning', message="Do you want to close Budget manager?")
@@ -99,7 +101,7 @@ class StartPage:
 
         if password == stored_password:
             self.main_menu_frame.destroy()
-            new_page = LoginUser(self.root, row)
+            new_page = LoginUser(self.root, row, self.connection, self.cursor)
             new_page.logged_user_page()
         else:
             tkinter.messagebox.showinfo(title="Information", message="Incorrect password.")
@@ -120,6 +122,25 @@ class StartPage:
                                            image=self.show_password_icon, command=self.show_password)
         show_password_icon_widget.grid(row=4, column=0, padx=470, sticky=E)
         self.password_entry.config(show="*")
+
+    # Other methods
+    def email_in_database(self):
+        username = self.login_entry.get()
+
+        if username == '':
+            tkinter.messagebox.showinfo(title="Information", message="Please enter username")
+            return
+
+        self.cursor.execute("SELECT * FROM `user` WHERE username = %s", (username,))
+        row = self.cursor.fetchone()
+
+        if row is None:
+            tkinter.messagebox.showinfo(title="Information", message="User does not exist.")
+            return
+
+        stored_email = row[1]
+        stored_password = row[2]
+        return stored_email, stored_password
 
 
 class CreateAccount:
@@ -233,15 +254,24 @@ class CreateAccount:
             return False
         return True
 
-    def email_validate(self, email):
-        #maybe add check if email was registered already
-        try:
-            v = validate_email(email)
-            email = v.normalized
-            return True
-        except EmailNotValidError as e:
-            messagebox.showerror(title='Error', message=str(e))
+    def email_validate(self, email: str):
+        self.cursor.execute(
+            "SELECT email, COUNT(*) FROM `user` WHERE email = %s",
+            (self.email.get(),))
+        row = self.cursor.fetchone()
+        row_count = row[1]
+        print(row_count)
+        if not row_count == 0:
+            messagebox.showerror(title='Error', message="This email already exists, try logging in")
             return False
+        else:
+            try:
+                v = validate_email(email)
+                email = v.normalized  # Try to delete variable
+                return True
+            except EmailNotValidError as e:
+                messagebox.showerror(title='Error', message=str(e))
+                return False
 
     def check_password_requirements(self):
         if len(self.password.get()) < 8:
@@ -275,8 +305,10 @@ class CreateAccount:
 
 
 class LoginUser:
-    def __init__(self, root, logged_user_info):
+    def __init__(self, root, logged_user_info, connection, cursor):
         self.root = root
+        self.connection = connection
+        self.cursor = cursor
         self.logged_user_info = logged_user_info
         self.acc_icon = PhotoImage(file="user.png")
         self.acc_icon = self.acc_icon.subsample(20, 20)
@@ -336,53 +368,55 @@ class LoginUser:
             .grid(row=4, column=2, sticky=SE, padx=20, pady=10, ipadx=30)
 
         # Account button
-        acc_icon_widget = Button(self.logged_usr_page, text="A", bg='light gray', image=self.acc_icon, command=self.settings_command)
+        acc_icon_widget = Button(self.logged_usr_page, text="A", bg='light gray', image=self.acc_icon,
+                                 command=self.settings_command)
         acc_icon_widget.image = self.acc_icon
         acc_icon_widget.grid(row=0, column=2, sticky=NE, padx=20, pady=10)
 
         # Settings button
-        settings_icon_widget = Button(self.logged_usr_page, text="S", bg='light gray', image=self.settings_icon, command=self.your_acc)
+        settings_icon_widget = Button(self.logged_usr_page, text="S", bg='light gray', image=self.settings_icon,
+                                      command=self.your_acc)
         settings_icon_widget.image = self.settings_icon
         settings_icon_widget.grid(row=0, column=2, sticky=NW, padx=30, pady=10)
 
     # Buttons methods
     def settings_command(self):
         self.logged_usr_page.destroy()
-        settings = Settings(self.root, self.logged_user_info)
+        settings = Settings(self.root, self.logged_user_info, self.connection, self.cursor)
         settings.settings_layout()
 
     def your_acc(self):
         self.logged_usr_page.destroy()
-        your_acc = Account(self.root, self.logged_user_info)
+        your_acc = Account(self.root, self.logged_user_info, self.connection, self.cursor)
         your_acc.account_layout()
 
     def manage_budget(self):
         self.logged_usr_page.destroy()
-        manage_budget = ManageBudget(self.root)
+        manage_budget = ManageBudget(self.root, self.connection, self.cursor)
         manage_budget.manage_budget_layout()
 
     def stats(self):
         self.logged_usr_page.destroy()
-        statistics = Statistics(self.root)
+        statistics = Statistics(self.root, self.connection, self.cursor)
         statistics.statistics_layout()
 
     def shopping_list(self):
         self.logged_usr_page.destroy()
-        shopping_list = ShoppingList(self.root)
+        shopping_list = ShoppingList(self.root, self.connection, self.cursor)
         shopping_list.shopping_list_layout()
 
     def savings(self):
         self.logged_usr_page.destroy()
-        savings = Savings(self.root)
+        savings = Savings(self.root, self.connection, self.cursor)
         savings.savings_layout()
 
     def receipts(self):
         self.logged_usr_page.destroy()
-        receipts = Receipts(self.root)
+        receipts = Receipts(self.root, self.connection, self.cursor)
         receipts.receipts_layout()
 
     def rate_us(self):
-        rate_us = RateUs(self.root, self.logged_user_info)
+        rate_us = RateUs(self.root, self.logged_user_info, self.connection, self.cursor)
         rate_us.rate_us_layout()
 
     def mobile_app(self):
@@ -412,40 +446,50 @@ class LoginUser:
 
 
 class Receipts:
-    def __init__(self, root):
+    def __init__(self, root, connection, cursor):
         self.root = root
+        self.connection = connection
+        self.cursor = cursor
 
     def receipts_layout(self):
         ...
 
 
 class Savings:
-    def __init__(self, root):
+    def __init__(self, root, connection, cursor):
         self.root = root
+        self.connection = connection
+        self.cursor = cursor
 
     def savings_layout(self):
         ...
 
 
 class ShoppingList:
-    def __init__(self, root):
+    def __init__(self, root, connection, cursor):
         self.root = root
+        self.connection = connection
+        self.cursor = cursor
 
     def shopping_list_layout(self):
         ...
 
 
 class Statistics:
-    def __init__(self, root):
+    def __init__(self, root, connection, cursor):
         self.root = root
+        self.connection = connection
+        self.cursor = cursor
 
     def statistics_layout(self):
         ...
 
 
 class ManageBudget:
-    def __init__(self, root):
+    def __init__(self, root, connection, cursor):
         self.root = root
+        self.connection = connection
+        self.cursor = cursor
 
     def manage_budget_layout(self):
         ...
@@ -458,34 +502,47 @@ class MobileApp:
         self.copy_icon = self.copy_icon.subsample(20, 20)
 
     def mobile_app_layout(self):
+        # Create TopLevel window
         self.mobile_app_root = Toplevel(self.root)
         self.mobile_app_root.geometry("400x200")
         self.mobile_app_root.title("Download our mobile app")
 
-        Label(self.mobile_app_root, text="There is a link to our mobile app:\n"
-                                         "Link", font=('Arial', 15)) \
+        # Labels
+        Label(self.mobile_app_root, text="There is a link to our mobile app:", font=('Arial', 15)) \
             .grid(row=0, column=0, pady=10)
+        self.app_link = Label(self.mobile_app_root, text="Link", font=('Arial', 15))
+        self.app_link.grid(row=1, column=0)
         Label(self.mobile_app_root, text="To download you have to click this link on your mobile device,\n"
                                          "so type it in google\n"
                                          "or copy and sent it to yourself then use on phone", borderwidth=2,
               relief="solid") \
-            .grid(row=1, column=0, pady=15, padx=30)
-        copy_icon_widget = Button(self.mobile_app_root, text="copy", image=self.copy_icon, bg="light gray")
+            .grid(row=2, column=0, pady=10, padx=30)
+
+        # Copy button
+        copy_icon_widget = Button(self.mobile_app_root, text="copy", image=self.copy_icon, bg="light gray",
+                                  command=self.copy_app_link)
         copy_icon_widget.image = self.copy_icon
-        copy_icon_widget.grid(row=0, column=0, rowspan=2, sticky=NE, padx=10, pady=40)
+        copy_icon_widget.grid(row=1, column=0, sticky=NE, padx=10)
+
+        # Close button
         Button(self.mobile_app_root, text="Close", font=('Arial', 15), command=self.mobile_app_root.destroy,
                bg="light gray") \
-            .grid(row=2, column=0)
+            .grid(row=3, column=0)
 
+        # Focus on TopLevel window
         self.mobile_app_root.grab_set()
 
+    # Buttons methods
     def copy_app_link(self):
-        ...
+        link = self.app_link.cget("text")
+        pyperclip.copy(link)
 
 
 class RateUs:
-    def __init__(self, root, logged_user_info):
+    def __init__(self, root, logged_user_info, connection, cursor):
         self.root = root
+        self.connection = connection
+        self.cursor = cursor
         self.logged_user_info = logged_user_info
         self.empty_star = PhotoImage(file="empty_star.png")
         self.empty_star = self.empty_star.subsample(20, 20)
@@ -493,14 +550,21 @@ class RateUs:
         self.full_star = self.full_star.subsample(20, 20)
         self.star_list = ["1", "2", "3", "4", "5"]
         self.final_rating = ""
+        self.user_rating_from_db = ""
 
     def rate_us_layout(self):
         self.rate_us_root = Toplevel(self.root)
         self.rate_us_root.geometry("400x200")
         self.rate_us_root.title("Rate us!")
+
+        # Labels
         Label(self.rate_us_root, text="Rate our app!", font=('Arial', 15)).grid(row=0, column=0, padx=135, pady=15,
                                                                                 sticky=W)
 
+        self.user_rate_widget = Label(self.rate_us_root, text="Your rating:\n", font=('Arial', 12))
+        self.user_rate_widget.grid(row=2, column=0, sticky=W, padx=150, pady=10)
+
+        # Star buttons
         i = 100
         for star in self.star_list:
             Button(self.rate_us_root, image=self.empty_star, bg="light gray",
@@ -508,22 +572,40 @@ class RateUs:
                 .grid(row=1, column=0, padx=i, sticky=W)
             i += 40
 
-        self.user_rate_widget = Label(self.rate_us_root, text="Your rating:\n", font=('Arial', 12))
-        self.user_rate_widget.grid(row=2, column=0, sticky=W, padx=150, pady=10)
-
+        # Submit rating button
         Button(self.rate_us_root, text="Submit", font=('Arial', 15), width=7, bg="light gray",
                command=self.submit_rating).grid(row=3, column=0, sticky=W, padx=150)
 
         self.rate_us_root.grab_set()
 
+    # Buttons methods
     def submit_rating(self):
-        #sent final rating to me, maybe to database to create some statistic
-        print(self.final_rating)
-        self.rate_us_root.destroy()
+        if self.check_user_in_rating_database():
+            insert_rating = 'INSERT INTO `rating` (user_login, user_rating) VALUES (%s, %s)'
+            values_to_insert = (self.logged_user_info[0], self.final_rating)
+            self.cursor.execute(insert_rating, values_to_insert)
+            self.connection.commit()
+            tkinter.messagebox.showinfo(title="Information",
+                                        message="Thanks for your feedback!")
+            self.rate_us_root.destroy()
+        else:
+            result = tkinter.messagebox.askquestion(title='Warning',
+                                                    message="You already rated us! Your rating is: {} star."
+                                                            "Do you Want to change your rating?"
+                                                    .format(self.user_rating_from_db))
+            if result == "yes":
+                self.cursor.execute('UPDATE budgetappdatabase.rating SET user_rating = %s WHERE user_login = %s',
+                                    (self.final_rating, self.logged_user_info[0]))
+                self.connection.commit()
+                self.rate_us_root.destroy()
+                tkinter.messagebox.showinfo(title="Information",
+                                            message="Your rating has been successfully updated")
+            elif result == "no":
+                self.rate_us_root.destroy()
 
+    # Other methods
     def fill_stars(self, user_rating):
-    #maybe optimize with stars widget in frame so you can delete frame and create new one with no stacking button on top of each other
-    #in future add check if user rate us, limit one per acc with ability to change your rating
+        # maybe optimize with stars widget in frame so you can delete frame and create new one with no stacking button on top of each other
         filled_star_list = []
         unfilled_star_list = []
         for i in range(0, int(user_rating)):
@@ -536,23 +618,39 @@ class RateUs:
 
         i = 100
         for star in filled_star_list:
-            Button(self.rate_us_root, image=self.full_star, bg="light gray", command=lambda user_rating=star: self.fill_stars(user_rating))\
+            Button(self.rate_us_root, image=self.full_star, bg="light gray",
+                   command=lambda rating=star: self.fill_stars(rating)) \
                 .grid(row=1, column=0, padx=i, sticky=W)
             i += 40
         for star in unfilled_star_list:
             Button(self.rate_us_root, image=self.empty_star, bg="light gray",
-                   command=lambda user_rating=star: self.fill_stars(user_rating)) \
+                   command=lambda rating=star: self.fill_stars(rating)) \
                 .grid(row=1, column=0, padx=i, sticky=W)
             i += 40
         self.user_rate_widget.configure(text="Your rating:\n {} star".format(user_rating))
         self.final_rating = user_rating
 
+    def check_user_in_rating_database(self):
+        username = self.logged_user_info[0]
+
+        self.cursor.execute("SELECT * FROM `rating` WHERE user_login = %s", (username,))
+        row = self.cursor.fetchone()
+
+        if row is None:
+            # User has not rated app
+            return True
+        # User has already rated app
+        self.user_rating_from_db = row[1]
+        return False
+
 
 class Account:
-    def __init__(self, root, logged_user_info):
+    def __init__(self, root, logged_user_info, connection, cursor):
         self.root = root
+        self.connection = connection
+        self.cursor = cursor
         self.logged_user_info = logged_user_info
-        self.exit_method = LoginUser(self.root, self.logged_user_info)
+        self.exit_method = LoginUser(self.root, self.logged_user_info, self.connection, self.cursor)
         self.main_menu = StartPage(self.root)
 
     def account_layout(self):
@@ -565,11 +663,12 @@ class Account:
         Button(self.acc_page, text="Verify e-mail").grid()
         Button(self.acc_page, text="Change e-mail").grid()
         Button(self.acc_page, text="Change e-mail notification settings").grid()
-        Button(self.acc_page, text="delete account")\
+        Button(self.acc_page, text="delete account") \
             .grid()
-        Button(self.acc_page, text="clear all data")\
+        Button(self.acc_page, text="clear all data") \
             .grid()
-        Button(self.acc_page, text="Close", command=lambda frame=self.acc_page: self.exit_method.exit_to_logged_user_page(frame)).grid()
+        Button(self.acc_page, text="Close",
+               command=lambda frame=self.acc_page: self.exit_method.exit_to_logged_user_page(frame)).grid()
 
     def change_password(self):
         ...
@@ -580,14 +679,14 @@ class Account:
         self.verify_email_root.title("E-mail verification")
 
         Label(self.verify_email_root, text="To verify e-mail enter the code, that was send on your email:\n"
-                                      "user email").grid()
+                                           "user email").grid()
         self.code_entry = Entry(self.verify_email_root)
         self.code_entry.grid()
         Button(self.verify_email_root, text="Resend e-mail").grid()
         Button(self.verify_email_root, text="Submit code").grid()
 
-        self.receiver = ... #get from database(later)
-        self.code = ... #generate random code with 6 chars
+        self.receiver = ...  # get from database(later)
+        self.code = ...  # generate random code with 6 chars
         SendEmails.send_email_verification(self, self.receiver, self.code)
 
         self.verify_email_root.grab_set()
@@ -610,28 +709,33 @@ class Account:
         ...
 
     def delete_account(self):
-        result = tkinter.messagebox.askquestion(title='Warning', message="Do you want to DELETE YOUR ACCOUNT? This action is PERNAMENT.")
+        result = tkinter.messagebox.askquestion(title='Warning',
+                                                message="Do you want to DELETE YOUR ACCOUNT? This action is PERNAMENT.")
         if result == "yes":
             self.acc_page.destroy()
             self.main_menu.main_menu()
-            ... #delete acc from database(later)
+            ...  # delete acc from database(later)
             tkinter.messagebox.showinfo(title="Information", message="Your account has been deleted")
         elif result == "no":
             pass
+
     def clear_all_data(self):
-        result = tkinter.messagebox.askquestion(title='Warning', message="Do you want to CLEAR ALL DATA? This action is PERNAMENT.")
+        result = tkinter.messagebox.askquestion(title='Warning',
+                                                message="Do you want to CLEAR ALL DATA? This action is PERNAMENT.")
         if result == "yes":
-            ... #clear all data of user from database but not acc(later)
+            ...  # clear all data of user from database but not acc(later)
             tkinter.messagebox.showinfo(title="Information", message="All of your data has been cleared")
         elif result == "no":
             pass
 
 
 class Settings:
-    def __init__(self, root, logged_user_info):
+    def __init__(self, root, logged_user_info, connection, cursor):
         self.root = root
+        self.connection = connection
+        self.cursor = cursor
         self.logged_user_info = logged_user_info
-        self.exit_method = LoginUser(self.root, self.logged_user_info)
+        self.exit_method = LoginUser(self.root, self.logged_user_info, self.connection, self.cursor)
 
     def settings_layout(self):
         # Frame creation
@@ -664,6 +768,7 @@ class Settings:
         ...
 
     # Other methods
+
 
 def main():
     root = Tk()

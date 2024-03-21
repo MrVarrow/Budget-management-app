@@ -46,3 +46,14 @@ def send_email_verification(self, receiver, code):
               '{}'.format(code)
 
     send_email(sender_email, sender_password, receiver_email, subject, message)
+
+
+def forgot_password_email(self, receiver, password):
+    sender_email = 'budgetappofficial@gmail.com'
+    sender_password = ''  # for safety reasons leaving empty
+    receiver_email = '{}'.format(receiver)
+    subject = 'Did you forget your password?'
+    message = 'Here is your password to budget app:\n' \
+              '{}'.format(password)
+
+    send_email(sender_email, sender_password, receiver_email, subject, message)
