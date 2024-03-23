@@ -27,7 +27,7 @@ class UserLoginController:
         # Check if password entered by user is correct
         if password == password_input:
             self.login_user_page_view.destroy_login_page_frame()
-            LoggedUserPageController(self.root)
+            LoggedUserPageController(self.root, user_data)
         else:
             messagebox.showinfo(title="Information", message="Incorrect password.")
 
@@ -54,4 +54,5 @@ class UserLoginController:
 
     # Go into create account page
     def create_acc(self):
+        self.login_user_page_view.destroy_login_page_frame()
         CreateAccountPageController(self.root)
