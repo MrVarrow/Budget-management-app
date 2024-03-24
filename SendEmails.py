@@ -3,6 +3,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 
+# For readability in future make class with methods and put in separate folder also change imports in files that
+# use this module to single function imports (which are they using) for optimization
 def send_email(sender_email, sender_password, receiver_email, subject, message):
     global server
     smtp_server = 'smtp.gmail.com'
@@ -27,10 +29,10 @@ def send_email(sender_email, sender_password, receiver_email, subject, message):
         server.quit()
 
 
-def send_confirm_email(self):
+def send_confirm_email(email_input):
     sender_email = 'budgetappofficial@gmail.com'
     sender_password = ''  # for safety reasons leaving empty
-    receiver_email = '{}'.format(self.email.get())
+    receiver_email = '{}'.format(email_input)
     subject = 'Thanks for Registration!'
     message = 'Your Registration to BudgetApp went successfully, now you can login to your account.'
 
@@ -55,5 +57,16 @@ def forgot_password_email(self, receiver, password):
     subject = 'Did you forget your password?'
     message = 'Here is your password to budget app:\n' \
               '{}'.format(password)
+
+    send_email(sender_email, sender_password, receiver_email, subject, message)
+
+
+def send_email_with_link(receiver, link):
+    sender_email = 'budgetappofficial@gmail.com'
+    sender_password = ''  # for safety reasons leaving empty
+    receiver_email = '{}'.format(receiver)
+    subject = 'Did you forget your password?'
+    message = 'Here is your link to download mobile app:\n' \
+              '{}'.format(link)
 
     send_email(sender_email, sender_password, receiver_email, subject, message)
