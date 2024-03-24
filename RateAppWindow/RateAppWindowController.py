@@ -10,37 +10,33 @@ class RateAppWindowController:
         self.rate_app_window_view = RateAppWindowView(self.root, self)
         self.rate_app_window_model = RateAppWindowsModel()
 
+    # Manipulation with numbers of stars displayed based on user action
     def star_selection(self, user_rating):
         self.rate_app_window_view.get_user_rating(user_rating)
-        self.rate_app_window_view.stars_display(user_rating)
+        self.rate_app_window_view.stars_display()
         self.rate_app_window_view.your_rating_widget_configure(user_rating)
 
+    # Inserting, Updating database or just closing the window
     def submit_rating(self, final_rating):
-        if self.check_if_user_choose(final_rating):
+        if not self.rate_app_window_model.check_if_user_choose(final_rating):
             messagebox.showinfo(title="Information",
-                                   message="You have to select number of stars in order to rate app")
+                                message="You Have to choose numbers of stars in order to rate the app")
             return
-        if self.check_if_has_already_rated_app():
+        if not self.rate_app_window_model.check_if_has_already_rated_app(self.user_data):
             result = messagebox.askquestion(title="Information",
-                                   message="You already has rated App. Do you want to change your rating?")
+                                            message="You already rated us! Your rating is: {} star."
+                                                    "Do you Want to change your rating?"
+                                            .format(self.rate_app_window_model.user_rating_from_db))
             if result == "yes":
-                ...
-                # update user rating
+                self.rate_app_window_model.update_user_rating(self.user_data, final_rating)
+                self.rate_app_window_view.close_rate_window()
+                messagebox.showinfo(title="Information",
+                                    message="You has successfully updated your rating. Thanks!")
             elif result == "no":
-                ...
-                # close the window
+                self.rate_app_window_view.close_rate_window()
+            return
 
-        # Add rate to database
+        self.rate_app_window_model.insert_user_rating(self.user_data, final_rating)
+        self.rate_app_window_view.close_rate_window()
         messagebox.showinfo(title="Information",
                             message="You has successfully rated application. Thanks!")
-
-    def check_if_user_choose(self, final_rating):
-        if final_rating == "":
-            return False
-        return True
-
-    def check_if_has_already_rated_app(self):
-        if self.rate_app_window_model.check_if_has_already_rated_app(self.user_data):
-            return False
-        return True
-

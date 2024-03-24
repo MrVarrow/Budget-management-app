@@ -38,15 +38,17 @@ class RateAppWindowView:
 
         # Submit rating button
         Button(self.rate_us_root, text="Submit", font=('Arial', 15), width=7, bg="light gray",
-               command=lambda final_rating=self.final_rating: controller.submit_rating(final_rating)).grid(row=3, column=0, sticky=W, padx=150)
+               command=lambda: controller.submit_rating(self.final_rating)).grid(row=3, column=0, sticky=W, padx=150)
 
         self.rate_us_root.grab_set()
 
+    # Display number of stars which user rated the app
     def your_rating_widget_configure(self, user_rating):
         self.user_rate_widget.configure(text="Your rating:\n {} star".format(user_rating))
         self.final_rating = user_rating
 
-    def stars_display(self, user_rating):
+    # Displaying filled/unfilled stars
+    def stars_display(self):
         self.rate_us_stars_frame.destroy()
         self.rate_us_stars_frame = Frame(self.rate_us_root)
         self.rate_us_stars_frame.grid(row=1, column=0)
@@ -62,6 +64,7 @@ class RateAppWindowView:
                 .grid(row=1, column=0, padx=i, sticky=W)
             i += 40
 
+    # Getting info about stars that have to be filled/unfilled
     def get_user_rating(self, user_rating):
         self.filled_star_list = []
         self.unfilled_star_list = []
@@ -72,3 +75,7 @@ class RateAppWindowView:
         for item in range(int(user_rating), len(self.star_list)):
             x = self.star_list[item]
             self.unfilled_star_list.append(x)
+
+    # Destroying window
+    def close_rate_window(self):
+        self.rate_us_root.destroy()
