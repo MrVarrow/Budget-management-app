@@ -3,12 +3,14 @@ from UserLoginPage.UserLoginController import UserLoginController
 
 
 def main():
+    # Create root
     root = Tk()
     root.configure(bg="light gray")
     root.geometry("1280x720")
     root.resizable(False, False)
     root.title("Budget")
-    app = UserLoginController(root)
+    # Launch App
+    UserLoginController(root)
     root.mainloop()
 
 
