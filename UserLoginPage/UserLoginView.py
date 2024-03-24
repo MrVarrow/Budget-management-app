@@ -3,14 +3,16 @@ from tkinter import *
 
 class UserLoginView:
     def __init__(self, master, controller):
-        self.root = master
-        self.controller = controller
         # Loading icon and scaling it
         self.show_password_icon = PhotoImage(file="Icons/hide.png")
         self.show_password_icon = self.show_password_icon.subsample(20, 20)
 
+        # Define variables for entries
+        self.password = StringVar()
+        self.login = StringVar()
+
         # Frame create
-        self.main_menu_frame = Frame(self.root)
+        self.main_menu_frame = Frame(master)
         self.main_menu_frame.grid(row=0, column=0, sticky=NSEW)
 
         # Labels and Entries
@@ -22,24 +24,22 @@ class UserLoginView:
 
         Label(self.main_menu_frame, text="login:", font=('Arial', 20)) \
             .grid(row=1, column=0, padx=500, sticky=W)
-        self.login = StringVar()
-        self.login_entry = Entry(self.main_menu_frame, font=('Arial', 20), textvariable=self.login)
-        self.login_entry.grid(row=2, column=0, padx=500, sticky=W, pady=10)
+        Entry(self.main_menu_frame, font=('Arial', 20), textvariable=self.login) \
+            .grid(row=2, column=0, padx=500, sticky=W, pady=10)
 
         Label(self.main_menu_frame, text="password:", font=('Arial', 20)) \
             .grid(row=3, column=0, padx=500, sticky=W)
-        self.password = StringVar()
         self.password_entry = Entry(self.main_menu_frame, font=('Arial', 20), show="*", textvariable=self.password)
         self.password_entry.grid(row=4, column=0, padx=500, sticky=W, pady=10)
 
         # Show Password button
         self.show_password_icon_widget = Button(self.main_menu_frame, text="S", bg='light gray',
-                                           image=self.show_password_icon, command=self.show_password)
+                                                image=self.show_password_icon, command=self.show_password)
         self.show_password_icon_widget.image = self.show_password_icon
         self.show_password_icon_widget.grid(row=4, column=0, padx=470, sticky=E)
 
         # Forgot Password button
-        Button(self.main_menu_frame, text="Forgot your passoword?", fg='blue', font=('Arial', 10, 'underline'), bd=0,
+        Button(self.main_menu_frame, text="Forgot your password?", fg='blue', font=('Arial', 10, 'underline'), bd=0,
                command=lambda: controller.forgot_pass(self.login.get())) \
             .grid(row=5, column=0)
 
@@ -61,7 +61,7 @@ class UserLoginView:
     def show_password(self):
         self.show_password_icon_widget.destroy()
         self.show_password_icon_widget = Button(self.main_menu_frame, bg='light gray',
-                                           image=self.show_password_icon, command=self.hide_password)
+                                                image=self.show_password_icon, command=self.hide_password)
         self.show_password_icon_widget.grid(row=4, column=0, padx=470, sticky=E)
         self.password_entry.config(show="")
 
@@ -69,7 +69,7 @@ class UserLoginView:
     def hide_password(self):
         self.show_password_icon_widget.destroy()
         self.show_password_icon_widget = Button(self.main_menu_frame, bg='light gray',
-                                           image=self.show_password_icon, command=self.show_password)
+                                                image=self.show_password_icon, command=self.show_password)
         self.show_password_icon_widget.grid(row=4, column=0, padx=470, sticky=E)
         self.password_entry.config(show="*")
 
