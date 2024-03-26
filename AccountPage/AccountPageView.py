@@ -31,11 +31,13 @@ class AccountPageView:
             .grid(row=2, column=0, sticky=E, padx=200, pady=30, ipady=5)
 
         # Delete account button
-        Button(self.acc_page, text="delete account", font=('Arial', 20), width=15, bg="light gray", fg="red") \
+        Button(self.acc_page, text="delete account", font=('Arial', 20), width=15, bg="light gray", fg="red",
+               command=lambda: controller.delete_account()) \
             .grid(row=3, column=0, sticky=W, padx=200, pady=30, ipady=5)
 
         # Clear all data button
-        Button(self.acc_page, text="clear all data", font=('Arial', 20), width=15, bg="light gray", fg="red") \
+        Button(self.acc_page, text="clear all data", font=('Arial', 20), width=15, bg="light gray", fg="red",
+               command=lambda: controller.clear_all_data()) \
             .grid(row=3, column=0, sticky=E, padx=200, pady=30, ipady=5)
 
         # Close button
