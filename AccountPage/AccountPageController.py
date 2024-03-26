@@ -9,21 +9,18 @@ class AccountPageController:
         self.user_data = user_data
         self.account_page_view = AccountPageView(self.root, self)
         self.account_page_model = AccountPageModel()
+        self.code = ""
 
+    # Account page buttons methods
     def change_password(self):
         ...
 
     def verify_email(self):
-         # Window for e mail verification
+        self.account_page_view.verify_email_window(self.user_data[1])
+        self.code = self.account_page_model.generate_code()
+        self.account_page_model.resend_email_with_code(self.user_data[1], self.code)
 
-
-          # get from database(later)
-         # generate random code with 6 chars
-         # Send email with code
-
-        ...
-
-    def resend_email(self):
+    def send_email(self):
         # resend email with code
         messagebox.showinfo(title="Information", message="E-mail has been sent")
 
@@ -57,6 +54,20 @@ class AccountPageController:
                                                 message="Do you want to CLEAR ALL DATA? This action is PERNAMENT.")
         if result == "yes":
             ...  # clear all data of user from database but not acc(later)
-            messagebox.showinfo(title="Information", message="All of your data has been cleared")
+            messagebox.showinfo(title="Information", message="All of your data has been cleared.")
         elif result == "no":
             pass
+
+    # Verify e-mail window buttons methods
+
+    # Check if code is valid
+    def submit_verification_code(self, user_entry_code):
+        if self.account_page_model.check_code(user_entry_code, self.code):
+            messagebox.showinfo(title="Information", message="Entered code is wrong, double check and try again.")
+        else:
+            # Add info that user verified e-mail to database
+            messagebox.showinfo(title="Information", message="Your e-mail is now verified.")
+
+    # Resend e-mail with code
+    def resend_email(self):
+        self.account_page_model.resend_email_with_code(self.user_data[1], self.account_page_model.generate_code())
