@@ -13,7 +13,7 @@ class AccountPageController:
 
     # Account page buttons methods
     def change_password(self):
-        ...
+        self.account_page_view.change_password_window()
 
     def verify_email(self):
         self.account_page_view.verify_email_window(self.user_data[1])
@@ -24,22 +24,22 @@ class AccountPageController:
         # resend email with code
         messagebox.showinfo(title="Information", message="E-mail has been sent")
 
-    def submit_code(self, code_entry, code):
-        if code_entry == code:
-            messagebox.showinfo(title="Information", message="Your account has been successfully verificated")
-            # destroy window e-mail
-        else:
-            messagebox.showinfo(title="Information", message="Wrong code, try again")
-
     def change_email(self):
         ...
 
     def change_email_notifications(self):
-        ...
+        status = self.account_page_model.email_notifications_status(self.user_data)
+        result = messagebox.askquestion(title='Warning',
+                                        message="Do you want to change your emails notification settings\n"
+                                                "status: {}".format(self.account_page_model.status_for_user))
+        if result == 'yes':
+            self.account_page_model.email_notifications_status_change(self.user_data, status)
+        elif result == "no":
+            pass
 
     def delete_account(self):
         result = messagebox.askquestion(title='Warning',
-                                                message="Do you want to DELETE YOUR ACCOUNT? This action is PERNAMENT.")
+                                        message="Do you want to DELETE YOUR ACCOUNT? This action is PERNAMENT.")
         if result == "yes":
             self.account_page_view.account_frame_destroy()
             from UserLoginPage.UserLoginController import UserLoginController
@@ -51,7 +51,7 @@ class AccountPageController:
 
     def clear_all_data(self):
         result = messagebox.askquestion(title='Warning',
-                                                message="Do you want to CLEAR ALL DATA? This action is PERNAMENT.")
+                                        message="Do you want to CLEAR ALL DATA? This action is PERNAMENT.")
         if result == "yes":
             ...  # clear all data of user from database but not acc(later)
             messagebox.showinfo(title="Information", message="All of your data has been cleared.")
@@ -65,9 +65,22 @@ class AccountPageController:
         if self.account_page_model.check_code(user_entry_code, self.code):
             messagebox.showinfo(title="Information", message="Entered code is wrong, double check and try again.")
         else:
-            # Add info that user verified e-mail to database
+            self.account_page_model.add_verify_user_to_db(self.user_data, True)
+            self.account_page_view.verify_email_root_destroy()
             messagebox.showinfo(title="Information", message="Your e-mail is now verified.")
 
     # Resend e-mail with code
     def resend_email(self):
         self.account_page_model.resend_email_with_code(self.user_data[1], self.account_page_model.generate_code())
+
+    # Change e-mail window buttons methods
+
+    # Change password window buttons methods
+
+    # Not sure about this rn but works
+    def submit_password(self, password_input, repeat_password_input):
+        from CreateAccountPage.CreateAccountController import CreateAccountPageController
+        self.create_account_page_controller = CreateAccountPageController.__call__(CreateAccountPageController(self.root), self.user_data, password_input, repeat_password_input)
+        if self.create_account_page_controller:
+            print("to database")
+        print("")

@@ -15,7 +15,7 @@ class AccountPageView:
             .grid(row=0, column=0, sticky=EW, padx=280, pady=20, ipadx=220, ipady=50)
 
         # Change password button
-        Button(self.acc_page, text="Change password", font=('Arial', 20), width=15, bg="light gray")\
+        Button(self.acc_page, text="Change password", font=('Arial', 20), width=15, bg="light gray", command=lambda: controller.change_password())\
             .grid(row=1, column=0, sticky=W, padx=200, pady=40, ipady=5)
 
         # Verify e-mail button
@@ -29,7 +29,7 @@ class AccountPageView:
 
         # Change e-mail notification settings button
         Button(self.acc_page, text="Change e-mail notification settings", font=('Arial', 15), width=22, bg="light gray",
-               height=2, wraplength=250)\
+               height=2, wraplength=250, command=lambda: controller.change_email_notifications())\
             .grid(row=2, column=0, sticky=E, padx=200, pady=30, ipady=5)
 
         # Delete account button
@@ -64,8 +64,8 @@ class AccountPageView:
             .grid(row=0, column=0)
 
         # Code Entry
-        self.code_entry = Entry(self.verify_email_root)
-        self.code_entry.grid(row=1, column=0)
+        self.old_password_entry = Entry(self.verify_email_root)
+        self.old_password_entry.grid(row=1, column=0)
 
         # Resend e-mail button
         Button(self.verify_email_root, text="Resend e-mail", command=lambda: self.controller.send_email()) \
@@ -73,7 +73,7 @@ class AccountPageView:
 
         # Submit code button
         Button(self.verify_email_root, text="Submit code",
-               command=lambda: self.controller.submit_verification_code(self.code_entry.get())) \
+               command=lambda: self.controller.submit_verification_code(self.old_password_entry.get())) \
             .grid(row=2, column=0)
 
         # Focus on e-mail verification window
@@ -82,3 +82,40 @@ class AccountPageView:
     # Destroy verify email root destroy
     def verify_email_root_destroy(self):
         self.verify_email_root.destroy()
+
+    def change_password_window(self):
+        # Creating password change window
+        self.change_password_root = Toplevel(self.root)
+        self.change_password_root.geometry("400x200")
+        self.change_password_root.title("Password change")
+
+        # Label
+        Label(self.change_password_root, text="Old password:") \
+            .grid(row=0, column=0)
+
+        Label(self.change_password_root, text="New password:") \
+            .grid(row=2, column=0)
+
+        Label(self.change_password_root, text="Repeat new password:") \
+            .grid(row=4, column=0)
+
+        # Code Entry
+        self.old_password_entry = Entry(self.change_password_root)
+        self.old_password_entry.grid(row=1, column=0)
+
+        self.new_password_entry = Entry(self.change_password_root)
+        self.new_password_entry.grid(row=3, column=0)
+
+        self.new_password_reentry = Entry(self.change_password_root)
+        self.new_password_reentry.grid(row=5, column=0)
+
+        # Submit password button
+        Button(self.change_password_root, text="Submit password",
+               command=lambda: self.controller.submit_password(self.new_password_entry.get(), self.new_password_reentry.get())) \
+            .grid(row=6, column=0)
+
+        # Focus on e-mail verification window
+        self.change_password_root.grab_set()
+
+    def change_email_window(self):
+        ...
