@@ -82,9 +82,9 @@ class CreateAccountPageModel:
 
     # Inserting user to database "user"
     def insert_user_to_database(self, login_input, password_input, email_input, notifications):
-        insert_query = 'INSERT INTO `user` (username, email, password, EmailNotifications) VALUES (%s, %s, %s, %s)'
+        insert_query = 'INSERT INTO `user` (username, email, password, EmailNotifications, rating, emailverification) VALUES (%s, %s, %s, %s, %s, %s)'
         values_to_insert = (login_input, email_input, password_input,
-                            '1' if notifications else '0')
+                            '1' if notifications else '0', '0', False)
         self.cursor.execute(insert_query, values_to_insert)
         self.connection.commit()
 

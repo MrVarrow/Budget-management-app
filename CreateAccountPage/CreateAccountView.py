@@ -5,6 +5,8 @@ class CreateAccountPageView:
     def __init__(self, master, controller):
         self.controller = controller
         self.root = master
+
+        # Define variables for entries and checkbutton
         self.email_notification_state = BooleanVar()
         self.login_var = StringVar()
         self.password_var = StringVar()
