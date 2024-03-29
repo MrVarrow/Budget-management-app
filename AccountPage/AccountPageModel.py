@@ -1,7 +1,7 @@
 import mysql.connector
 from SendEmails import send_email_with_code
 import random
-
+from CreateAccountPage.CreateAccountModel import CreateAccountPageModel
 
 class AccountPageModel:
     def __init__(self):
@@ -9,6 +9,7 @@ class AccountPageModel:
                                                   database="budgetappdatabase")
         self.cursor = self.connection.cursor()
         self.status_for_user = ''
+        self.create_account_model = CreateAccountPageModel()
 
     # Get email notification status from database
     def email_notifications_status(self, user_data):
@@ -68,6 +69,76 @@ class AccountPageModel:
         row = self.cursor.fetchone()
         return row[0]
 
+    # !!!
+    def new_email_validate(self, new_email_entry):
+        result = self.create_account_model.check_if_email_is_valid(new_email_entry)
+        return result
 
-    def password_update(self):
-        ...
+    def check_new_email_in_database(self, new_email_entry):
+        result = self.create_account_model.check_email_in_database(new_email_entry)
+        return result
+
+    def check_if_old_email_is_correct(self, old_email_entry, user_data):
+        if not old_email_entry == user_data[1]:
+            return False
+        return True
+
+    def update_user_email(self, user_data, new_email_entry):
+        self.cursor.execute('UPDATE budgetappdatabase.user SET email = %s WHERE username = %s',
+                            (new_email_entry, user_data[0]))
+        self.connection.commit()
+
+    def check_if_emails_are_the_same(self, new_email_entry, new_email_reentry):
+        if not new_email_entry == new_email_reentry:
+            return False
+        return True
+
+    def check_if_old_is_new_email(self, new_email_entry, user_data):
+        if not new_email_entry != user_data[1]:
+            return False
+        return True
+
+    # Check if user password is at least 8 chars
+    def check_new_password_length(self, new_password_entry):
+        result = self.create_account_model.check_password_length(new_password_entry)
+        return result
+
+    # Check if user password contains small char
+    def check_new_password_for_small_char(self, new_password_entry):
+        result = self.create_account_model.check_password_for_small_char(new_password_entry)
+        return result
+
+    # Check if user password contains upper char
+    def check_new_password_for_upper_char(self, new_password_entry):
+        result = self.create_account_model.check_password_for_upper_char(new_password_entry)
+        return result
+
+    # Check if user password contains digit
+    def check_new_password_for_numbers(self, new_password_entry):
+        result = self.create_account_model.check_password_for_numbers(new_password_entry)
+        return result
+
+    # Check if user password contains special char
+    def check_new_password_for_special_char(self, new_password_entry):
+        result = self.create_account_model.check_password_for_special_char(new_password_entry)
+        return result
+
+    # Check if both passwords are the same
+    def check_if_new_passwords_are_the_same(self, new_password_entry, new_password_reentry):
+        result = self.create_account_model.check_if_passwords_are_the_same(new_password_entry, new_password_reentry)
+        return result
+
+    def check_if_old_password_is_correct(self, old_password_entry, user_data):
+        if not old_password_entry == user_data[2]:
+            return False
+        return True
+
+    def update_user_new_password(self, user_data, new_password_entry):
+        self.cursor.execute('UPDATE budgetappdatabase.user SET password = %s WHERE username = %s',
+                            (new_password_entry, user_data[0]))
+        self.connection.commit()
+
+    def check_if_old_is_new_password(self, new_password_entry, user_data):
+        if not new_password_entry != user_data[2]:
+            return False
+        return True
