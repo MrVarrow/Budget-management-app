@@ -11,6 +11,7 @@ class CreateAccountPageController:
         self.create_account_model = CreateAccountPageModel()
 
     # Not sure about this rn
+    '''
     def __call__(self, user_data, password_input, repeat_password_input):
 
         self.create_account_view.destroy_create_account_frame()
@@ -19,7 +20,7 @@ class CreateAccountPageController:
         if self.password_validate(password_input) and self.repeat_password_validate(password_input, repeat_password_input):
             return True
         return False
-
+    '''
 
 
     '''
