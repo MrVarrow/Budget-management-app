@@ -17,13 +17,10 @@ class AccountPageController:
         self.account_page_view.change_password_window()
 
     def verify_email(self):
+        # TO DO: if email is already verified return and display message
         self.account_page_view.verify_email_window(self.user_data[1])
         self.code = self.account_page_model.generate_code()
-        self.account_page_model.resend_email_with_code(self.user_data[1], self.code)
-
-    def send_email(self):
-        # resend email with code
-        messagebox.showinfo(title="Information", message="E-mail has been sent")
+        self.send_email()
 
     def change_email(self):
         self.account_page_view.change_email_window()
@@ -40,28 +37,31 @@ class AccountPageController:
 
     def delete_account(self):
         result = messagebox.askquestion(title='Warning',
-                                        message="Do you want to DELETE YOUR ACCOUNT? This action is PERNAMENT.")
+                                        message="Do you want to DELETE YOUR ACCOUNT? This action is PERMANENT.")
         if result == "yes":
             self.account_page_view.account_frame_destroy()
             from UserLoginPage.UserLoginController import UserLoginController
             UserLoginController(self.root)
-            ...  # delete acc from database(later)
+            ...  # delete acc from database(later) and clear all data
             messagebox.showinfo(title="Information", message="Your account has been deleted")
         elif result == "no":
             pass
 
     def clear_all_data(self):
         result = messagebox.askquestion(title='Warning',
-                                        message="Do you want to CLEAR ALL DATA? This action is PERNAMENT.")
+                                        message="Do you want to CLEAR ALL DATA? This action is PERMANENT.")
         if result == "yes":
             ...  # clear all data of user from database but not acc(later)
             messagebox.showinfo(title="Information", message="All of your data has been cleared.")
         elif result == "no":
             pass
 
+    def back_from_acc_page(self):
+        ...
+
     # Verify e-mail window buttons methods
 
-    # Check if code is valid
+    # Check all conditions then change status
     def submit_verification_code(self, user_entry_code):
         if self.account_page_model.check_code(user_entry_code, self.code):
             messagebox.showinfo(title="Information", message="Entered code is wrong, double check and try again.")
@@ -70,9 +70,10 @@ class AccountPageController:
             self.account_page_view.verify_email_root_destroy()
             messagebox.showinfo(title="Information", message="Your e-mail is now verified.")
 
-    # Resend e-mail with code
-    def resend_email(self):
-        self.account_page_model.resend_email_with_code(self.user_data[1], self.account_page_model.generate_code())
+    # Sends e-mail with code
+    def send_email(self):
+        self.account_page_model.send_email_with_code(self.user_data[1], self.code)
+        messagebox.showinfo(title="Information", message="E-mail has been sent")
 
     # Change password window buttons methods
     def submit_password(self, old_password_entry, new_password_entry, new_password_reentry):
@@ -91,6 +92,7 @@ class AccountPageController:
         print("")
         '''
 
+    # Check and display potential errors to user for changing password
     def new_password_validate(self, new_password_entry):
         if not self.account_page_model.check_new_password_length(new_password_entry):
             messagebox.showerror(title='Error', message="Your password is too short.")
@@ -139,6 +141,7 @@ class AccountPageController:
             self.account_page_view.change_email_window_destroy()
             messagebox.showinfo(title="Information", message="Your e-mail has been successfully changed.")
 
+    # Check and display potential errors to user for changing e-mail
     def new_email_validation(self, new_email_entry):
         if not self.account_page_model.check_new_email_in_database(new_email_entry):
             messagebox.showerror(title='Error', message="This e-mail is already registered, try again")
@@ -167,4 +170,3 @@ class AccountPageController:
             messagebox.showerror(title='Error', message="Old e-mail can't be your new e-mail.")
             return False
         return True
-

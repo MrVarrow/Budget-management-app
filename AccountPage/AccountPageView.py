@@ -5,6 +5,9 @@ class AccountPageView:
     def __init__(self, master, controller):
         self.controller = controller
         self.root = master
+        # Icon get
+        self.send_email_icon = PhotoImage(file="Icons/email.png")
+        self.send_email_icon = self.send_email_icon.subsample(20, 20)
 
         # Frame creation
         self.acc_page = Frame(master)
@@ -52,30 +55,31 @@ class AccountPageView:
     def account_frame_destroy(self):
         self.acc_page.destroy()
 
+    # Creating e-mail verification window
     def verify_email_window(self, user_email):
-        # Creating e-mail verification window
         self.verify_email_root = Toplevel(self.root)
         self.verify_email_root.geometry("400x200")
         self.verify_email_root.title("E-mail verification")
 
         # Label
         Label(self.verify_email_root, text="To verify e-mail enter the code, that was send on your email:\n"
-                                           "{}"
-                                           "note: if you close this window you will need new code.".format(user_email))\
-            .grid(row=0, column=0)
+                                           "{}\n"
+                                           "note: if you close this window you will need new code.".format(user_email),
+              bd=2, relief="solid")\
+            .grid(row=0, column=0, padx=40, pady=20)
 
         # Code Entry
-        self.code_entry = Entry(self.verify_email_root)
-        self.code_entry.grid(row=1, column=0)
+        self.code_entry = Entry(self.verify_email_root, font=('Arial', 15))
+        self.code_entry.grid(row=1, column=0, padx=80)
 
         # Resend e-mail button
-        Button(self.verify_email_root, text="Resend e-mail", command=lambda: self.controller.send_email()) \
-            .grid(row=1, column=0, sticky=E)
+        Button(self.verify_email_root, image=self.send_email_icon, bg="light gray", font=('Arial', 15), command=lambda: self.controller.send_email()) \
+            .grid(row=1, column=0, sticky=E, padx=30)
 
         # Submit code button
-        Button(self.verify_email_root, text="Submit code",
+        Button(self.verify_email_root, text="Submit code", bg="light gray", font=('Arial', 15),
                command=lambda: self.controller.submit_verification_code(self.code_entry.get())) \
-            .grid(row=2, column=0)
+            .grid(row=2, column=0, pady=20)
 
         # Focus on e-mail verification window
         self.verify_email_root.grab_set()
@@ -84,71 +88,73 @@ class AccountPageView:
     def verify_email_root_destroy(self):
         self.verify_email_root.destroy()
 
+    # Creating password change window
     def change_password_window(self):
-        # Creating password change window
         self.change_password_root = Toplevel(self.root)
         self.change_password_root.geometry("400x200")
         self.change_password_root.title("Password change")
 
         # Labels and entries
-        Label(self.change_password_root, text="Old password:") \
-            .grid(row=0, column=0)
-        self.old_password_entry = Entry(self.change_password_root)
-        self.old_password_entry.grid(row=1, column=0)
+        Label(self.change_password_root, text="Old password:", font=('Arial', 10)) \
+            .grid(row=0, column=0, sticky=W, padx=90)
+        self.old_password_entry = Entry(self.change_password_root, font=('Arial', 15))
+        self.old_password_entry.grid(row=1, column=0, padx=90)
 
-        Label(self.change_password_root, text="New password:") \
-            .grid(row=2, column=0)
-        self.new_password_entry = Entry(self.change_password_root)
-        self.new_password_entry.grid(row=3, column=0)
+        Label(self.change_password_root, text="New password:", font=('Arial', 10)) \
+            .grid(row=2, column=0, sticky=W, padx=90)
+        self.new_password_entry = Entry(self.change_password_root, font=('Arial', 15))
+        self.new_password_entry.grid(row=3, column=0, padx=90)
 
-        Label(self.change_password_root, text="Repeat new password:") \
-            .grid(row=4, column=0)
-        self.new_password_reentry = Entry(self.change_password_root)
-        self.new_password_reentry.grid(row=5, column=0)
+        Label(self.change_password_root, text="Repeat new password:", font=('Arial', 10)) \
+            .grid(row=4, column=0, sticky=W, padx=90)
+        self.new_password_reentry = Entry(self.change_password_root, font=('Arial', 15))
+        self.new_password_reentry.grid(row=5, column=0, padx=90)
 
         # Submit password button
-        Button(self.change_password_root, text="Submit password",
+        Button(self.change_password_root, text="Submit password", font=('Arial', 15), bg="light grey",
                command=lambda: self.controller.submit_password(self.old_password_entry.get(),
                                                                self.new_password_entry.get(),
                                                                self.new_password_reentry.get())) \
-            .grid(row=6, column=0)
+            .grid(row=6, column=0, pady=5)
 
         # Focus on password change window
         self.change_password_root.grab_set()
 
+    # Change password window destroy
     def change_password_window_destroy(self):
         self.change_password_root.destroy()
 
+    # Creating e-mail change window
     def change_email_window(self):
-        # Creating e-mail change window
         self.change_email_root = Toplevel(self.root)
         self.change_email_root.geometry("400x200")
         self.change_email_root.title("E-mail change")
 
         # Labels and entries
-        Label(self.change_email_root, text="Old e-mail:") \
-            .grid(row=0, column=0)
-        self.old_email_entry = Entry(self.change_email_root)
-        self.old_email_entry.grid(row=1, column=0)
+        Label(self.change_email_root, text="Old e-mail:", font=('Arial', 10)) \
+            .grid(row=0, column=0, sticky=W, padx=90)
+        self.old_email_entry = Entry(self.change_email_root, font=('Arial', 15))
+        self.old_email_entry.grid(row=1, column=0, sticky=W, padx=90)
 
-        Label(self.change_email_root, text="New e-mail:") \
-            .grid(row=2, column=0)
-        self.new_email_entry = Entry(self.change_email_root)
-        self.new_email_entry.grid(row=3, column=0)
+        Label(self.change_email_root, text="New e-mail:", font=('Arial', 10)) \
+            .grid(row=2, column=0, sticky=W, padx=90)
+        self.new_email_entry = Entry(self.change_email_root, font=('Arial', 15))
+        self.new_email_entry.grid(row=3, column=0, sticky=W, padx=90)
 
-        Label(self.change_email_root, text="Repeat new e-mail:") \
-            .grid(row=4, column=0)
-        self.new_email_reentry = Entry(self.change_email_root)
-        self.new_email_reentry.grid(row=5, column=0)
+        Label(self.change_email_root, text="Repeat new e-mail:", font=('Arial', 10)) \
+            .grid(row=4, column=0, sticky=W, padx=90)
+        self.new_email_reentry = Entry(self.change_email_root, font=('Arial', 15))
+        self.new_email_reentry.grid(row=5, column=0, sticky=W, padx=90)
 
         # Submit E-mail button
-        Button(self.change_email_root, text="Submit e-mail",
+        Button(self.change_email_root, text="Submit e-mail", font=('Arial', 15), bg="light grey",
                command=lambda: self.controller.submit_email(self.old_email_entry.get(), self.new_email_entry.get(),
                                                             self.new_email_reentry.get())) \
-            .grid(row=6, column=0)
+            .grid(row=6, column=0, pady=5)
 
         # Focus on change e-mail window
         self.change_email_root.grab_set()
 
+    # Change e-mail window destroy
     def change_email_window_destroy(self):
         self.change_email_root.destroy()

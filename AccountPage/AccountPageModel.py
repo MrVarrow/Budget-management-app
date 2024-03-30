@@ -3,6 +3,7 @@ from SendEmails import send_email_with_code
 import random
 from CreateAccountPage.CreateAccountModel import CreateAccountPageModel
 
+
 class AccountPageModel:
     def __init__(self):
         self.connection = mysql.connector.connect(host="localhost", user="root", passwd="AkniLUAp01-",
@@ -11,6 +12,7 @@ class AccountPageModel:
         self.status_for_user = ''
         self.create_account_model = CreateAccountPageModel()
 
+    # E-MAIL NOTIFICATIONS METHODS
     # Get email notification status from database
     def email_notifications_status(self, user_data):
         username = user_data[0]
@@ -32,8 +34,9 @@ class AccountPageModel:
                             (status, user_data[0]))
         self.connection.commit()
 
+    # E-MAIL VERIFICATION METHODS
     # Send e-mail with code
-    def resend_email_with_code(self, user_email, code):
+    def send_email_with_code(self, user_email, code):
         send_email_with_code(user_email, code)
 
     # Generate code to verify e-mail
@@ -57,47 +60,42 @@ class AccountPageModel:
                             (email_verification_status, user_data[0]))
         self.connection.commit()
 
-    def user_email_get(self, user_data):
-        username = user_data[0]
-        self.cursor.execute("SELECT email FROM `user` WHERE username = %s", (username,))
-        row = self.cursor.fetchone()
-        return row[0]
-
-    def user_password_get(self, user_data):
-        username = user_data[0]
-        self.cursor.execute("SELECT password FROM `user` WHERE username = %s", (username,))
-        row = self.cursor.fetchone()
-        return row[0]
-
-    # !!!
+    # E-MAIL CHANGE METHODS
+    # E-mail validation
     def new_email_validate(self, new_email_entry):
         result = self.create_account_model.check_if_email_is_valid(new_email_entry)
         return result
 
+    # Check if new e-mail is already in database
     def check_new_email_in_database(self, new_email_entry):
         result = self.create_account_model.check_email_in_database(new_email_entry)
         return result
 
+    # Check if entered old e-mail is correct
     def check_if_old_email_is_correct(self, old_email_entry, user_data):
         if not old_email_entry == user_data[1]:
             return False
         return True
 
+    # Update user email to new one
     def update_user_email(self, user_data, new_email_entry):
         self.cursor.execute('UPDATE budgetappdatabase.user SET email = %s WHERE username = %s',
                             (new_email_entry, user_data[0]))
         self.connection.commit()
 
+    # Check if both entered e-mails are the same
     def check_if_emails_are_the_same(self, new_email_entry, new_email_reentry):
         if not new_email_entry == new_email_reentry:
             return False
         return True
 
+    # Check if old e-mail is the same as new e-mail
     def check_if_old_is_new_email(self, new_email_entry, user_data):
         if not new_email_entry != user_data[1]:
             return False
         return True
 
+    # PASSWORD CHANGE METHODS
     # Check if user password is at least 8 chars
     def check_new_password_length(self, new_password_entry):
         result = self.create_account_model.check_password_length(new_password_entry)
@@ -128,16 +126,19 @@ class AccountPageModel:
         result = self.create_account_model.check_if_passwords_are_the_same(new_password_entry, new_password_reentry)
         return result
 
+    # Check if entered old password is correct
     def check_if_old_password_is_correct(self, old_password_entry, user_data):
         if not old_password_entry == user_data[2]:
             return False
         return True
 
+    # Update user password to new one
     def update_user_new_password(self, user_data, new_password_entry):
         self.cursor.execute('UPDATE budgetappdatabase.user SET password = %s WHERE username = %s',
                             (new_password_entry, user_data[0]))
         self.connection.commit()
 
+    # Check if old password is the same as new password
     def check_if_old_is_new_password(self, new_password_entry, user_data):
         if not new_password_entry != user_data[2]:
             return False
