@@ -2,7 +2,8 @@ from tkinter import *
 
 
 class MobileAppWindowView:
-    def __init__(self, master, controller):
+    def __init__(self, master, controller, bg_color):
+        self.bg_color = bg_color
         # Loading icons and scaling them
         copy_icon = PhotoImage(file="Icons/copy.png")
         copy_icon = copy_icon.subsample(20, 20)
@@ -10,9 +11,10 @@ class MobileAppWindowView:
         email_icon = email_icon.subsample(20, 20)
 
         # Create TopLevel window
-        mobile_app_root = Toplevel(master)
+        mobile_app_root = Toplevel(master, bg=bg_color)
         mobile_app_root.geometry("400x200")
         mobile_app_root.title("Download our mobile app")
+        mobile_app_root.resizable(False, False)
 
         # Labels
         Label(mobile_app_root, text="There is a link to our mobile app:", font=('Arial', 15)) \

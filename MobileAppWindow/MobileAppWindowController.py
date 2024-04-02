@@ -3,10 +3,11 @@ from MobileAppWindow.MobileAppWindowView import MobileAppWindowView
 
 
 class MobileAppWindowController:
-    def __init__(self, root, user_data):
+    def __init__(self, root, user_data, bg_color):
         self.root = root
+        self.bg_color = bg_color
         self.user_data = user_data
-        self.mobile_app_window_view = MobileAppWindowView(self.root, self)
+        self.mobile_app_window_view = MobileAppWindowView(self.root, self, self.bg_color)
         self.mobile_app_window_model = MobileAppWindowsModel()
 
     # Copy link when user press the button
