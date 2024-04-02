@@ -9,19 +9,21 @@ from tkinter import messagebox
 
 
 class LoggedUserPageController:
-    def __init__(self, root, user_data):
+    def __init__(self, root, user_data, bg_color):
         self.root = root
+        self.bg_color = bg_color
         self.user_data = user_data
-        self.logged_user_page_view = LoggedUserPageView(self.root, self)
+        self.logged_user_page_view = LoggedUserPageView(self.root, self, self.bg_color)
         self.logged_user_page_model = LoggedUserPageModel()
 
     # Go into settings
     def settings(self):
-        SettingsPageController(self.root, self.user_data)
+        # destroy frame
+        SettingsPageController(self.root, self.user_data, self.bg_color)
 
     # Go into user account
     def your_acc(self):
-        AccountPageController(self.root, self.user_data)
+        AccountPageController(self.root, self.user_data, self.bg_color)
 
     # Go into manage budget page
     def manage_budget(self):
@@ -45,11 +47,11 @@ class LoggedUserPageController:
 
     # Go into rate us window
     def rate_us(self):
-        RateAppWindowController(self.root, self.user_data)
+        RateAppWindowController(self.root, self.user_data, self.bg_color)
 
     # Go into mobile app window
     def mobile_app(self):
-        MobileAppWindowController(self.root, self.user_data)
+        MobileAppWindowController(self.root, self.user_data, self.bg_color)
 
     # Display question if user wants to log out, then takes action based on decision
     def logout(self):
@@ -58,7 +60,7 @@ class LoggedUserPageController:
             # this import look strange for me but i cannot find other way to make this work because of circular import error
             self.logged_user_page_view.destroy_logged_user_frame()
             from UserLoginPage.UserLoginController import UserLoginController
-            UserLoginController(self.root)
+            UserLoginController(self.root, self.bg_color)
         elif result == "no":
             pass
 

@@ -2,7 +2,8 @@ from tkinter import *
 
 
 class LoggedUserPageView:
-    def __init__(self, master, controller):
+    def __init__(self, master, controller, bg_color):
+        self.bg_color = bg_color
         self.controller = controller
         # Loading icons and scaling them
         self.acc_icon = PhotoImage(file="Icons/user.png")
@@ -11,7 +12,7 @@ class LoggedUserPageView:
         self.settings_icon = self.settings_icon.subsample(20, 20)
 
         # Frame creation
-        self.logged_usr_page = Frame(master)
+        self.logged_usr_page = Frame(master, bg=self.bg_color)
         self.logged_usr_page.grid(row=0, column=0, sticky=NSEW)
 
         # Labels
