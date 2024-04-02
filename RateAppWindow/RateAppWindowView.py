@@ -2,23 +2,26 @@ from tkinter import *
 
 
 class RateAppWindowView:
-    def __init__(self, master, controller):
+    def __init__(self, master, controller, bg_color):
+        self.bg_color = bg_color
         self.controller = controller
-        self.empty_star = PhotoImage(file="Icons/empty_star.png")
-        self.empty_star = self.empty_star.subsample(20, 20)
-        self.full_star = PhotoImage(file="Icons/full_star.png")
-        self.full_star = self.full_star.subsample(20, 20)
         self.star_list = ["1", "2", "3", "4", "5"]
         self.filled_star_list = []
         self.unfilled_star_list = []
         self.final_rating = ""
+        # Icons loading from Icons folder
+        self.empty_star = PhotoImage(file="Icons/empty_star.png")
+        self.empty_star = self.empty_star.subsample(20, 20)
+        self.full_star = PhotoImage(file="Icons/full_star.png")
+        self.full_star = self.full_star.subsample(20, 20)
 
-        self.rate_us_root = Toplevel(master)
+        self.rate_us_root = Toplevel(master, bg=self.bg_color)
         self.rate_us_root.geometry("400x200")
         self.rate_us_root.title("Rate us!")
+        self.rate_us_root.resizable(False, False)
 
         # Stars Frame creation
-        self.rate_us_stars_frame = Frame(self.rate_us_root)
+        self.rate_us_stars_frame = Frame(self.rate_us_root, bg=self.bg_color)
         self.rate_us_stars_frame.grid(row=1, column=0)
 
         # Labels
@@ -40,6 +43,7 @@ class RateAppWindowView:
         Button(self.rate_us_root, text="Submit", font=('Arial', 15), width=7, bg="light gray",
                command=lambda: controller.submit_rating(self.final_rating)).grid(row=3, column=0, sticky=W, padx=150)
 
+        # Focus on TopLevel window
         self.rate_us_root.grab_set()
 
     # Display number of stars which user rated the app
@@ -50,7 +54,7 @@ class RateAppWindowView:
     # Displaying filled/unfilled stars
     def stars_display(self):
         self.rate_us_stars_frame.destroy()
-        self.rate_us_stars_frame = Frame(self.rate_us_root)
+        self.rate_us_stars_frame = Frame(self.rate_us_root, bg=self.bg_color)
         self.rate_us_stars_frame.grid(row=1, column=0)
         i = 100
         for star in self.filled_star_list:

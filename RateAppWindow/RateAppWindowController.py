@@ -4,10 +4,11 @@ from tkinter import messagebox
 
 
 class RateAppWindowController:
-    def __init__(self, root, user_data):
+    def __init__(self, root, user_data, bg_color):
+        self.bg_color = bg_color
         self.root = root
         self.user_data = user_data
-        self.rate_app_window_view = RateAppWindowView(self.root, self)
+        self.rate_app_window_view = RateAppWindowView(self.root, self, self.bg_color)
         self.rate_app_window_model = RateAppWindowsModel()
 
     # Manipulation with numbers of stars displayed based on user action
