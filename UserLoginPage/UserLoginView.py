@@ -2,17 +2,18 @@ from tkinter import *
 
 
 class UserLoginView:
-    def __init__(self, master, controller):
+    def __init__(self, master, controller, bg_color):
         # Loading icon and scaling it
         self.show_password_icon = PhotoImage(file="Icons/hide.png")
         self.show_password_icon = self.show_password_icon.subsample(20, 20)
+        self.bg_color = bg_color
 
         # Define variables for entries
         self.password = StringVar()
         self.login = StringVar()
 
         # Frame create
-        self.main_menu_frame = Frame(master)
+        self.main_menu_frame = Frame(master, bg=self.bg_color)
         self.main_menu_frame.grid(row=0, column=0, sticky=NSEW)
 
         # Labels and Entries

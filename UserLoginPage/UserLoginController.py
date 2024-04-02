@@ -6,9 +6,10 @@ from tkinter import messagebox
 
 
 class UserLoginController:
-    def __init__(self, root):
+    def __init__(self, root, bg_color):
         self.root = root
-        self.login_user_page_view = UserLoginView(self.root, self)
+        self.bg_color = bg_color
+        self.login_user_page_view = UserLoginView(self.root, self, self.bg_color)
         self.login_user_page_model = UserLoginModel()
 
     def user_login(self, login_input, password_input):
@@ -27,7 +28,7 @@ class UserLoginController:
         # Check if password entered by user is correct
         if password == password_input:
             self.login_user_page_view.destroy_login_page_frame()
-            LoggedUserPageController(self.root, user_data)
+            LoggedUserPageController(self.root, user_data, self.bg_color)
         else:
             messagebox.showinfo(title="Information", message="Incorrect password.")
 
@@ -51,8 +52,9 @@ class UserLoginController:
             messagebox.showinfo(title="Information", message="User does not exist.")
             return
         self.login_user_page_model.email_with_password(user_data)
+        messagebox.showinfo(title="Information", message="E-mail with password has been sent")
 
     # Go into create account page
     def create_acc(self):
         self.login_user_page_view.destroy_login_page_frame()
-        CreateAccountPageController(self.root)
+        CreateAccountPageController(self.root, self.bg_color)
