@@ -5,12 +5,12 @@ from UserLoginPage.UserLoginController import UserLoginController
 def main():
     # Create root
     root = Tk()
-    root.configure(bg="light gray")
+    bg_color = "#f0f0f0"
     root.geometry("1280x720")
     root.resizable(False, False)
     root.title("Budget")
     # Launch App
-    UserLoginController(root)
+    UserLoginController(root, bg_color)
     root.mainloop()
 
 
