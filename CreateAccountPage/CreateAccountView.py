@@ -2,7 +2,7 @@ from tkinter import *
 
 
 class CreateAccountPageView:
-    def __init__(self, master, controller):
+    def __init__(self, master, controller, bg_color):
         self.controller = controller
         self.root = master
 
@@ -14,7 +14,7 @@ class CreateAccountPageView:
         self.email_var = StringVar()
 
         # Frame creation
-        self.create_account_page = Frame(self.root)
+        self.create_account_page = Frame(self.root, bg=bg_color)
         self.create_account_page.grid(row=0, column=0, sticky=NSEW)
 
         # Labels and Entries
@@ -59,7 +59,7 @@ class CreateAccountPageView:
 
         # E-mail notifications checkbutton
         Checkbutton(self.create_account_page, text="I want to get e-mail notifications about news", font=('Arial', 12),
-                    variable=self.email_notification_state, onvalue=True, offvalue=False) \
+                    variable=self.email_notification_state, onvalue=True, offvalue=False, command=lambda: self.controller.dark_mode()) \
             .grid(row=8, column=1, columnspan=2, sticky=E, padx=150)
 
         # Create account button

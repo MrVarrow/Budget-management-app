@@ -5,9 +5,10 @@ from email_validator import EmailNotValidError
 
 
 class CreateAccountPageController:
-    def __init__(self, root):
+    def __init__(self, root, bg_color):
         self.root = root
-        self.create_account_view = CreateAccountPageView(self.root, self)
+        self.bg_color = bg_color
+        self.create_account_view = CreateAccountPageView(self.root, self, self.bg_color)
         self.create_account_model = CreateAccountPageModel()
 
     # Not sure about this rn
@@ -21,7 +22,6 @@ class CreateAccountPageController:
             return True
         return False
     '''
-
 
     '''
     Check all conditions combined and if all is correct create account and sent confirm email, then going back to 
@@ -38,7 +38,7 @@ class CreateAccountPageController:
             self.create_account_view.destroy_create_account_frame()
 
             from UserLoginPage.UserLoginController import UserLoginController
-            UserLoginController(self.root)
+            UserLoginController(self.root, self.bg_color)
             messagebox.showinfo(title="Information", message="Your account has been created, now you can login")
 
     # Check if login meets requirements
@@ -96,6 +96,6 @@ class CreateAccountPageController:
             # this import look strange for me. I cannot find other way to make this work because of circular import error
             self.create_account_view.destroy_create_account_frame()
             from UserLoginPage.UserLoginController import UserLoginController
-            UserLoginController(self.root)
+            UserLoginController(self.root, self.bg_color)
         elif result == "no":
             pass
