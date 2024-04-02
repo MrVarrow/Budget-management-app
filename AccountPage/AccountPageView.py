@@ -2,15 +2,24 @@ from tkinter import *
 
 
 class AccountPageView:
-    def __init__(self, master, controller):
+    def __init__(self, master, controller, bg_color):
+        self.bg_color = bg_color
         self.controller = controller
         self.root = master
         # Icon get
         self.send_email_icon = PhotoImage(file="Icons/email.png")
         self.send_email_icon = self.send_email_icon.subsample(20, 20)
+        # Variables for entries
+        self.old_email_entry = StringVar()
+        self.new_email_entry = StringVar()
+        self.new_email_reentry = StringVar()
+        self.old_password_entry = StringVar()
+        self.new_password_entry = StringVar()
+        self.new_password_reentry = StringVar()
+        self.code_entry = StringVar()
 
         # Frame creation
-        self.acc_page = Frame(master)
+        self.acc_page = Frame(master, bg=self.bg_color)
         self.acc_page.grid(row=0, column=0, sticky=NSEW)
 
         # Labels
@@ -57,9 +66,10 @@ class AccountPageView:
 
     # Creating e-mail verification window
     def verify_email_window(self, user_email):
-        self.verify_email_root = Toplevel(self.root)
+        self.verify_email_root = Toplevel(self.root, bg=self.bg_color)
         self.verify_email_root.geometry("400x200")
         self.verify_email_root.title("E-mail verification")
+        self.verify_email_root.resizable(False, False)
 
         # Label
         Label(self.verify_email_root, text="To verify e-mail enter the code, that was send on your email:\n"
@@ -69,8 +79,8 @@ class AccountPageView:
             .grid(row=0, column=0, padx=40, pady=20)
 
         # Code Entry
-        self.code_entry = Entry(self.verify_email_root, font=('Arial', 15))
-        self.code_entry.grid(row=1, column=0, padx=80)
+        Entry(self.verify_email_root, font=('Arial', 15), textvariable=self.code_entry) \
+            .grid(row=1, column=0, padx=80)
 
         # Resend e-mail button
         Button(self.verify_email_root, image=self.send_email_icon, bg="light gray", font=('Arial', 15), command=lambda: self.controller.send_email()) \
@@ -90,25 +100,26 @@ class AccountPageView:
 
     # Creating password change window
     def change_password_window(self):
-        self.change_password_root = Toplevel(self.root)
+        self.change_password_root = Toplevel(self.root, bg=self.bg_color)
         self.change_password_root.geometry("400x200")
         self.change_password_root.title("Password change")
+        self.change_password_root.resizable(False, False)
 
         # Labels and entries
         Label(self.change_password_root, text="Old password:", font=('Arial', 10)) \
             .grid(row=0, column=0, sticky=W, padx=90)
-        self.old_password_entry = Entry(self.change_password_root, font=('Arial', 15))
-        self.old_password_entry.grid(row=1, column=0, padx=90)
+        Entry(self.change_password_root, font=('Arial', 15), textvariable=self.old_password_entry) \
+            .grid(row=1, column=0, padx=90)
 
         Label(self.change_password_root, text="New password:", font=('Arial', 10)) \
             .grid(row=2, column=0, sticky=W, padx=90)
-        self.new_password_entry = Entry(self.change_password_root, font=('Arial', 15))
-        self.new_password_entry.grid(row=3, column=0, padx=90)
+        Entry(self.change_password_root, font=('Arial', 15), textvariable=self.new_password_entry) \
+            .grid(row=3, column=0, padx=90)
 
         Label(self.change_password_root, text="Repeat new password:", font=('Arial', 10)) \
             .grid(row=4, column=0, sticky=W, padx=90)
-        self.new_password_reentry = Entry(self.change_password_root, font=('Arial', 15))
-        self.new_password_reentry.grid(row=5, column=0, padx=90)
+        Entry(self.change_password_root, font=('Arial', 15), textvariable=self.new_password_reentry) \
+            .grid(row=5, column=0, padx=90)
 
         # Submit password button
         Button(self.change_password_root, text="Submit password", font=('Arial', 15), bg="light grey",
@@ -126,25 +137,26 @@ class AccountPageView:
 
     # Creating e-mail change window
     def change_email_window(self):
-        self.change_email_root = Toplevel(self.root)
+        self.change_email_root = Toplevel(self.root, bg=self.bg_color)
         self.change_email_root.geometry("400x200")
         self.change_email_root.title("E-mail change")
+        self.change_email_root.resizable(False, False)
 
         # Labels and entries
         Label(self.change_email_root, text="Old e-mail:", font=('Arial', 10)) \
             .grid(row=0, column=0, sticky=W, padx=90)
-        self.old_email_entry = Entry(self.change_email_root, font=('Arial', 15))
-        self.old_email_entry.grid(row=1, column=0, sticky=W, padx=90)
+        Entry(self.change_email_root, font=('Arial', 15), textvariable=self.old_email_entry) \
+            .grid(row=1, column=0, sticky=W, padx=90)
 
         Label(self.change_email_root, text="New e-mail:", font=('Arial', 10)) \
             .grid(row=2, column=0, sticky=W, padx=90)
-        self.new_email_entry = Entry(self.change_email_root, font=('Arial', 15))
-        self.new_email_entry.grid(row=3, column=0, sticky=W, padx=90)
+        Entry(self.change_email_root, font=('Arial', 15), textvariable=self.new_email_entry) \
+            .grid(row=3, column=0, sticky=W, padx=90)
 
         Label(self.change_email_root, text="Repeat new e-mail:", font=('Arial', 10)) \
             .grid(row=4, column=0, sticky=W, padx=90)
-        self.new_email_reentry = Entry(self.change_email_root, font=('Arial', 15))
-        self.new_email_reentry.grid(row=5, column=0, sticky=W, padx=90)
+        Entry(self.change_email_root, font=('Arial', 15), textvariable=self.new_email_reentry) \
+            .grid(row=5, column=0, sticky=W, padx=90)
 
         # Submit E-mail button
         Button(self.change_email_root, text="Submit e-mail", font=('Arial', 15), bg="light grey",

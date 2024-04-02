@@ -5,10 +5,11 @@ from email_validator import EmailNotValidError
 
 
 class AccountPageController:
-    def __init__(self, root, user_data):
+    def __init__(self, root, user_data, bg_color):
         self.root = root
+        self.bg_color = bg_color
         self.user_data = user_data
-        self.account_page_view = AccountPageView(self.root, self)
+        self.account_page_view = AccountPageView(self.root, self, self.bg_color)
         self.account_page_model = AccountPageModel()
         self.code = ""
 
@@ -22,9 +23,11 @@ class AccountPageController:
         self.code = self.account_page_model.generate_code()
         self.send_email()
 
+    # Change e-mail window popup
     def change_email(self):
         self.account_page_view.change_email_window()
 
+    # Change e-mail messagebox popup
     def change_email_notifications(self):
         status = self.account_page_model.email_notifications_status(self.user_data)
         result = messagebox.askquestion(title='Warning',
@@ -35,18 +38,20 @@ class AccountPageController:
         elif result == "no":
             pass
 
+    # Delete account popup
     def delete_account(self):
         result = messagebox.askquestion(title='Warning',
                                         message="Do you want to DELETE YOUR ACCOUNT? This action is PERMANENT.")
         if result == "yes":
             self.account_page_view.account_frame_destroy()
             from UserLoginPage.UserLoginController import UserLoginController
-            UserLoginController(self.root)
+            UserLoginController(self.root, self.bg_color)
             ...  # delete acc from database(later) and clear all data
             messagebox.showinfo(title="Information", message="Your account has been deleted")
         elif result == "no":
             pass
 
+    # Clear all data popup
     def clear_all_data(self):
         result = messagebox.askquestion(title='Warning',
                                         message="Do you want to CLEAR ALL DATA? This action is PERMANENT.")
@@ -56,6 +61,7 @@ class AccountPageController:
         elif result == "no":
             pass
 
+    # Back from acc page to logged user page
     def back_from_acc_page(self):
         ...
 
