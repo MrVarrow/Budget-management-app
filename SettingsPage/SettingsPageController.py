@@ -11,9 +11,9 @@ class SettingsPageController:
         self.settings_page_view = SettingsPageView(self.root, self, self.bg_color)
         self.settings_page_model = SettingsPageModel()
 
+    # Launch a window with chatbot assistant
     def support_and_help(self):
-        # Create a chatbot with database in json which predict the best answer with disclaimer if anwer dont match issue send us email
-        ...
+        self.settings_page_view.support_and_help_window()
 
     # Display info to user about version
     def app_version(self):
@@ -43,3 +43,8 @@ class SettingsPageController:
 
     def credits_linkedin(self, url):
         self.settings_page_model.credits_linkedin_link(url)
+
+    # Support and help window methods
+    def update_answer(self, question):
+        answer = self.settings_page_model.chat_bot(question)
+        self.settings_page_view.update_answer_widget(answer)
