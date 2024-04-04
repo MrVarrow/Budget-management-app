@@ -23,9 +23,10 @@ class SettingsPageController:
     def credits(self):
         self.settings_page_view.credits_window_create()
 
+    # Opens txt file after pressing button
     def about_app(self):
         # Here show an app description
-        ...
+        self.settings_page_model.open_about_app_file()
 
     # Change bg of app to dark or back to light based on choice
     def dark_mode(self):

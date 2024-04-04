@@ -1,3 +1,4 @@
+import os
 import mysql.connector
 import webbrowser
 import json
@@ -49,6 +50,6 @@ class SettingsPageModel:
                 message = "any of the answers match your question, if you need help please contact support via email"
                 return message
 
-
-
-
+    # Opens about app txt file
+    def open_about_app_file(self):
+        os.startfile("AboutApp.txt")
