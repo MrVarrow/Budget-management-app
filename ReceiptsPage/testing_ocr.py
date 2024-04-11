@@ -1,6 +1,7 @@
 import pytesseract
 import cv2
 import easyocr
+import re
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import ndimage
@@ -15,17 +16,18 @@ def preprocess_image(image):
     # Scale the image
     image = cv2.resize(image, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
 
+
     # Convert to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    # Apply Otsu's binarization
-    _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
     # Apply Gaussian blurring to remove noise
-    blurred = cv2.GaussianBlur(binary, (5, 5), 0)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+    # Apply Otsu's binarization
+    _, binary = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
     #Enhance contrast
-    enhanced = cv2.equalizeHist(blurred)
+    enhanced = cv2.equalizeHist(binary)
 
     return enhanced
 
@@ -35,13 +37,15 @@ def read_text(image1):
     reader = easyocr.Reader(['en'], gpu=False)
     text_detections = reader.readtext(image)
     data = ""
+    has_digits = False
     for result in text_detections:
         text = result[1]
-        bbox = result[0]  # Bounding box coordinates are the first element
-        x1, y1, x2, y2 = bbox
+        print(text)
         data += text
+
     # draw_bounding_boxes(img, text_detections, threshold)
     cv2.imwrite('1083-receipt_roi_fixed.png', image)
+
 
     return data
 
@@ -66,7 +70,7 @@ cv2.imwrite('1083-receipt_dilate.png', dilate)
 
 cnts = cv2.findContours(dilate, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-cnts = sorted(cnts, key=lambda x: cv2.boundingRect(x)[0])
+cnts = sorted(cnts, key=lambda x: (cv2.boundingRect(x)[1], cv2.boundingRect(x)[0]))
 
 results = []
 for c in cnts:
