@@ -8,6 +8,9 @@ class AddNewReceiptView:
         self.controller = controller
         self.root = master
         self.bg_color = bg_color
+        # Entries variables
+        self.item_name = StringVar()
+        self.item_price = StringVar()
 
         # Add new receipt frame
         self.add_new_receipt_frame = Frame(self.root)
@@ -23,12 +26,12 @@ class AddNewReceiptView:
 
         Label(self.add_new_receipt_frame, text="Enter product name:", font=('Arial', 15)) \
             .grid(row=1, column=0, sticky=W, padx=50)
-        Entry(self.add_new_receipt_frame, font=('Arial', 20)) \
+        Entry(self.add_new_receipt_frame, font=('Arial', 20), textvariable=self.item_name) \
             .grid(row=2, column=0, sticky=W, padx=50)
 
         Label(self.add_new_receipt_frame, text="Enter product price:", font=('Arial', 15)) \
             .grid(row=3, column=0, sticky=W, padx=50)
-        Entry(self.add_new_receipt_frame, font=('Arial', 20)) \
+        Entry(self.add_new_receipt_frame, font=('Arial', 20), textvariable=self.item_price) \
             .grid(row=4, column=0, sticky=W, padx=50)
 
         Label(self.add_new_receipt_frame, font=('Arial', 15), text="Try by uploading a photo:\n"
@@ -36,47 +39,66 @@ class AddNewReceiptView:
             .grid(row=1, column=2, sticky=E, padx=65)
 
         # Submit item button
-        Button(self.add_new_receipt_frame, text="Submit", font=('Arial', 20), bg="light gray", width=10) \
+        Button(self.add_new_receipt_frame, text="Submit", font=('Arial', 20), bg="light gray", width=10,
+               command=lambda: controller.submit_item(self.item_name.get(), self.item_price.get())) \
             .grid(row=5, column=0, sticky=W, padx=120, pady=20)
 
-        # Delete item button
-        Button(self.add_new_receipt_frame, text="Delete", font=('Arial', 20), bg="light gray", width=10) \
+        # Delete item button (to delete it would take index of item)
+        Button(self.add_new_receipt_frame, text="Delete", font=('Arial', 20), bg="light gray", width=10,
+               command=lambda: controller.delete_item(self.table.selection())) \
             .grid(row=6, column=0, sticky=W, padx=120, pady=20)
 
         # Add receipt button
-        Button(self.add_new_receipt_frame, text="Add receipt", font=('Arial', 20), bg="light gray", width=10) \
+        Button(self.add_new_receipt_frame, text="Add receipt", font=('Arial', 20), bg="light gray", width=10,
+               command=lambda: controller.add_receipt()) \
             .grid(row=7, column=1, pady=10)
 
         # Choose path to receipt photo button
-        Button(self.add_new_receipt_frame, text="path to selected file", font=('Arial', 20), bg="light gray") \
+        Button(self.add_new_receipt_frame, text="path to selected file", font=('Arial', 20), bg="light gray",
+               command=lambda: controller.choose_path_to_photo()) \
             .grid(row=2, rowspan=2, column=2, sticky=SE, padx=50)
 
         # Submit photo button
-        Button(self.add_new_receipt_frame, text="Submit", font=('Arial', 20), bg="light gray", width=10) \
+        Button(self.add_new_receipt_frame, text="Submit", font=('Arial', 20), bg="light gray", width=10,
+               command=lambda: controller.submit_photo()) \
             .grid(row=4, rowspan=2, column=2, sticky=SE, padx=100)
 
         # Back to Receipt page
-        Button(self.add_new_receipt_frame, text="Back", font=('Arial', 15), bg="light gray", width=7) \
+        Button(self.add_new_receipt_frame, text="Back", font=('Arial', 15), bg="light gray", width=7,
+               command=lambda: controller.back_to_receipt_page()) \
             .grid(row=8, column=2, sticky=E)
 
-        data = {'Name': ['John', 'Jane', 'Bob', 'Alice', 'Tom', 'Lily', 'Mike', 'Emily'],
-        'Age': [25, 30, 35, 40, 45, 50, 55, 60],
-        'City': ['New York', 'London', 'Paris', 'Tokyo', 'Sydney', 'Berlin', 'Moscow', 'Seoul']}
-        df = pd.DataFrame(data)
+    # Creating treeview table and scrollbar
+    def create_treeview(self, treeview_df):
+        self.table = ttk.Treeview(self.items_frame, height=15)
+        self.table["columns"] = list(treeview_df.columns)
+        self.table.column("#0", width=50)
 
-        # Table for items
-        table = ttk.Treeview(self.items_frame, height=15)
-        table["columns"] = list(df.columns)
-        table.column("#0", width=100)
-        table.pack(fill="both", expand=True)
-        for col in df.columns:
-            table.column(col, width=100)
-        table.pack(side=LEFT, fill="both", expand=True)
+        for col in treeview_df.columns:
+            self.table.column(col, width=100)
 
-        scrollbar = ttk.Scrollbar(self.items_frame, command=table.yview)
+        self.table.heading("#0", text="Index", anchor="w")
+        for col in treeview_df.columns:
+            self.table.heading(col, text=col, anchor="w")
+
+        self.table.pack(fill="both", expand=True, side=LEFT)
+
+        scrollbar = ttk.Scrollbar(self.items_frame, command=self.table.yview)
         scrollbar.pack(side=LEFT, fill="y")
-        table.configure(yscrollcommand=scrollbar.set)
-        for i, row in df.iterrows():
-            table.insert("", "end", text=i, values=list(row))
+        self.table.configure(yscrollcommand=scrollbar.set)
 
+    # Update values in treeview
+    def update_treeview(self, updated_df):
+        for i, row in updated_df.iterrows():
+            self.table.insert("", "end", text=i, values=list(row))
 
+    # Deleting old values in treeview
+    def delete_items_in_treeview(self):
+        items = self.table.get_children()
+        for item in items:
+            self.table.delete(item)
+
+    def delete_item_from_treeview(self, selected_item):
+
+        if selected_item:
+            self.table.delete(selected_item)
