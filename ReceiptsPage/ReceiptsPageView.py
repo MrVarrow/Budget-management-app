@@ -2,18 +2,23 @@ from tkinter import *
 from tkinter import ttk
 
 
+# Add refreshing combobox widget
 class ReceiptsPageView:
     def __init__(self, master, controller, bg_color):
         self.controller = controller
         self.root = master
         self.bg_color = bg_color
 
+        # Variables
+        self.combobox_var = StringVar()
+        self.total_price = ""
+
         # Receipts page frame
-        self.receipts_frame = Frame(self.root)
+        self.receipts_frame = Frame(self.root, bg=self.bg_color)
         self.receipts_frame.grid(row=0, column=0)
 
         # Overview of receipt frame
-        self.overview_frame = Frame(self.receipts_frame)
+        self.overview_frame = Frame(self.receipts_frame, bg=self.bg_color)
         self.overview_frame.grid(row=1, rowspan=4, column=1, sticky=W)
 
         # Labels
@@ -23,32 +28,77 @@ class ReceiptsPageView:
         Label(self.receipts_frame, text="Your receipts:", font=('Arial', 15)) \
             .grid(row=1, column=0, sticky=W, padx=100)
 
+        Label(self.receipts_frame, text="Total:", font=('Arial', 20)) \
+            .grid(row=5, column=1, sticky=W)
+
+        self.total_price_widget = Label(self.receipts_frame, text=self.total_price, font=('Arial', 20))
+        self.total_price_widget.grid(row=5, column=0, sticky=E, padx=250, columnspan=2)
+
         # Combobox
-        ttk.Combobox(self.receipts_frame, font=('Arial', 20))\
-            .grid(row=2, column=0, sticky=W, padx=100)
+        self.combobox_receipts = ttk.Combobox(self.receipts_frame, font=('Arial', 20), textvariable=self.combobox_var)
+        self.combobox_receipts.grid(row=2, column=0, sticky=W, padx=100)
 
         # Choose receipt button
-        Button(self.receipts_frame, text="Choose", font=('Arial', 20), bg='light gray', width=10, command=lambda: controller.choose_receipt()) \
+        Button(self.receipts_frame, text="Choose", font=('Arial', 20), bg='light gray', width=10,
+               command=lambda: controller.choose_receipt(self.combobox_var.get())) \
             .grid(row=3, column=0, sticky=W, padx=170, pady=20)
 
         # Delete receipt button
-        Button(self.receipts_frame, text="Delete", font=('Arial', 20), bg='light gray', width=10, command=lambda: controller.delete_receipt()) \
+        Button(self.receipts_frame, text="Delete", font=('Arial', 20), bg='light gray', width=10,
+               command=lambda: controller.delete_receipt(self.combobox_var.get())) \
             .grid(row=4, column=0, sticky=W, padx=170, pady=30)
 
         # Add new receipt button
-        Button(self.receipts_frame, text="Add new receipt", font=('Arial', 20), bg='light gray', width=15, command=lambda: controller.add_new_receipt()) \
+        Button(self.receipts_frame, text="Add new receipt", font=('Arial', 20), bg='light gray',
+               width=15, command=lambda: controller.add_new_receipt()) \
             .grid(row=5, column=0, sticky=W, padx=130)
 
         # Back to logged user page button
-        Button(self.receipts_frame, text="Back", font=('Arial', 15), bg='light gray', width=7, command=lambda: controller.back_to_logged_user_page()) \
+        Button(self.receipts_frame, text="Back", font=('Arial', 15), bg='light gray', width=7,
+               command=lambda: controller.back_to_logged_user_page()) \
             .grid(row=6, column=1, columnspan=2, sticky=SE, pady=30, padx=10)
 
-        # Overview frame
+    # Overview receipt treeview
+    def create_treeview(self, receipt_df):
+        self.overview = ttk.Treeview(self.overview_frame, height=15)
+        self.overview["columns"] = list(receipt_df.columns)
+        self.overview.column("#0", width=50)
+        for col in receipt_df.columns:
+            self.overview.column(col, width=100)
 
+        self.overview.heading("#0", text="Index", anchor="w")
+        for col in receipt_df.columns:
+            self.overview.heading(col, text=col, anchor="w")
 
-        table = ttk.Treeview(self.overview_frame, height=15)
-        table.column("#0", width=300)
-        table.grid(sticky=E)
+        self.overview.pack(fill="both", expand=True, side=LEFT)
 
+        scrollbar = ttk.Scrollbar(self.overview_frame, command=self.overview.yview)
+        scrollbar.pack(side=LEFT, fill="y")
+        self.overview.configure(yscrollcommand=scrollbar.set)
+
+    # Display total price of receipt in widget
+    def display_total_price(self, total_price):
+        self.total_price_widget.configure(text=total_price)
+
+    # Clearing total price widget
+    def clear_total_price(self):
+        self.total_price_widget.configure(text="")
+
+    # Adding items to treeview
+    def add_items_to_treeview(self, items_df):
+        for i, row in items_df.iterrows():
+            self.overview.insert("", "end", text=i, values=list(row))
+
+    # Clearing items in treeview
+    def clear_treeview(self):
+        items = self.overview.get_children()
+        for item in items:
+            self.overview.delete(item)
+
+    # Updates list of user receipts
+    def receipt_combobox_update(self, receipt_list):
+        self.combobox_receipts.configure(values=receipt_list)
+
+    # Destroying receipts page
     def destroy_receipts_page_frame(self):
         self.receipts_frame.destroy()
