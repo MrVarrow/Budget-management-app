@@ -34,24 +34,35 @@ class ReceiptsPageView:
         self.total_price_widget = Label(self.receipts_frame, text=self.total_price, font=('Arial', 20))
         self.total_price_widget.grid(row=5, column=0, sticky=E, padx=250, columnspan=2)
 
+        self.receipt_name_widget = Label(self.receipts_frame, text="", font=('Arial', 15), width=22)
+        self.receipt_name_widget.grid(row=3, column=0, columnspan=2, sticky=W, padx=460)
+
+        self.receipt_date_widget = Label(self.receipts_frame, text="", font=('Arial', 15), width=22)
+        self.receipt_date_widget.grid(row=3, rowspan=2, column=0, columnspan=2, sticky=W, padx=460, pady=40)
+
         # Combobox
         self.combobox_receipts = ttk.Combobox(self.receipts_frame, font=('Arial', 20), textvariable=self.combobox_var)
         self.combobox_receipts.grid(row=2, column=0, sticky=W, padx=100)
 
         # Choose receipt button
-        Button(self.receipts_frame, text="Choose", font=('Arial', 20), bg='light gray', width=10,
+        Button(self.receipts_frame, text="Choose", font=('Arial', 20), bg='light gray', width=15,
                command=lambda: controller.choose_receipt(self.combobox_var.get())) \
-            .grid(row=3, column=0, sticky=W, padx=170, pady=20)
+            .grid(row=3, column=0, sticky=W, padx=130, pady=20)
 
         # Delete receipt button
-        Button(self.receipts_frame, text="Delete", font=('Arial', 20), bg='light gray', width=10,
+        Button(self.receipts_frame, text="Delete Receipt", font=('Arial', 20), bg='light gray', width=15,
                command=lambda: controller.delete_receipt(self.combobox_var.get())) \
-            .grid(row=4, column=0, sticky=W, padx=170, pady=30)
+            .grid(row=4, column=0, sticky=W, padx=130, pady=30)
 
         # Add new receipt button
         Button(self.receipts_frame, text="Add new receipt", font=('Arial', 20), bg='light gray',
                width=15, command=lambda: controller.add_new_receipt()) \
             .grid(row=5, column=0, sticky=W, padx=130)
+
+        # Edit receipt button
+        Button(self.receipts_frame, text="Edit Receipt", font=('Arial', 20), bg="light gray", width=15,
+               command=lambda: controller.edit_receipt(self.receipt_name_widget.cget("text"))) \
+            .grid(row=5, column=0, columnspan=2, sticky=W, padx=460)
 
         # Back to logged user page button
         Button(self.receipts_frame, text="Back", font=('Arial', 15), bg='light gray', width=7,
@@ -76,13 +87,17 @@ class ReceiptsPageView:
         scrollbar.pack(side=LEFT, fill="y")
         self.overview.configure(yscrollcommand=scrollbar.set)
 
-    # Display total price of receipt in widget
-    def display_total_price(self, total_price):
+    # Display receipt data in widgets
+    def display_receipt_data(self, total_price, receipt_name, receipt_date):
         self.total_price_widget.configure(text=total_price)
+        self.receipt_name_widget.configure(text=receipt_name)
+        self.receipt_date_widget.configure(text=receipt_date)
 
-    # Clearing total price widget
-    def clear_total_price(self):
+    # Clear receipt data from widgets
+    def clear_receipt_data(self):
         self.total_price_widget.configure(text="")
+        self.receipt_name_widget.configure(text="")
+        self.receipt_date_widget.configure(text="")
 
     # Adding items to treeview
     def add_items_to_treeview(self, items_df):

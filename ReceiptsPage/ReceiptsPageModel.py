@@ -45,9 +45,23 @@ class ReceiptsPageModel:
         row = self.cursor.fetchone()
         return row[0]
 
+    # Get receipt creation date from database
+    def receipt_date(self, receipt_id):
+        self.cursor.reset()
+        self.cursor.execute('SELECT CreationDate FROM `receipts` WHERE ReceiptID = %s', (receipt_id,))
+        row = self.cursor.fetchone()
+        return row[0]
+
     # Deletes receipt from database
     def delete_receipt_from_database(self, receipt_name, receipt_id):
         self.cursor.execute('DELETE FROM `receiptitems` WHERE ReceiptID = %s', (receipt_id,))
         self.connection.commit()
         self.cursor.execute('DELETE FROM `receipts` WHERE ReceiptName = %s', (receipt_name,))
         self.connection.commit()
+
+    # Check if user selected a receipt to edit
+    def check_chosen_receipt(self, chosen_receipt):
+        if not chosen_receipt == "":
+            return True
+        return False
+
