@@ -1,10 +1,9 @@
 from tkinter import *
 from tkinter import ttk
-import pandas as pd
 
 
 class AddNewReceiptView:
-    def __init__(self, master, controller, bg_color):
+    def __init__(self, master, controller, bg_color, receipt_name, state):
         self.controller = controller
         self.root = master
         self.bg_color = bg_color
@@ -18,11 +17,11 @@ class AddNewReceiptView:
         self.filepath.set("None")
 
         # Add new receipt frame
-        self.add_new_receipt_frame = Frame(self.root)
+        self.add_new_receipt_frame = Frame(self.root, bg=self.bg_color)
         self.add_new_receipt_frame.grid(row=0, column=0)
 
         # Items frame
-        self.items_frame = Frame(self.add_new_receipt_frame)
+        self.items_frame = Frame(self.add_new_receipt_frame, bg=self.bg_color)
         self.items_frame.grid(row=1, rowspan=6, column=1)
 
         # Labels and entries
@@ -43,12 +42,16 @@ class AddNewReceiptView:
         self.item_price.set("ex. 12.50")
         self.product_price_entry.grid(row=4, column=0, sticky=W, padx=50)
         Label(self.add_new_receipt_frame, font=('Arial', 15), text="Try by uploading a photo:\n"
-                                               "Choose photo:") \
+                                                                   "Choose photo:") \
             .grid(row=1, column=2, sticky=E, padx=70)
 
         self.receipt_name_entry = Entry(self.add_new_receipt_frame, textvariable=self.receipt_name, font=('Arial', 20))
         self.receipt_name_entry.bind("<Button-1>", lambda e: self.receipt_name_entry.delete(0, END))
-        self.receipt_name.set("Your receipt name")
+        if receipt_name is None:
+            self.receipt_name.set("Your receipt name")
+        else:
+            self.receipt_name.set(receipt_name)
+            self.receipt_name_entry.configure(state="disabled")
         self.receipt_name_entry.grid(row=7, column=1, pady=10)
 
         # Submit item button
@@ -61,10 +64,17 @@ class AddNewReceiptView:
                command=lambda: controller.delete_item(self.table.item(self.table.selection()[0], 'values')[0])) \
             .grid(row=6, column=0, sticky=W, padx=120, pady=20)
 
-        # Add receipt button
-        Button(self.add_new_receipt_frame, text="Add receipt", font=('Arial', 20), bg="light gray", width=10,
-               command=lambda: controller.add_receipt(self.receipt_name.get())) \
-            .grid(row=8, column=1)
+        if state == "ADD":
+            # Add receipt button
+            Button(self.add_new_receipt_frame, text="Add receipt", font=('Arial', 20), bg="light gray", width=15,
+                   command=lambda: controller.add_receipt(self.receipt_name.get())) \
+                .grid(row=8, column=1)
+
+        elif state == "UPDATE":
+            # Update receipt button
+            Button(self.add_new_receipt_frame, text="Update receipt", font=('Arial', 20), bg="light gray", width=15,
+                   command=lambda: controller.update_receipt()) \
+                .grid(row=8, column=1)
 
         # Choose path to receipt photo button
         Button(self.add_new_receipt_frame, textvariable=self.filepath, font=('Arial', 12), height=3, width=30,

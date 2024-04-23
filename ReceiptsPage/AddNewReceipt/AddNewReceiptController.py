@@ -4,16 +4,21 @@ from tkinter import messagebox
 
 
 class AddNewReceiptController:
-    def __init__(self, root, user_data, bg_color):
+    def __init__(self, root, user_data, bg_color, items_df, receipt_name, state):
         self.root = root
         self.bg_color = bg_color
         self.user_data = user_data
+        self.receipt_name = receipt_name
 
         self.add_new_receipt_model = AddNewReceiptModel()
-        self.add_new_receipt_view = AddNewReceiptView(self.root, self, self.bg_color)
-
-        self.items_df = self.add_new_receipt_model.create_df()
-        self.add_new_receipt_view.create_treeview(self.items_df)
+        self.add_new_receipt_view = AddNewReceiptView(self.root, self, self.bg_color, self.receipt_name, state)
+        if items_df is None:
+            self.items_df = self.add_new_receipt_model.create_df()
+            self.add_new_receipt_view.create_treeview(self.items_df)
+        else:
+            self.items_df = items_df
+            self.add_new_receipt_view.create_treeview(self.items_df)
+            self.add_new_receipt_view.update_treeview(self.items_df)
 
     # Submit item button method
     def submit_item(self, item_name, item_price):
@@ -51,17 +56,35 @@ class AddNewReceiptController:
 
         self.add_new_receipt_model.add_receipt_to_database(
             self.user_data, receipt_name,
-            self.add_new_receipt_model.item_count_in_receipt(self.items_df)
+            self.add_new_receipt_model.item_count_in_receipt(self.items_df),
+            self.add_new_receipt_model.get_creation_time()
         )
         self.add_new_receipt_model.add_items_to_database(
             self.add_new_receipt_model.get_receipt_id(receipt_name),
             self.user_data,
             self.items_df,
-            self.add_new_receipt_model.calculate_total_price(self.items_df)
+            self.add_new_receipt_model.calculate_total_price(self.items_df),
         )
         self.add_new_receipt_view.reset_receipt()
         self.items_df = self.add_new_receipt_model.create_df()
         messagebox.showinfo(title="Information", message="Receipt has been added successfully!")
+
+    # Update receipt button method
+    def update_receipt(self):
+        self.add_new_receipt_model.delete_items_from_database(self.add_new_receipt_model.get_receipt_id(self.receipt_name))
+        self.add_new_receipt_model.add_items_to_database(
+            self.add_new_receipt_model.get_receipt_id(self.receipt_name),
+            self.user_data,
+            self.items_df,
+            self.add_new_receipt_model.calculate_total_price(self.items_df)
+        )
+        self.add_new_receipt_model.update_item_count(
+            self.add_new_receipt_model.item_count_in_receipt(self.items_df),
+            self.add_new_receipt_model.get_receipt_id(self.receipt_name)
+        )
+
+        self.back_to_receipt_page()
+        messagebox.showinfo(title="Information", message="Receipt has been updated successfully!")
 
     # Choosing path to photo method
     def choose_path_to_photo(self):

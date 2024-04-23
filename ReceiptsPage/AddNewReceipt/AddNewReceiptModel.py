@@ -2,6 +2,7 @@ import mysql.connector
 import pandas as pd
 from tkinter import filedialog
 import re
+from datetime import date
 
 
 class AddNewReceiptModel:
@@ -9,6 +10,10 @@ class AddNewReceiptModel:
         self.connection = mysql.connector.connect(host="localhost", user="root", passwd="AkniLUAp01-",
                                                   database="budgetappdatabase")
         self.cursor = self.connection.cursor()
+
+    '''
+    ADD METHODS
+    '''
 
     # Creating base of dataframe
     def create_df(self):
@@ -47,9 +52,10 @@ class AddNewReceiptModel:
         return total
 
     # Adding receipt to database
-    def add_receipt_to_database(self, user_data, receipt_name, item_count):
-        insert_query = 'INSERT INTO `receipts` (UserName, ReceiptName, ItemsCount) VALUES (%s, %s, %s)'
-        values_to_insert = (user_data[0], receipt_name, str(item_count))
+    def add_receipt_to_database(self, user_data, receipt_name, item_count, creation_date):
+        insert_query = 'INSERT INTO `receipts` (UserName, ReceiptName, ItemsCount, CreationDate)' \
+                       ' VALUES (%s, %s, %s, %s)'
+        values_to_insert = (user_data[0], receipt_name, str(item_count), creation_date)
         self.cursor.execute(insert_query, values_to_insert)
         self.connection.commit()
 
@@ -64,10 +70,16 @@ class AddNewReceiptModel:
     def add_items_to_database(self, receipt_id, user_data, items_df, total):
         for index, row in items_df.iterrows():
             item, price = self.get_items_and_prices(row)
-            insert_query = 'INSERT INTO `receiptitems` (ReceiptID, Username, Item, Price, TotalPrice) VALUES (%s, %s, %s, %s, %s)'
+            insert_query = 'INSERT INTO `receiptitems` (ReceiptID, Username, Item, Price, TotalPrice)' \
+                           ' VALUES (%s, %s, %s, %s, %s)'
             values_to_insert = (receipt_id, user_data[0], item, price, total)
             self.cursor.execute(insert_query, values_to_insert)
             self.connection.commit()
+
+    # Get time of receipt creation in system
+    def get_creation_time(self):
+        creation_date = date.today()
+        return creation_date
 
     # Gets item name and its price
     def get_items_and_prices(self, row):
@@ -93,3 +105,21 @@ class AddNewReceiptModel:
         if re.search(r"\W", receipt_name):
             return False
         return True
+
+    # Check if receipt name is unique
+    def check_for_duplicates(self):
+        ...
+
+    '''
+    UPDATE METHODS
+    '''
+
+    # Updates item count
+    def update_item_count(self, item_count, receipt_id):
+        self.cursor.execute('UPDATE `receipts` SET ItemsCount = %s WHERE ReceiptID = %s', (item_count, receipt_id))
+        self.connection.commit()
+
+    # Delete old items from database before update
+    def delete_items_from_database(self, receipt_id):
+        self.cursor.execute('DELETE FROM `receiptitems` WHERE ReceiptID = %s', (receipt_id,))
+        self.connection.commit()
