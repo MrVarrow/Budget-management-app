@@ -83,7 +83,7 @@ class AddNewReceiptView:
 
         # Submit photo button
         Button(self.add_new_receipt_frame, text="Submit", font=('Arial', 20), bg="light gray", width=10,
-               command=lambda: controller.submit_photo()) \
+               command=lambda: controller.submit_photo(self.filepath.get())) \
             .grid(row=4, rowspan=2, column=2, sticky=SE, padx=100)
 
         # Back to Receipt page

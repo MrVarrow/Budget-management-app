@@ -91,9 +91,10 @@ class AddNewReceiptController:
         filepath = self.add_new_receipt_model.choose_file()
         self.add_new_receipt_view.configure_file_path_view(filepath)
 
-    def submit_photo(self):
+    def submit_photo(self, filepath):
         # proceed ocr and ML
-        ...
+        results = self.add_new_receipt_model.preprocess_receipt_image(filepath)
+        self.add_new_receipt_model.look_for_products(results)
 
     # Clearing receipt local data if user wants to start over
     def clear_receipt_data(self):
