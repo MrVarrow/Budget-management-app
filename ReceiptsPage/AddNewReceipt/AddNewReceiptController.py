@@ -91,10 +91,14 @@ class AddNewReceiptController:
         filepath = self.add_new_receipt_model.choose_file()
         self.add_new_receipt_view.configure_file_path_view(filepath)
 
+    # Submit photo button method
     def submit_photo(self, filepath):
-        # proceed ocr and ML
         results = self.add_new_receipt_model.preprocess_receipt_image(filepath)
-        self.add_new_receipt_model.look_for_products(results)
+        prod = self.add_new_receipt_model.look_for_products(results)
+        price = self.add_new_receipt_model.look_for_prices(results)
+        dict = self.add_new_receipt_model.create_dict(prod, price)
+        self.items_df = self.add_new_receipt_model.dict_to_df(dict, self.items_df)
+        self.add_new_receipt_view.update_treeview(self.items_df)
 
     # Clearing receipt local data if user wants to start over
     def clear_receipt_data(self):
@@ -106,7 +110,25 @@ class AddNewReceiptController:
         elif result == "no":
             pass
 
+    # Edits a selected element
+    def edit_element(self, item_value):
+        product_name = item_value[0]
+        product_price = item_value[1]
+        self.add_new_receipt_view.edit_element_window(product_name, product_price)
+
     # Back to receipt page method
     def back_to_receipt_page(self):
         from ReceiptsPage.ReceiptsPageController import ReceiptsPageController
         ReceiptsPageController(self.root, self.user_data, self.bg_color)
+
+    '''
+    EDIT ELEMENTS WINDOW METHODS
+    '''
+
+    # Apply edit method
+    def apply_edit(self, new_name, new_price):
+        ...
+
+    # Discard edit method
+    def discard_edit(self):
+        self.add_new_receipt_view.edit_element_widnow_destroy()

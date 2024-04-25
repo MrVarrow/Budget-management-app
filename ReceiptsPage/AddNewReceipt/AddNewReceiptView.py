@@ -86,6 +86,11 @@ class AddNewReceiptView:
                command=lambda: controller.submit_photo(self.filepath.get())) \
             .grid(row=4, rowspan=2, column=2, sticky=SE, padx=100)
 
+        # Edit element button
+        Button(self.add_new_receipt_frame, text="Edit element", font=('Arial', 20), bg="light gray", width=10,
+               command=lambda: controller.edit_element(self.table.item(self.table.selection()[0], 'values'))) \
+            .grid()
+
         # Back to Receipt page
         Button(self.add_new_receipt_frame, text="Back", font=('Arial', 15), bg="light gray", width=7,
                command=lambda: controller.back_to_receipt_page()) \
@@ -95,6 +100,37 @@ class AddNewReceiptView:
         Button(self.add_new_receipt_frame, text="Clear Receipt", font=('Arial', 20), bg="light gray", width=10,
                command=lambda: controller.clear_receipt_data()) \
             .grid(row=7, column=0, sticky=W, padx=120)
+
+    # Edit element window
+    def edit_element_window(self, product_name, product_price):
+        name = StringVar()
+        price = StringVar()
+
+        self.edit_window = Toplevel(self.root, bg=self.bg_color)
+        self.edit_window.geometry("400x200")
+        self.edit_window.title("Editing element")
+        self.edit_window.resizable(False, False)
+
+        Label(self.edit_window, text="Edit element") \
+            .grid()
+
+        prodduct_name_widget = Entry(self.edit_window, textvariable=name)
+        name.set(product_name)
+        prodduct_name_widget.grid()
+
+        product_price_widget = Entry(self.edit_window, textvariable=price)
+        price.set(product_price)
+        product_price_widget.grid()
+
+        Button(self.edit_window, text="Apply", command=lambda: self.controller.apply_edit(name.get(), price.get())) \
+            .grid()
+        Button(self.edit_window, text="Close", command=lambda: self.controller.discard_edit()) \
+            .grid()
+
+    # Destroying edit element window
+    def edit_element_widnow_destroy(self):
+        self.edit_window.destroy()
+
 
     # Creating treeview table and scrollbar
     def create_treeview(self, treeview_df):

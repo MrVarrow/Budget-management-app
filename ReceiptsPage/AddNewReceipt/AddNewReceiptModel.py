@@ -163,7 +163,6 @@ class AddNewReceiptModel:
         has_digits = False
         for result in text_detections:
             text = result[1]
-            print(text)
             data += text
 
         # draw_bounding_boxes(img, text_detections, threshold)
@@ -192,7 +191,6 @@ class AddNewReceiptModel:
                 ocr_result = self.read_text(roi)
                 results.append(ocr_result)
 
-        print(results)
         return results
 
     # Use ML model to look for products in ocr results
@@ -202,17 +200,33 @@ class AddNewReceiptModel:
         with open("ReceiptsPage/AddNewReceipt/MachineLearning/vectorizer_product.pkl", "rb") as file:
             loaded_vectorizer = joblib.load(file)
 
-
+        products_list = []
         for item in ocr_results:
             list = []
             list.append(item)
             ocr_results_vectorized = loaded_vectorizer.transform(list)
             prediction = loaded_model.predict(ocr_results_vectorized)
             if prediction[0] == 1:
-                print(f"The new data {item} is a food.")
-            else:
-                print(f"The new data {item} is not a food.")
+                products_list.append(item)
 
+        return products_list
 
+    # Use regex to get prices from ocr results
     def look_for_prices(self, ocr_results):
-        ...
+        price_list = []
+        for item in ocr_results:
+            if re.search(r'^\d+(?:[.]\d{1,2}|$)$', item) or re.search(r'^\d+(?:[,]\d{1,2}|$)$', item):
+                print(item)
+                price_list.append(item)
+        return price_list
+
+    # Create dict from products and prices lists
+    def create_dict(self, products_list, price_list):
+        zipped_dict = dict(zip(products_list, price_list))
+        return zipped_dict
+
+    # Write dict to dataframe
+    def dict_to_df(self, items_dict, items_df):
+        data = [(k, v) for k, v in  items_dict.items()]
+        df = pd.DataFrame(data, columns=["Item name", "Item price"])
+        return df
