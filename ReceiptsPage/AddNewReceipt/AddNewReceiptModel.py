@@ -1,13 +1,10 @@
-import pickle
-
 import mysql.connector
 import pandas as pd
 from tkinter import filedialog
 import re
 from datetime import date
 import cv2
-import easyocr
-import joblib
+from joblib import load
 
 
 class AddNewReceiptModel:
@@ -156,6 +153,8 @@ class AddNewReceiptModel:
 
     # Reading text from small images
     def read_text(self, image1):
+        # import here bcs on the top program is much slower even when not used ocr
+        import easyocr
         image = self.preprocess_image(image1)
         reader = easyocr.Reader(['en'], gpu=False)
         text_detections = reader.readtext(image)
@@ -196,9 +195,9 @@ class AddNewReceiptModel:
     # Use ML model to look for products in ocr results
     def look_for_products(self, ocr_results):
         with open('ReceiptsPage/AddNewReceipt/MachineLearning/model_product.pkl', "rb") as file:
-            loaded_model = joblib.load(file)
+            loaded_model = load(file)
         with open("ReceiptsPage/AddNewReceipt/MachineLearning/vectorizer_product.pkl", "rb") as file:
-            loaded_vectorizer = joblib.load(file)
+            loaded_vectorizer = load(file)
 
         products_list = []
         for item in ocr_results:
@@ -230,3 +229,14 @@ class AddNewReceiptModel:
         data = [(k, v) for k, v in  items_dict.items()]
         df = pd.DataFrame(data, columns=["Item name", "Item price"])
         return df
+
+    '''
+    EDIT ELEMENT METHODS
+    '''
+
+    def edit_element_in_df(self, items_df, old_name, new_name, new_price):
+        row_index = items_df.loc[items_df["Item name"] == old_name].index[0]
+        items_df.loc[row_index, 'Item name'] = new_name
+        items_df.loc[row_index, "Item price"] = float(new_price)
+
+        return items_df
