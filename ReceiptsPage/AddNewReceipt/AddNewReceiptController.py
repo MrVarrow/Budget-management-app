@@ -46,12 +46,13 @@ class AddNewReceiptController:
         if not self.add_new_receipt_model.check_receipt_name(receipt_name):
             messagebox.showinfo("Information", "Entered receipt name contains not allowed characters")
             return
-        receipt_id = self.add_new_receipt_model.get_receipt_id(receipt_name)
+
         self.add_new_receipt_model.add_receipt_to_database(
             self.user_data, receipt_name,
             self.add_new_receipt_model.item_count_in_receipt(self.items_df),
             self.add_new_receipt_model.get_creation_time()
         )
+        receipt_id = self.add_new_receipt_model.get_receipt_id(receipt_name)
         self.add_new_receipt_model.add_items_to_database(
             receipt_id,
             self.user_data,
