@@ -9,8 +9,8 @@ class AddNewShoppingListView:
         self.bg_color = bg_color
 
         self.item_name = StringVar()
-        self.item_price = StringVar()
-        self.receipt_name = StringVar()
+        self.item_quantity = StringVar()
+        self.shopping_list_name = StringVar()
 
         # Add new receipt frame
         self.add_new_shopping_list_frame = Frame(self.root, bg=self.bg_color)
@@ -33,24 +33,24 @@ class AddNewShoppingListView:
 
         Label(self.add_new_shopping_list_frame, text="Enter quantity:", font=('Arial', 15)) \
             .grid(row=3, column=0, sticky=W, padx=50)
-        self.product_quantity_entry = Entry(self.add_new_shopping_list_frame, font=('Arial', 20), textvariable=self.item_price)
+        self.product_quantity_entry = Entry(self.add_new_shopping_list_frame, font=('Arial', 20), textvariable=self.item_quantity)
         self.product_quantity_entry.bind("<Button-1>", lambda e: self.product_quantity_entry.delete(0, END))
-        self.item_price.set("ex. 3")
+        self.item_quantity.set("ex. 3")
         self.product_quantity_entry.grid(row=4, column=0, sticky=W, padx=50)
 
 
-        self.shopping_list_name_entry = Entry(self.add_new_shopping_list_frame, textvariable=self.receipt_name, font=('Arial', 20))
+        self.shopping_list_name_entry = Entry(self.add_new_shopping_list_frame, textvariable=self.shopping_list_name, font=('Arial', 20))
         self.shopping_list_name_entry.bind("<Button-1>", lambda e: self.shopping_list_name_entry.delete(0, END))
         if shopping_list_name is None:
-            self.receipt_name.set("Your shopping list name")
+            self.shopping_list_name.set("Your shopping list name")
         else:
-            self.receipt_name.set(shopping_list_name)
+            self.shopping_list_name.set(shopping_list_name)
             self.shopping_list_name_entry.configure(state="disabled")
         self.shopping_list_name_entry.grid(row=7, column=1, pady=10)
 
         # Submit item button
         Button(self.add_new_shopping_list_frame, text="Submit", font=('Arial', 20), bg="light gray", width=10,
-               command=lambda: self.controller.submit_item(self.item_name.get(), self.item_price.get())) \
+               command=lambda: self.controller.submit_item(self.item_name.get(), self.item_quantity.get())) \
             .grid(row=5, column=0, sticky=W, padx=120, pady=5)
 
         # Delete item button (to delete it would take index of item)
@@ -59,13 +59,13 @@ class AddNewShoppingListView:
             .grid(row=7, column=0, sticky=W, padx=120, pady=10)
 
         if state == "ADD":
-            # Add receipt button
+            # Add shopping list button
             Button(self.add_new_shopping_list_frame, text="Add shopping list", font=('Arial', 20), bg="light gray", width=15,
-                   command=lambda: self.controller.add_receipt(self.receipt_name.get())) \
+                   command=lambda: self.controller.add_shopping_list(self.shopping_list_name.get())) \
                 .grid(row=8, column=1)
 
         elif state == "UPDATE":
-            # Update receipt button
+            # Update shopping list button
             Button(self.add_new_shopping_list_frame, text="Update shopping list", font=('Arial', 20), bg="light gray", width=15,
                    command=lambda: self.controller.update_receipt()) \
                 .grid(row=8, column=1)
@@ -75,20 +75,20 @@ class AddNewShoppingListView:
                command=lambda: self.controller.edit_element(self.table.item(self.table.selection()[0], 'values'))) \
             .grid(row=6, column=0, sticky=W, padx=120, pady=10)
 
-        # Back to Receipt page
+        # Back to shopping list page
         Button(self.add_new_shopping_list_frame, text="Back", font=('Arial', 15), bg="light gray", width=7,
-               command=lambda: self.controller.back_to_receipt_page()) \
+               command=lambda: self.controller.back_to_shopping_list_page()) \
             .grid(row=8, column=2, sticky=E, padx=20)
 
         # Clear all button
         Button(self.add_new_shopping_list_frame, text="Clear List", font=('Arial', 20), bg="light gray", width=10,
-               command=lambda: self.controller.clear_receipt_data()) \
+               command=lambda: self.controller.clear_shopping_list_list()) \
             .grid(row=8, column=0, sticky=W, padx=120, pady=5)
 
     # Edit element window
     def edit_element_window(self, product_name, product_price):
         name = StringVar()
-        price = StringVar()
+        quantity = StringVar()
 
         self.edit_window = Toplevel(self.root, bg=self.bg_color)
         self.edit_window.geometry("400x200")
@@ -106,16 +106,20 @@ class AddNewShoppingListView:
 
         Label(self.edit_window, text="New price:", font=('Arial', 12)) \
             .grid(row=3, column=0, sticky=W, padx=90)
-        product_price_widget = Entry(self.edit_window, textvariable=price, font=('Arial', 15))
-        price.set(product_price)
-        product_price_widget.grid(row=4, column=0, sticky=W, padx=90)
+        product_quantity_widget = Entry(self.edit_window, textvariable=quantity, font=('Arial', 15))
+        quantity.set(product_price)
+        product_quantity_widget.grid(row=4, column=0, sticky=W, padx=90)
 
         Button(self.edit_window, text="Apply", font=('Arial', 15), bg="light gray", width=10,
-               command=lambda: self.controller.apply_edit(product_name, name.get(), price.get())) \
+               command=lambda: self.controller.apply_edit(product_name, name.get(), quantity.get())) \
             .grid(row=5, column=0, sticky=W, padx=20, pady=5)
         Button(self.edit_window, text="Close", font=('Arial', 15), bg="light gray", width=10,
                command=lambda: self.controller.discard_edit()) \
             .grid(row=5, column=0, sticky=W, padx=260, pady=5)
+
+    # Destroying edit element window
+    def edit_element_widnow_destroy(self):
+        self.edit_window.destroy()
 
     # Creating treeview table and scrollbar
     def create_treeview(self, treeview_df):
@@ -140,3 +144,24 @@ class AddNewShoppingListView:
     def update_treeview(self, updated_df):
         for i, row in updated_df.iterrows():
             self.table.insert("", "end", text=i, values=list(row))
+
+    # Deleting old values in treeview
+    def delete_items_in_treeview(self):
+        items = self.table.get_children()
+        for item in items:
+            self.table.delete(item)
+
+    # Resets all after adding shopping list
+    def reset_receipt(self):
+        self.product_name_entry.delete(0, END)
+        self.product_name_entry.delete(0, END)
+        self.product_quantity_entry.delete(0, END)
+        self.item_name.set("ex. Tomato")
+        self.item_quantity.set("ex. 3")
+        self.shopping_list_name.set("Your receipt name")
+        self.clear_treeview()
+
+    # Clear treeview
+    def clear_treeview(self):
+        for item in self.table.get_children():
+            self.table.delete(item)
