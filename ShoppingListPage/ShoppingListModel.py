@@ -52,3 +52,22 @@ class ShoppingListModel:
         if not chosen_list == "":
             return True
         return False
+
+    # Check if shopping list is complete
+    def check_completion(self, checkbox_list):
+        if False in checkbox_list:
+            return False
+        return True
+
+    # Toggle selected checkbutton and update its value in list
+    def toggle_checkbutton(self, index, check_vars):
+        for i, var in enumerate(check_vars):
+            if i == index:
+                if check_vars[i]:
+                    check_vars[i] = False
+                    break
+
+                check_vars[i] = True
+
+        return check_vars
+

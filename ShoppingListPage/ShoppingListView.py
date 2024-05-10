@@ -10,14 +10,15 @@ class ShoppingListView:
 
         # Define variables
         self.combobox_var = StringVar()
+        self.check_vars = []
 
         # Shopping list frame
         self.shopping_list_frame = Frame(self.root, bg=self.bg_color)
         self.shopping_list_frame.grid(row=0, column=0)
 
         # Item list frame
-        self.list_items_frame = Frame(self.shopping_list_frame, bg=self.bg_color, borderwidth=2, relief="solid")
-        self.list_items_frame.grid(row=1, rowspan=5, column=0, columnspan=2, sticky=E, padx=200, ipadx=180, ipady=170)
+        self.list_items_frame = Frame(self.shopping_list_frame, bg=self.bg_color, borderwidth=2, relief="solid", width=600, height=400)
+        self.list_items_frame.grid(row=1, rowspan=5, column=0, columnspan=2, sticky=E, padx=200)
 
         # Labels
         Label(self.shopping_list_frame, text="Your shopping lists", font=('Arial', 40), bg='light gray') \
@@ -63,7 +64,7 @@ class ShoppingListView:
 
     # Creates overview of shopping list
     def create_overview(self, shopping_list_name, items_df, shopping_list_date):
-        canvas = Canvas(self.list_items_frame)
+        canvas = Canvas(self.list_items_frame, width=600, height=400)
         canvas.pack(side="left", fill="both", expand=True)
 
         # Create a frame inside the canvas to hold the labels
@@ -72,10 +73,24 @@ class ShoppingListView:
         # Add the labels frame to the canvas
         canvas.create_window((0, 0), window=labels_frame, anchor="nw")
 
+        # Create heading label
+        Label(labels_frame, text=f"Shopping list name: {shopping_list_name}, Creation date: {shopping_list_date}", font=('Arial', 15)).pack(pady=5)
+
         # Create the labels inside the labels_frame
-        for i in range(50):
-            label = ttk.Label(labels_frame, text=f"Label {i}")
-            label.pack(pady=5)
+        for index, row in items_df.iterrows():
+            item_name = row['Item name']
+            item_quantity = row['Item quantity']
+            check_var = BooleanVar()
+            self.check_vars.append(check_var.get())
+            item_checkbutton = Checkbutton(labels_frame, text=f"{item_name}, Quantity {item_quantity}", font=('Arial', 13),
+                        bg="light gray", width=63, anchor="w", variable=check_var,
+                        command=lambda i=index: self.controller.check_box(i, self.check_vars))
+            item_checkbutton.pack(pady=10, anchor="w")
+
+        # Button for checking if list is complete
+        Button(labels_frame, text="Done", font=('Arial', 15), bg="light gray", width=10,
+               command=lambda: self.controller.check_list(shopping_list_name)) \
+            .pack()
 
         # Add a scrollbar to the canvas
         scrollbar = ttk.Scrollbar(self.list_items_frame, orient="vertical", command=canvas.yview)
