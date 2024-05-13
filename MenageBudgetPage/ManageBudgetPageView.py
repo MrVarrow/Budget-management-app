@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter import ttk
 
 
 class ManageBudgetView:
@@ -35,21 +34,29 @@ class ManageBudgetView:
                 .grid(row=row, column=col, pady=10, ipady=5)
 
         # Open budget button
-        Button(self.manage_budget_frame, text="Open budget", font=('Arial', 20), bg='light gray', width=20) \
+        Button(self.manage_budget_frame, text="Open budget", font=('Arial', 20), bg='light gray', width=20,
+               command=lambda: self.controller.open_budget()) \
             .grid(row=4, column=0, columnspan=3, sticky=W, padx=100, pady=30)
 
         # Edit budget button
-        Button(self.manage_budget_frame, text="Edit budget", font=('Arial', 20), bg='light gray', width=20) \
+        Button(self.manage_budget_frame, text="Edit budget", font=('Arial', 20), bg='light gray', width=20,
+               command=lambda: self.controller.edit_budget()) \
             .grid(row=5, column=0, columnspan=3, sticky=W, padx=100, pady=10)
 
         # Manage constant incomes and expenses button
-        Button(self.manage_budget_frame, text="Manage constants", font=('Arial', 20), bg='light gray', width=20) \
+        Button(self.manage_budget_frame, text="Manage constants", font=('Arial', 20), bg='light gray', width=20,
+               command=lambda: self.controller.manage_constants()) \
             .grid(row=4, column=3, columnspan=3, sticky=E, padx=100, pady=30)
 
         # Delete budget button
-        Button(self.manage_budget_frame, text="Delete budget", font=('Arial', 20), bg='light gray', width=20) \
+        Button(self.manage_budget_frame, text="Delete budget", font=('Arial', 20), bg='light gray', width=20,
+               command=lambda: self.controller.delete_budget()) \
             .grid(row=5, column=3, columnspan=3, sticky=E, padx=100, pady=10)
 
         # Back to logged user page button
-        Button(self.manage_budget_frame, text="Back", font=('Arial', 15), bg='light gray', width=8) \
+        Button(self.manage_budget_frame, text="Back", font=('Arial', 15), bg='light gray', width=8,
+               command=lambda: self.destroy_manage_budget_frame()) \
             .grid(row=6, column=0, columnspan=6, sticky=E, pady=40, padx=15)
+
+    def destroy_manage_budget_frame(self):
+        self.manage_budget_frame.destroy()

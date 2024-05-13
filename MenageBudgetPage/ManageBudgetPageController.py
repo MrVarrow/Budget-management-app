@@ -1,6 +1,7 @@
 from tkinter import messagebox
 from MenageBudgetPage.ManageBudgetPageModel import ManageBudgetModel
 from MenageBudgetPage.ManageBudgetPageView import ManageBudgetView
+from MenageBudgetPage.OpenBudgetPage.OpenBudgetPageController import OpenBudgetController
 
 
 class ManageBudgetController:
@@ -16,7 +17,8 @@ class ManageBudgetController:
                                                    )
 
     def open_budget(self):
-        ...
+        self.manage_budget_view.destroy_manage_budget_frame()
+        OpenBudgetController(self.root, self, self.bg_color)
 
     def edit_budget(self):
         ...
@@ -30,5 +32,3 @@ class ManageBudgetController:
     def choosing_month(self):
         ...
 
-    def back(self):
-        ...
