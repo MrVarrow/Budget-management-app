@@ -2,6 +2,9 @@ from tkinter import messagebox
 from MenageBudgetPage.ManageBudgetPageModel import ManageBudgetModel
 from MenageBudgetPage.ManageBudgetPageView import ManageBudgetView
 from MenageBudgetPage.OpenBudgetPage.OpenBudgetPageController import OpenBudgetController
+from MenageBudgetPage.AdjustBudgetPage.AdjustBudgetPageController import AdjustBudgetController
+from MenageBudgetPage.ManageConstantTransactionsPage.ManageConstantTransactionsPageController import\
+    ManageConstBudgetController
 
 
 class ManageBudgetController:
@@ -21,10 +24,12 @@ class ManageBudgetController:
         OpenBudgetController(self.root, self, self.bg_color)
 
     def edit_budget(self):
-        ...
+        self.manage_budget_view.destroy_manage_budget_frame()
+        AdjustBudgetController(self.root, self.user_data, self.bg_color)
 
     def manage_constants(self):
-        ...
+        self.manage_budget_view.destroy_manage_budget_frame()
+        ManageConstBudgetController(self.root, self.user_data, self.bg_color)
 
     def delete_budget(self):
         ...
