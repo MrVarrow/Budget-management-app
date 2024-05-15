@@ -11,3 +11,24 @@ class AdjustBudgetController:
 
         self.adjust_budget_model = AdjustBudgetModel()
         self.adjust_budget_view = AdjustBudgetView(self.root, self, self.bg_color)
+
+    def add_const_income(self):
+        ...
+
+    def delete_const_income(self):
+        ...
+
+    def add_const_expense(self):
+        ...
+
+    def delete_const_expense(self):
+        ...
+
+    def update_const_transactions(self):
+        ...
+
+    def back(self):
+        from MenageBudgetPage.ManageBudgetPageController import ManageBudgetController
+        self.adjust_budget_view.destroy_budget_frame()
+        ManageBudgetController(self.root, self.user_data, self.bg_color)
+
