@@ -14,11 +14,11 @@ class AdjustBudgetView:
         self.income_entry_var = StringVar()
         self.expense_entry_var = StringVar()
 
-        # Open budget frame
+        # Edit budget frame
         self.adjust_budget_frame = Frame(self.root, bg=self.bg_color)
         self.adjust_budget_frame.grid()
 
-        # Grid configuration in open budget frame
+        # Grid configuration in edit budget frame
         self.adjust_budget_frame.grid_columnconfigure(0, weight=0)
 
         # Income frame
@@ -56,9 +56,9 @@ class AdjustBudgetView:
         Entry(self.adjust_budget_frame, font=('Arial', 13), width=26, textvariable=self.income_entry_var) \
             .grid(row=5, column=0, sticky=W, padx=50)
 
-        Label(self.adjust_budget_frame, text="Amount:", font=('Arial', 13), textvariable=self.expense_entry_var) \
+        Label(self.adjust_budget_frame, text="Amount:", font=('Arial', 13)) \
             .grid(row=4, column=3, sticky=W, padx=40)
-        Entry(self.adjust_budget_frame, font=('Arial', 13), width=26) \
+        Entry(self.adjust_budget_frame, font=('Arial', 13), width=26, textvariable=self.expense_entry_var) \
             .grid(row=5, column=3, sticky=W, padx=40)
 
         # Combobox for category
@@ -68,28 +68,28 @@ class AdjustBudgetView:
         ttk.Combobox(self.adjust_budget_frame, font=('Arial', 15), values=self.expenses_categories) \
             .grid(row=3, column=3, sticky=W, padx=40)
 
-        # Add const income button
+        # Add income button
         Button(self.adjust_budget_frame, text="Add income", font=('Arial', 15), bg="light gray", width=21,
                command=lambda: self.controller.add_const_income()) \
             .grid(row=6, column=0, sticky=W, padx=50)
 
-        # Delete const income button
+        # Delete income button
         Button(self.adjust_budget_frame, text="Delete income", font=('Arial', 15), bg="light gray", width=21,
                command=lambda: self.controller.delete_const_income()) \
             .grid(row=7, column=0, sticky=W, padx=50)
 
-        # Add const expanse button
+        # Add expanse button
         Button(self.adjust_budget_frame, text="Add expanse", font=('Arial', 15), bg="light gray", width=21,
                command=lambda: self.controller.add_const_expense()) \
             .grid(row=6, column=3, sticky=W, padx=40)
 
-        # Delete const expanse button
+        # Delete expanse button
         Button(self.adjust_budget_frame, text="Delete expanse", font=('Arial', 15), bg="light gray", width=21,
                command=lambda: self.controller.delete_const_expense()) \
             .grid(row=7, column=3, sticky=W, padx=40)
 
-        # Update your const expanses
-        Button(self.adjust_budget_frame, text="Update your transactions", font=('Arial', 15), bg="light gray", width=20,
+        # Update your expanses
+        Button(self.adjust_budget_frame, text="Update your budget", font=('Arial', 15), bg="light gray", width=20,
                command=lambda: self.controller.update_const_transactions()) \
             .grid(row=10, column=1, columnspan=2, sticky=W, padx=200)
 
