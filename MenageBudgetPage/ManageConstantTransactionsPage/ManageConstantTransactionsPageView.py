@@ -115,5 +115,23 @@ class ManageConstBudgetView:
         expenses_scrollbar.pack(side=LEFT, fill="y")
         self.expenses_table.configure(yscrollcommand=expenses_scrollbar.set)
 
+    def add_items_to_incomes(self, incomes_df):
+        for i, row, in incomes_df.iterrows():
+            self.income_table.insert("", "end", text=i, values=list(row))
+
+    def add_items_to_expenses(self, expenses_df):
+        for i, row, in expenses_df.iterrows():
+            self.expenses_table.insert("", "end", text=i, values=list(row))
+
+    def clear_incomes(self):
+        items = self.income_table.get_children()
+        for item in items:
+            self.income_table.delete(item)
+
+    def clear_expenses(self):
+        items = self.expenses_table.get_children()
+        for item in items:
+            self.expenses_table.delete(item)
+
     def destroy_budget_frame(self):
         self.menage_const_budget_frame.destroy()
