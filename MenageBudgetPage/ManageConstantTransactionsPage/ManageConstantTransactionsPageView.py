@@ -3,16 +3,24 @@ from tkinter import ttk
 
 
 class ManageConstBudgetView:
-    def __init__(self, master, controller, bg_color):
+    def __init__(self, master, controller, bg_color, incomes_df, expenses_df, month_date):
         self.controller = controller
         self.root = master
         self.bg_color = bg_color
+        self.incomes_df = incomes_df
+        self.expenses_df = expenses_df
+        self.month_date = month_date
 
         # Define variables
-        self.income_categories = []
-        self.expenses_categories = []
+        self.income_categories = ["salary", "added"]
+        self.expenses_categories = ["rent", "bills", "groceries"]
         self.income_entry_var = StringVar()
         self.expense_entry_var = StringVar()
+        self.income_category_var = StringVar()
+        self.expense_category_var = StringVar()
+        self.total_incomes = StringVar()
+        self.total_expenses = StringVar()
+        self.free_amount = StringVar()
 
         # Open budget frame
         self.menage_const_budget_frame = Frame(self.root, bg=self.bg_color)
@@ -34,16 +42,16 @@ class ManageConstBudgetView:
               bg='light gray') \
             .grid(row=0, column=0, columnspan=4, sticky=EW, padx=140, pady=20, ipadx=135, ipady=50)
 
-        Label(self.menage_const_budget_frame, text="date", font=('Arial', 15), bg="red", width=10) \
+        Label(self.menage_const_budget_frame, text=self.month_date, font=('Arial', 15), width=10) \
             .grid(row=1, column=1, columnspan=2, pady=5, sticky=W, padx=250)
 
-        Label(self.menage_const_budget_frame, text="total incomes: ", font=('Arial', 15), bg="red", width=18) \
+        Label(self.menage_const_budget_frame, text=self.total_incomes.get(), font=('Arial', 15), bg="red", width=18) \
             .grid(row=8, column=1, sticky=W, pady=5)
 
-        Label(self.menage_const_budget_frame, text="total expenses: ", font=('Arial', 15), bg="red", width=18) \
+        Label(self.menage_const_budget_frame, text=self.total_expenses.get(), font=('Arial', 15), bg="red", width=18) \
             .grid(row=8, column=2, sticky=E, padx=15, pady=5)
 
-        Label(self.menage_const_budget_frame, text="Free amount: ", font=('Arial', 15), bg="red", width=20) \
+        Label(self.menage_const_budget_frame, text=self.free_amount.get(), font=('Arial', 15), bg="red", width=20) \
             .grid(row=9, column=1, columnspan=2, pady=10, sticky=W, padx=200)
 
         Label(self.menage_const_budget_frame, text="Category:", font=('Arial', 13)) \
@@ -63,35 +71,37 @@ class ManageConstBudgetView:
             .grid(row=5, column=3, sticky=W, padx=40)
 
         # Combobox for category
-        ttk.Combobox(self.menage_const_budget_frame, font=('Arial', 15), values=self.income_categories) \
+        ttk.Combobox(self.menage_const_budget_frame, font=('Arial', 15), values=self.income_categories,
+                     textvariable=self.income_category_var) \
             .grid(row=3, column=0, sticky=W, padx=50)
 
-        ttk.Combobox(self.menage_const_budget_frame, font=('Arial', 15), values=self.expenses_categories) \
+        ttk.Combobox(self.menage_const_budget_frame, font=('Arial', 15), values=self.expenses_categories,
+                     textvariable=self.expense_category_var) \
             .grid(row=3, column=3, sticky=W, padx=40)
 
         # Add const income button
         Button(self.menage_const_budget_frame, text="Add income", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.add_const_income()) \
+               command=lambda: self.controller.add_income(self.income_category_var.get(), self.income_entry_var.get())) \
             .grid(row=6, column=0, sticky=W, padx=50)
 
         # Delete const income button
         Button(self.menage_const_budget_frame, text="Delete income", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.delete_const_income()) \
+               command=lambda: self.controller.delete_income(self.income_table.index(self.income_table.selection()[0]))) \
             .grid(row=7, column=0, sticky=W, padx=50)
 
         # Add const expanse button
         Button(self.menage_const_budget_frame, text="Add expanse", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.add_const_expense()) \
+               command=lambda: self.controller.add_expense(self.expense_category_var.get(), self.expense_entry_var.get())) \
             .grid(row=6, column=3, sticky=W, padx=40)
 
         # Delete const expanse button
         Button(self.menage_const_budget_frame, text="Delete expanse", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.delete_const_expense()) \
+               command=lambda: self.controller.delete_expense(self.expenses_table.index(self.expenses_table.selection()[0]))) \
             .grid(row=7, column=3, sticky=W, padx=40)
 
         # Update your const expanses
         Button(self.menage_const_budget_frame, text="Update your transactions", font=('Arial', 15), bg="light gray",
-               width=20, command=lambda: self.controller.update_const_transactions()) \
+               width=20, command=lambda: self.controller.update_transactions()) \
             .grid(row=10, column=1, columnspan=2, sticky=W, padx=200)
 
         # Back to manage budget page button
@@ -101,6 +111,15 @@ class ManageConstBudgetView:
 
         # Income treeview
         self.income_table = ttk.Treeview(self.income_frame, height=13)
+        self.income_table["columns"] = list(self.incomes_df.columns)
+        self.income_table.column("#0", width=50)
+
+        for col in incomes_df.columns:
+            self.income_table.column(col, width=75)
+
+        self.income_table.heading("#0", text="Index", anchor="w")
+        for col in incomes_df.columns:
+            self.income_table.heading(col, text=col, anchor="w")
         self.income_table.pack(fill="both", expand=True, side=LEFT, anchor="w")
 
         income_scrollbar = ttk.Scrollbar(self.income_frame, command=self.income_table.yview)
@@ -109,6 +128,15 @@ class ManageConstBudgetView:
 
         # Expenses treeview
         self.expenses_table = ttk.Treeview(self.expenses_frame, height=13)
+        self.expenses_table["columns"] = list(self.expenses_df.columns)
+        self.expenses_table.column("#0", width=50)
+
+        for col in expenses_df.columns:
+            self.expenses_table.column(col, width=75)
+
+        self.expenses_table.heading("#0", text="Index", anchor="w")
+        for col in expenses_df.columns:
+            self.expenses_table.heading(col, text=col, anchor="w")
         self.expenses_table.pack(fill="both", expand=True, side=LEFT, anchor="w")
 
         expenses_scrollbar = ttk.Scrollbar(self.expenses_frame, command=self.expenses_table.yview)
@@ -132,6 +160,16 @@ class ManageConstBudgetView:
         items = self.expenses_table.get_children()
         for item in items:
             self.expenses_table.delete(item)
+
+    def update_labels(self, total_incomes, total_expenses, free_amount):
+        self.total_incomes.set(f"Incomes: {total_incomes}")
+        self.total_expenses.set(f"Expenses: {total_expenses}")
+        self.free_amount.set(f"Free: {free_amount}")
+
+    def reset_labels(self):
+        self.total_incomes.set("Incomes: 0")
+        self.total_expenses.set("Expenses: 0")
+        self.free_amount.set("Free: 0")
 
     def destroy_budget_frame(self):
         self.menage_const_budget_frame.destroy()
