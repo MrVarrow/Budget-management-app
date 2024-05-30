@@ -3,13 +3,12 @@ from tkinter import ttk
 
 
 class ManageConstBudgetView:
-    def __init__(self, master, controller, bg_color, incomes_df, expenses_df, month_date):
+    def __init__(self, master, controller, bg_color, incomes_df, expenses_df):
         self.controller = controller
         self.root = master
         self.bg_color = bg_color
         self.incomes_df = incomes_df
         self.expenses_df = expenses_df
-        self.month_date = month_date
 
         # Define variables
         self.income_categories = ["salary", "added"]
@@ -21,6 +20,9 @@ class ManageConstBudgetView:
         self.total_incomes = StringVar()
         self.total_expenses = StringVar()
         self.free_amount = StringVar()
+
+        # Define default values for labels
+        self.reset_labels()
 
         # Open budget frame
         self.menage_const_budget_frame = Frame(self.root, bg=self.bg_color)
@@ -40,18 +42,15 @@ class ManageConstBudgetView:
         # Labels and entries
         Label(self.menage_const_budget_frame, text="Edit your constant transactions", font=('Arial', 40),
               bg='light gray') \
-            .grid(row=0, column=0, columnspan=4, sticky=EW, padx=140, pady=20, ipadx=135, ipady=50)
+            .grid(row=0, column=0, columnspan=4, sticky=EW, padx=140, pady=30, ipadx=135, ipady=50)
 
-        Label(self.menage_const_budget_frame, text=self.month_date, font=('Arial', 15), width=10) \
-            .grid(row=1, column=1, columnspan=2, pady=5, sticky=W, padx=250)
-
-        Label(self.menage_const_budget_frame, text=self.total_incomes.get(), font=('Arial', 15), bg="red", width=18) \
+        Label(self.menage_const_budget_frame, textvariable=self.total_incomes, font=('Arial', 15), width=18) \
             .grid(row=8, column=1, sticky=W, pady=5)
 
-        Label(self.menage_const_budget_frame, text=self.total_expenses.get(), font=('Arial', 15), bg="red", width=18) \
+        Label(self.menage_const_budget_frame, textvariable=self.total_expenses, font=('Arial', 15), width=18) \
             .grid(row=8, column=2, sticky=E, padx=15, pady=5)
 
-        Label(self.menage_const_budget_frame, text=self.free_amount.get(), font=('Arial', 15), bg="red", width=20) \
+        Label(self.menage_const_budget_frame, textvariable=self.free_amount, font=('Arial', 15), width=20) \
             .grid(row=9, column=1, columnspan=2, pady=10, sticky=W, padx=200)
 
         Label(self.menage_const_budget_frame, text="Category:", font=('Arial', 13)) \
@@ -81,28 +80,36 @@ class ManageConstBudgetView:
 
         # Add const income button
         Button(self.menage_const_budget_frame, text="Add income", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.add_income(self.income_category_var.get(), self.income_entry_var.get())) \
+               command=lambda: self.controller.add_income(
+                   self.income_category_var.get(), self.income_entry_var.get()
+               )) \
             .grid(row=6, column=0, sticky=W, padx=50)
 
         # Delete const income button
         Button(self.menage_const_budget_frame, text="Delete income", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.delete_income(self.income_table.index(self.income_table.selection()[0]))) \
+               command=lambda: self.controller.delete_income(
+                   self.income_table.index(self.income_table.selection()[0])
+               )) \
             .grid(row=7, column=0, sticky=W, padx=50)
 
         # Add const expanse button
         Button(self.menage_const_budget_frame, text="Add expanse", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.add_expense(self.expense_category_var.get(), self.expense_entry_var.get())) \
+               command=lambda: self.controller.add_expense(
+                   self.expense_category_var.get(), self.expense_entry_var.get()
+               )) \
             .grid(row=6, column=3, sticky=W, padx=40)
 
         # Delete const expanse button
         Button(self.menage_const_budget_frame, text="Delete expanse", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.delete_expense(self.expenses_table.index(self.expenses_table.selection()[0]))) \
+               command=lambda: self.controller.delete_expense(
+                   self.expenses_table.index(self.expenses_table.selection()[0])
+               )) \
             .grid(row=7, column=3, sticky=W, padx=40)
 
         # Update your const expanses
         Button(self.menage_const_budget_frame, text="Update your transactions", font=('Arial', 15), bg="light gray",
                width=20, command=lambda: self.controller.update_transactions()) \
-            .grid(row=10, column=1, columnspan=2, sticky=W, padx=200)
+            .grid(row=10, column=1, columnspan=2, sticky=W, padx=200, pady=10)
 
         # Back to manage budget page button
         Button(self.menage_const_budget_frame, text="back", font=('Arial', 15), bg='light gray', width=7,

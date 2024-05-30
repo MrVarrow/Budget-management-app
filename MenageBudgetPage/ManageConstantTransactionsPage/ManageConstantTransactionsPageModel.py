@@ -3,7 +3,6 @@ import re
 import pandas as pd
 
 
-# solveproblem with delete
 class ManageConstBudgetModel:
     def __init__(self):
         self.connection = mysql.connector.connect(host="localhost", user="root", passwd="AkniLUAp01-",
@@ -37,19 +36,22 @@ class ManageConstBudgetModel:
         items_df = expenses_df.reset_index(drop=True)
         return items_df
 
-    def add_items_to_database(self, user_data, incomes_df, expenses_df):
+    def insert_items_to_database(self, user_data, incomes_df, expenses_df):
         for index, row in incomes_df.iterrows():
             category, amount = self.get_category_and_amount(row)
-            insert_query = ''
-            values_to_insert = ()
+            insert_query = 'INSERT INTO consttransactions (Username, Type, Category, Amount) VALUES (%s, %s, %s, %s)'
+            values_to_insert = (user_data[0], 'Income', category, amount)
             self.cursor.execute(insert_query, values_to_insert)
             self.connection.commit()
         for index, row in expenses_df.iterrows():
             category, amount = self.get_category_and_amount(row)
-            insert_query = ''
-            values_to_insert = ()
+            insert_query = 'INSERT INTO consttransactions (Username, Type, Category, Amount) VALUES (%s, %s, %s, %s)'
+            values_to_insert = (user_data[0], 'Expense', category, amount)
             self.cursor.execute(insert_query, values_to_insert)
             self.connection.commit()
+
+    def delete_items_from_database(self, user_data):
+        self.cursor.execute('DELETE FROM consttransactions WHERE Username = %s', (user_data[0],))
 
     def get_category_and_amount(self, row):
         category = row["Category"]
@@ -67,14 +69,43 @@ class ManageConstBudgetModel:
         return True
 
     def calculate_total_incomes(self, incomes_df):
-        ...
+        income_values = incomes_df["Amount"].values.tolist()
+        total_income = 0
+        for amount in income_values:
+            total_income += float(amount)
+        return total_income
 
     def calculate_total_expenses(self, expenses_df):
-        ...
+        expenses_values = expenses_df["Amount"].values.tolist()
+        total_expenses = 0
+        for amount in expenses_values:
+            total_expenses += float(amount)
+        return total_expenses
 
     def calculate_free_amount(self, total_incomes, total_expenses):
         free = float(total_incomes) - float(total_expenses)
         return free
+
+    def check_if_budget_exists(self, user_data):
+        self.cursor.execute('SELECT Incomes FROM `constbudget` WHERE Username = %s', (user_data[0],))
+        row = self.cursor.fetchone()
+        if row is None:
+            return False
+        return True
+
+    def insert_budget(self, user_data, total_incomes, total_expenses, free_amount):
+        insert_query = 'INSERT INTO constbudget (Username, Incomes, Expenses, FreeAmount) VALUES (%s, %s, %s, %s)'
+        values_to_insert = (user_data[0], total_incomes, total_expenses, free_amount)
+        self.cursor.execute(insert_query, values_to_insert)
+        self.connection.commit()
+
+    def update_budget(self, user_data, total_incomes, total_expenses, free_amount):
+        update_query = 'UPDATE constbudget SET Incomes = %s, Expenses = %s, FreeAmount = %s WHERE Username = %s'
+        values_to_update = (total_incomes, total_expenses, free_amount, user_data[0])
+        self.cursor.execute(update_query, values_to_update)
+        self.connection.commit()
+
+
 
 
 
