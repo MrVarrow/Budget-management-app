@@ -73,17 +73,17 @@ class AdjustBudgetModel:
         return free
 
     # FIX WITH DATABASE TO WORK
-    def insert_items_to_database(self, user_data, incomes_df, expenses_df):
+    def insert_items_to_database(self, user_data, incomes_df, expenses_df, month):
         for index, row in incomes_df.iterrows():
             category, amount = self.get_category_and_amount(row)
-            insert_query = 'INSERT INTO budgetapptransactions (Username, Type, Category, Amount) VALUES (%s, %s, %s, %s)'
-            values_to_insert = (user_data[0], 'Income', category, amount)
+            insert_query = 'INSERT INTO budgettransactions (Username, Month, Type, Category, Amount) VALUES (%s, %s, %s, %s, %s)'
+            values_to_insert = (user_data[0], month, 'Income', category, amount)
             self.cursor.execute(insert_query, values_to_insert)
             self.connection.commit()
         for index, row in expenses_df.iterrows():
             category, amount = self.get_category_and_amount(row)
-            insert_query = 'INSERT INTO budgetapptransactions (Username, Type, Category, Amount) VALUES (%s, %s, %s, %s)'
-            values_to_insert = (user_data[0], 'Expense', category, amount)
+            insert_query = 'INSERT INTO budgettransactions (Username, Month, Type, Category, Amount) VALUES (%s, %s, %s, %s, %s)'
+            values_to_insert = (user_data[0], month, 'Expense', category, amount)
             self.cursor.execute(insert_query, values_to_insert)
             self.connection.commit()
 
@@ -93,7 +93,7 @@ class AdjustBudgetModel:
         return category, amount
 
     def delete_items_from_database(self, user_data):
-        self.cursor.execute('DELETE FROM budgetapptransactions WHERE Username = %s', (user_data[0],))
+        self.cursor.execute('DELETE FROM budgettransactions WHERE Username = %s', (user_data[0],))
 
     def check_if_budget_exists(self, user_data):
         self.cursor.execute('SELECT Month FROM `monthbudget` WHERE Username = %s', (user_data[0],))
@@ -108,9 +108,9 @@ class AdjustBudgetModel:
         self.cursor.execute(insert_query, values_to_insert)
         self.connection.commit()
 
-    def update_budget(self, user_data, total_incomes, total_expenses, free_amount):
-        update_query = 'UPDATE monthbudget SET Incomes = %s, Expenses = %s, FreeAmount = %s WHERE Username = %s'
-        values_to_update = (total_incomes, total_expenses, free_amount, user_data[0])
+    def update_budget(self, month, total_incomes, total_expenses, free_amount):
+        update_query = 'UPDATE monthbudget SET Incomes = %s, Expenses = %s, FreeAmount = %s WHERE Month = %s'
+        values_to_update = (total_incomes, total_expenses, free_amount, month)
         self.cursor.execute(update_query, values_to_update)
         self.connection.commit()
 

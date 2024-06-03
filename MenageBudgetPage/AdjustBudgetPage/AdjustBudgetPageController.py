@@ -3,8 +3,6 @@ from MenageBudgetPage.AdjustBudgetPage.AdjustBudgetPageModel import AdjustBudget
 from MenageBudgetPage.AdjustBudgetPage.AdjustBudgetPageView import AdjustBudgetView
 
 
-# FIX DATABASE
-# AUTO ADD CONST TRANSACTIONS TO CALCULATIONS
 class AdjustBudgetController:
     def __init__(self, root, user_data, bg_color, month_date):
         self.root = root
@@ -30,21 +28,28 @@ class AdjustBudgetController:
 
         existing_const_budget = self.adjust_budget_model.get_const_from_db(self.user_data)
         if existing_const_budget is None:
-            self.const_incomes_df, self.const_expenses_df = None, None
+            self.const_incomes_df, self.const_expenses_df = self.adjust_budget_model.create_df()
         else:
             self.const_incomes_df, self.const_expenses_df = self.adjust_budget_model.const_budget_into_df(
                 existing_const_budget)
             self.adjust_budget_view.load_const_incomes(self.const_incomes_df)
             self.adjust_budget_view.load_const_expenses(self.const_expenses_df)
-            self.combined_incomes_df = self.adjust_budget_model.add_dfs(self.const_incomes_df, self.incomes_df)
-            self.combined_expenses_df = self.adjust_budget_model.add_dfs(self.const_expenses_df, self.expenses_df)
+
+        self.combined_incomes_df = self.adjust_budget_model.add_dfs(self.const_incomes_df, self.incomes_df)
+        self.combined_expenses_df = self.adjust_budget_model.add_dfs(self.const_expenses_df, self.expenses_df)
+
         self.const_expenses_len = len(self.const_expenses_df)
         self.const_incomes_len = len(self.const_incomes_df)
 
         self.total_incomes = self.adjust_budget_model.calculate_total_incomes(self.combined_incomes_df)
         self.total_expenses = self.adjust_budget_model.calculate_total_expenses(self.combined_expenses_df)
         self.free_amount = self.adjust_budget_model.calculate_free_amount(self.total_incomes, self.total_expenses)
+
         self.adjust_budget_view.update_labels(self.total_incomes, self.total_expenses, self.free_amount)
+        self.adjust_budget_view.clear_incomes()
+        self.adjust_budget_view.clear_expenses()
+        self.adjust_budget_view.add_items_to_incomes(self.combined_incomes_df, self.const_incomes_len)
+        self.adjust_budget_view.add_items_to_expenses(self.combined_expenses_df, self.const_expenses_len)
 
     def add_income(self, category, amount):
         if self.adjust_budget_model.check_category(category):
@@ -120,7 +125,19 @@ class AdjustBudgetController:
             messagebox.showinfo("Information", "You can't delete constant expense")
 
     def update_budget(self):
-        ...
+        if not self.adjust_budget_model.check_if_budget_exists(self.user_data):
+            self.adjust_budget_model.insert_budget(
+                self.user_data, self.total_incomes, self.total_expenses, self.free_amount, self.month_date
+            )
+        else:
+            self.adjust_budget_model.update_budget(
+                self.month_date, self.total_incomes, self.total_expenses, self.free_amount
+            )
+            self.adjust_budget_model.delete_items_from_database(self.user_data)
+
+        self.adjust_budget_model.insert_items_to_database(self.user_data, self.incomes_df, self.expenses_df, self.month_date)
+
+        messagebox.showinfo("Information", "Your transactions has been updated successfully!")
 
     def back(self):
         from MenageBudgetPage.ManageBudgetPageController import ManageBudgetController
