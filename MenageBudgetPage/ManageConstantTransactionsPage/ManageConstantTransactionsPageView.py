@@ -44,27 +44,30 @@ class ManageConstBudgetView:
               bg='light gray') \
             .grid(row=0, column=0, columnspan=4, sticky=EW, padx=140, pady=30, ipadx=135, ipady=50)
 
-        Label(self.menage_const_budget_frame, textvariable=self.total_incomes, font=('Arial', 15), width=18) \
+        Label(self.menage_const_budget_frame, textvariable=self.total_incomes, font=('Arial', 15), width=18,
+              bg=self.bg_color) \
             .grid(row=8, column=1, sticky=W, pady=5)
 
-        Label(self.menage_const_budget_frame, textvariable=self.total_expenses, font=('Arial', 15), width=18) \
+        Label(self.menage_const_budget_frame, textvariable=self.total_expenses, font=('Arial', 15), width=18,
+              bg=self.bg_color) \
             .grid(row=8, column=2, sticky=E, padx=15, pady=5)
 
-        Label(self.menage_const_budget_frame, textvariable=self.free_amount, font=('Arial', 15), width=20) \
+        Label(self.menage_const_budget_frame, textvariable=self.free_amount, font=('Arial', 15), width=20,
+              bg=self.bg_color) \
             .grid(row=9, column=1, columnspan=2, pady=10, sticky=W, padx=200)
 
-        Label(self.menage_const_budget_frame, text="Category:", font=('Arial', 13)) \
+        Label(self.menage_const_budget_frame, text="Category:", font=('Arial', 13), bg=self.bg_color) \
             .grid(row=2, column=0, sticky=W, padx=50)
 
-        Label(self.menage_const_budget_frame, text="Category:", font=('Arial', 13)) \
+        Label(self.menage_const_budget_frame, text="Category:", font=('Arial', 13), bg=self.bg_color) \
             .grid(row=2, column=3, sticky=W, padx=40)
 
-        Label(self.menage_const_budget_frame, text="Amount:", font=('Arial', 13)) \
+        Label(self.menage_const_budget_frame, text="Amount:", font=('Arial', 13), bg=self.bg_color) \
             .grid(row=4, column=0, sticky=W, padx=50)
         Entry(self.menage_const_budget_frame, font=('Arial', 13), width=26, textvariable=self.income_entry_var) \
             .grid(row=5, column=0, sticky=W, padx=50)
 
-        Label(self.menage_const_budget_frame, text="Amount:", font=('Arial', 13)) \
+        Label(self.menage_const_budget_frame, text="Amount:", font=('Arial', 13), bg=self.bg_color) \
             .grid(row=4, column=3, sticky=W, padx=40)
         Entry(self.menage_const_budget_frame, font=('Arial', 13), width=26, textvariable=self.expense_entry_var) \
             .grid(row=5, column=3, sticky=W, padx=40)
