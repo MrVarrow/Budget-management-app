@@ -12,6 +12,7 @@ class ManageBudgetController:
         self.root = root
         self.bg_color = bg_color
         self.user_data = user_data
+        self.month_date = ""
 
         # ...
         self.manage_budget_model = ManageBudgetModel()
@@ -20,20 +21,48 @@ class ManageBudgetController:
                                                    )
 
     def open_budget(self):
-        self.manage_budget_view.destroy_manage_budget_frame()
-        OpenBudgetController(self.root, self, self.bg_color)
+        if not self.month_date == "":
+            self.manage_budget_view.destroy_manage_budget_frame()
+            OpenBudgetController(self.root, self.user_data, self.bg_color, self.month_date)
+            return
+        messagebox.showinfo("Information", "You have to select month first")
 
     def edit_budget(self):
-        self.manage_budget_view.destroy_manage_budget_frame()
-        AdjustBudgetController(self.root, self.user_data, self.bg_color)
+        if not self.month_date == "":
+            self.manage_budget_view.destroy_manage_budget_frame()
+            AdjustBudgetController(self.root, self.user_data, self.bg_color, self.month_date)
+            return
+        messagebox.showinfo("Information", "You have to select month first")
 
     def manage_constants(self):
         self.manage_budget_view.destroy_manage_budget_frame()
         ManageConstBudgetController(self.root, self.user_data, self.bg_color)
 
     def delete_budget(self):
-        ...
+        result = messagebox.askquestion("Warning", "Do you want to delete budget for selected month?")
+        if result == "yes":
+            if not self.month_date == "":
+                self.manage_budget_model.delete_budget_transactions(self.user_data, self.month_date)
+                self.manage_budget_model.delete_budget_month(self.user_data, self.month_date)
+                self.manage_budget_view.clear_info_about_month()
+                self.month_date = ""
+                return
+            messagebox.showinfo("Information", "You have to select month first")
+        messagebox.showinfo("Information", "Budget deleted successfully.")
 
-    def choosing_month(self):
-        ...
+    def back(self):
+        from LoggedUserPage.LoggedUserPageController import LoggedUserPageController
+        self.manage_budget_view.destroy_manage_budget_frame()
+        LoggedUserPageController(self.root, self.user_data, self.bg_color)
+
+    def choosing_month(self, date):
+        self.month_date = date
+        self.manage_budget_view.show_chosen_date(date)
+        self.manage_budget_view.clear_info_about_month()
+        incomes, expenses, free_amount = self.manage_budget_model.get_info_about_budget(self.user_data[0], date)
+        if incomes is None:
+            incomes, expenses, free_amount = self.manage_budget_model.get_info_about_const_budget(self.user_data)
+        if incomes is None:
+            return
+        self.manage_budget_view.show_info_about_budget(incomes, expenses, free_amount)
 
