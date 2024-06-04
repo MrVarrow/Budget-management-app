@@ -73,8 +73,12 @@ class AdjustBudgetController:
             result = messagebox.askquestion("Warning", "Do you want to delete selected item from your"
                                                        " budget incomes?")
             if result == "yes":
-                self.incomes_df = self.adjust_budget_model.delete_from_incomes_df(index, self.incomes_df, combined=False)
-                self.combined_incomes_df = self.adjust_budget_model.delete_from_incomes_df(index, self.combined_incomes_df, combined=True)
+                self.incomes_df = self.adjust_budget_model.delete_from_incomes_df(
+                    index, self.incomes_df, combined=False
+                )
+                self.combined_incomes_df = self.adjust_budget_model.delete_from_incomes_df(
+                    index, self.combined_incomes_df, combined=True
+                )
                 self.total_incomes = self.adjust_budget_model.calculate_total_incomes(self.combined_incomes_df)
                 self.free_amount = self.adjust_budget_model.calculate_free_amount(self.total_incomes,
                                                                                   self.total_expenses)
@@ -110,8 +114,12 @@ class AdjustBudgetController:
             result = messagebox.askquestion("Warning", "Do you want to delete selected item from your"
                                                        " budget expenses?")
             if result == "yes":
-                self.expenses_df = self.adjust_budget_model.delete_from_expenses_df(index, self.expenses_df, combined=False)
-                self.combined_expenses_df = self.adjust_budget_model.delete_from_expenses_df(index, self.combined_expenses_df, combined=True)
+                self.expenses_df = self.adjust_budget_model.delete_from_expenses_df(
+                    index, self.expenses_df, combined=False
+                )
+                self.combined_expenses_df = self.adjust_budget_model.delete_from_expenses_df(
+                    index, self.combined_expenses_df, combined=True
+                )
                 self.total_expenses = self.adjust_budget_model.calculate_total_expenses(self.combined_expenses_df)
                 self.free_amount = self.adjust_budget_model.calculate_free_amount(self.total_incomes,
                                                                                   self.total_expenses)
@@ -125,7 +133,7 @@ class AdjustBudgetController:
             messagebox.showinfo("Information", "You can't delete constant expense")
 
     def update_budget(self):
-        if not self.adjust_budget_model.check_if_budget_exists(self.user_data):
+        if not self.adjust_budget_model.check_if_budget_exists(self.month_date):
             self.adjust_budget_model.insert_budget(
                 self.user_data, self.total_incomes, self.total_expenses, self.free_amount, self.month_date
             )
@@ -133,9 +141,11 @@ class AdjustBudgetController:
             self.adjust_budget_model.update_budget(
                 self.month_date, self.total_incomes, self.total_expenses, self.free_amount
             )
-            self.adjust_budget_model.delete_items_from_database(self.user_data)
+            self.adjust_budget_model.delete_items_from_database(self.month_date)
 
-        self.adjust_budget_model.insert_items_to_database(self.user_data, self.incomes_df, self.expenses_df, self.month_date)
+        self.adjust_budget_model.insert_items_to_database(
+            self.user_data, self.incomes_df, self.expenses_df, self.month_date
+        )
 
         messagebox.showinfo("Information", "Your transactions has been updated successfully!")
 

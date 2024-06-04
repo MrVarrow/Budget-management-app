@@ -42,32 +42,35 @@ class AdjustBudgetView:
 
         # Labels and entries
         Label(self.adjust_budget_frame, text="Edit your monthly budget", font=('Arial', 40), bg='light gray') \
-            .grid(row=0, column=0, columnspan=4, sticky=EW, padx=140, pady=20, ipadx=210, ipady=50)
+            .grid(row=0, column=0, columnspan=4, sticky=EW, padx=140, pady=23, ipadx=210, ipady=50)
 
-        Label(self.adjust_budget_frame, text=self.month_date, font=('Arial', 15), width=10) \
+        Label(self.adjust_budget_frame, text=self.month_date, font=('Arial', 15), width=10, bg=self.bg_color) \
             .grid(row=1, column=1, columnspan=2, pady=5, sticky=W, padx=250)
 
-        Label(self.adjust_budget_frame, textvariable=self.total_incomes, font=('Arial', 15), width=18) \
+        Label(self.adjust_budget_frame, textvariable=self.total_incomes, font=('Arial', 15), width=18,
+              bg=self.bg_color) \
             .grid(row=8, column=1, sticky=W, pady=5)
 
-        Label(self.adjust_budget_frame, textvariable=self.total_expenses, font=('Arial', 15), width=18) \
+        Label(self.adjust_budget_frame, textvariable=self.total_expenses, font=('Arial', 15), width=18,
+              bg=self.bg_color) \
             .grid(row=8, column=2, sticky=E, padx=15, pady=5)
 
-        Label(self.adjust_budget_frame, textvariable=self.free_amount, font=('Arial', 15), width=20) \
+        Label(self.adjust_budget_frame, textvariable=self.free_amount, font=('Arial', 15), width=20,
+              bg=self.bg_color) \
             .grid(row=9, column=1, columnspan=2, pady=10, sticky=W, padx=200)
 
-        Label(self.adjust_budget_frame, text="Category:", font=('Arial', 13)) \
+        Label(self.adjust_budget_frame, text="Category:", font=('Arial', 13), bg=self.bg_color) \
             .grid(row=2, column=0, sticky=W, padx=50)
 
-        Label(self.adjust_budget_frame, text="Category:", font=('Arial', 13)) \
+        Label(self.adjust_budget_frame, text="Category:", font=('Arial', 13), bg=self.bg_color) \
             .grid(row=2, column=3, sticky=W, padx=40)
 
-        Label(self.adjust_budget_frame, text="Amount:", font=('Arial', 13)) \
+        Label(self.adjust_budget_frame, text="Amount:", font=('Arial', 13), bg=self.bg_color) \
             .grid(row=4, column=0, sticky=W, padx=50)
         Entry(self.adjust_budget_frame, font=('Arial', 13), width=26, textvariable=self.income_entry_var) \
             .grid(row=5, column=0, sticky=W, padx=50)
 
-        Label(self.adjust_budget_frame, text="Amount:", font=('Arial', 13)) \
+        Label(self.adjust_budget_frame, text="Amount:", font=('Arial', 13), bg=self.bg_color) \
             .grid(row=4, column=3, sticky=W, padx=40)
         Entry(self.adjust_budget_frame, font=('Arial', 13), width=26, textvariable=self.expense_entry_var) \
             .grid(row=5, column=3, sticky=W, padx=40)
@@ -83,22 +86,30 @@ class AdjustBudgetView:
 
         # Add income button
         Button(self.adjust_budget_frame, text="Add income", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.add_income(self.income_category_var.get(), self.income_entry_var.get())) \
+               command=lambda: self.controller.add_income(
+                   self.income_category_var.get(), self.income_entry_var.get()
+               )) \
             .grid(row=6, column=0, sticky=W, padx=50)
 
         # Delete income button
         Button(self.adjust_budget_frame, text="Delete income", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.delete_income(self.income_table.index(self.income_table.selection()[0]))) \
+               command=lambda: self.controller.delete_income(
+                   self.income_table.index(self.income_table.selection()[0])
+               )) \
             .grid(row=7, column=0, sticky=W, padx=50)
 
         # Add expanse button
         Button(self.adjust_budget_frame, text="Add expanse", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.add_expense(self.expense_category_var.get(), self.expense_entry_var.get())) \
+               command=lambda: self.controller.add_expense(
+                   self.expense_category_var.get(), self.expense_entry_var.get()
+               )) \
             .grid(row=6, column=3, sticky=W, padx=40)
 
         # Delete expanse button
         Button(self.adjust_budget_frame, text="Delete expanse", font=('Arial', 15), bg="light gray", width=21,
-               command=lambda: self.controller.delete_expense(self.expenses_table.index(self.expenses_table.selection()[0]))) \
+               command=lambda: self.controller.delete_expense(
+                   self.expenses_table.index(self.expenses_table.selection()[0])
+               )) \
             .grid(row=7, column=3, sticky=W, padx=40)
 
         # Update your expanses

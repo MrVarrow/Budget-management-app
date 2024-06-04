@@ -76,13 +76,15 @@ class AdjustBudgetModel:
     def insert_items_to_database(self, user_data, incomes_df, expenses_df, month):
         for index, row in incomes_df.iterrows():
             category, amount = self.get_category_and_amount(row)
-            insert_query = 'INSERT INTO budgettransactions (Username, Month, Type, Category, Amount) VALUES (%s, %s, %s, %s, %s)'
+            insert_query = 'INSERT INTO budgettransactions (Username, Month, Type, Category, Amount) ' \
+                           'VALUES (%s, %s, %s, %s, %s)'
             values_to_insert = (user_data[0], month, 'Income', category, amount)
             self.cursor.execute(insert_query, values_to_insert)
             self.connection.commit()
         for index, row in expenses_df.iterrows():
             category, amount = self.get_category_and_amount(row)
-            insert_query = 'INSERT INTO budgettransactions (Username, Month, Type, Category, Amount) VALUES (%s, %s, %s, %s, %s)'
+            insert_query = 'INSERT INTO budgettransactions (Username, Month, Type, Category, Amount) ' \
+                           'VALUES (%s, %s, %s, %s, %s)'
             values_to_insert = (user_data[0], month, 'Expense', category, amount)
             self.cursor.execute(insert_query, values_to_insert)
             self.connection.commit()
@@ -92,18 +94,19 @@ class AdjustBudgetModel:
         amount = row["Amount"]
         return category, amount
 
-    def delete_items_from_database(self, user_data):
-        self.cursor.execute('DELETE FROM budgettransactions WHERE Username = %s', (user_data[0],))
+    def delete_items_from_database(self, month):
+        self.cursor.execute('DELETE FROM budgettransactions WHERE Username = %s', (month,))
 
-    def check_if_budget_exists(self, user_data):
-        self.cursor.execute('SELECT Month FROM `monthbudget` WHERE Username = %s', (user_data[0],))
+    def check_if_budget_exists(self, month_date):
+        self.cursor.execute('SELECT Month FROM `monthbudget` WHERE Month = %s', (month_date,))
         row = self.cursor.fetchone()
         if row is None:
             return False
         return True
 
     def insert_budget(self, user_data, total_incomes, total_expenses, free_amount, month):
-        insert_query = 'INSERT INTO monthbudget (Username, Month, Incomes, Expenses, FreeAmount) VALUES (%s, %s, %s, %s, %s)'
+        insert_query = 'INSERT INTO monthbudget (Username, Month, Incomes, Expenses, FreeAmount) VALUES ' \
+                       '(%s, %s, %s, %s, %s)'
         values_to_insert = (user_data[0], month, total_incomes, total_expenses, free_amount)
         self.cursor.execute(insert_query, values_to_insert)
         self.connection.commit()
@@ -130,7 +133,9 @@ class AdjustBudgetModel:
         return const_incomes_df, const_expenses_df
 
     def get_budget_from_db(self, user_data, month):
-        self.cursor.execute('SELECT * FROM budgettransactions WHERE Username = %s AND Month = %s', (user_data[0], month))
+        self.cursor.execute(
+            'SELECT * FROM budgettransactions WHERE Username = %s AND Month = %s', (user_data[0], month)
+        )
         rows = self.cursor.fetchall()
         return rows
 
