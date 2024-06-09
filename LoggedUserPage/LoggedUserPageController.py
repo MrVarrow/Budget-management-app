@@ -4,7 +4,9 @@ from SettingsPage.SettingsPageController import SettingsPageController
 from AccountPage.AccountPageController import AccountPageController
 from RateAppWindow.RateAppWindowController import RateAppWindowController
 from MobileAppWindow.MobileAppWindowController import MobileAppWindowController
-
+from ReceiptsPage.ReceiptsPageController import ReceiptsPageController
+from ShoppingListPage.ShoppingListController import ShoppingListController
+from MenageBudgetPage.ManageBudgetPageController import ManageBudgetController
 from tkinter import messagebox
 
 
@@ -18,16 +20,18 @@ class LoggedUserPageController:
 
     # Go into settings
     def settings(self):
-        # destroy frame
+        self.logged_user_page_view.destroy_logged_user_frame()
         SettingsPageController(self.root, self.user_data, self.bg_color)
 
     # Go into user account
     def your_acc(self):
+        self.logged_user_page_view.destroy_logged_user_frame()
         AccountPageController(self.root, self.user_data, self.bg_color)
 
     # Go into manage budget page
     def manage_budget(self):
-        ...
+        self.logged_user_page_view.destroy_logged_user_frame()
+        ManageBudgetController(self.root, self.user_data, self.bg_color)
 
     # Go into statistics page
     def stats(self):
@@ -35,7 +39,8 @@ class LoggedUserPageController:
 
     # Go into shopping list page
     def shopping_list(self):
-        ...
+        self.logged_user_page_view.destroy_logged_user_frame()
+        ShoppingListController(self.root, self.user_data, self.bg_color)
 
     # Go into savings page
     def savings(self):
@@ -43,7 +48,8 @@ class LoggedUserPageController:
 
     # Go into receipts page
     def receipts(self):
-        ...
+        self.logged_user_page_view.destroy_logged_user_frame()
+        ReceiptsPageController(self.root, self.user_data, self.bg_color)
 
     # Go into rate us window
     def rate_us(self):
