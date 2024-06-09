@@ -17,13 +17,13 @@ class SettingsPageView:
 
         # Labels
         Label(self.settings_page, text="Settings", font=('Arial', 40), bg="light gray") \
-            .grid(row=0, column=0, sticky=EW, padx=330, pady=30, ipadx=220, ipady=50)
+            .grid(row=0, column=0, sticky=EW, padx=330, pady=40, ipadx=220, ipady=50)
 
         # Dark mode checkbutton
         self.dark_mode = Checkbutton(self.settings_page, text="Dark mode", font=('Arial', 20), bg="light gray", borderwidth=2,
                     relief="solid", command=lambda: controller.dark_mode(), variable=self.bg_color_state,
                     onvalue=True, offvalue=False)
-        self.dark_mode.grid(row=3, column=0, pady=40)
+        self.dark_mode.grid(row=3, column=0, pady=35)
 
         # Support and help button
         Button(self.settings_page, text="Support and Help", font=('Arial', 20), width=15, bg="light gray",
@@ -70,22 +70,23 @@ class SettingsPageView:
         self.credits_root.resizable(False, False)
 
         # Labels
-        Label(self.credits_root, text="Credits", font=('Arial', 15))\
+        Label(self.credits_root, text="Credits", font=('Arial', 15), bg=self.bg_color)\
             .grid(row=0, column=0, padx=150, pady=10)
         Label(self.credits_root, text="This App is fully created by Franciszek Gawadziński\n"
-                                      "(Varrow)", font=('Arial', 12))\
+                                      "(Varrow)", font=('Arial', 12), bg=self.bg_color)\
             .grid(row=1, column=0)
-        Label(self.credits_root, text="Visit me on Github and Linkedin!", font=('Arial', 12))\
+        Label(self.credits_root, text="Visit me on Github and Linkedin!", font=('Arial', 12), bg=self.bg_color)\
             .grid(row=2, column=0)
 
         # Github link button
         github_button = Button(self.credits_root, text="https://github.com/MrVarrow", font=('Arial', 9), fg='blue',
-                               bd=0, command=lambda: self.controller.credits_github(github_button.cget("text")))
+                               bd=0, command=lambda: self.controller.credits_github(github_button.cget("text")),
+                               bg=self.bg_color)
         github_button.grid(row=3, column=0)
 
         # Linkedin link button
         linkedin_button = Button(self.credits_root, text="https://www.linkedin.com/in/franciszek-gawadzi%C5%84ski-5493492b0",
-                                 font=('Arial', 9), fg='blue', bd=0,
+                                 font=('Arial', 9), fg='blue', bd=0, bg=self.bg_color,
                                  command=lambda: self.controller.credits_linkedin(linkedin_button.cget("text")))
         linkedin_button.grid(row=4, column=0)
 
@@ -127,7 +128,7 @@ class SettingsPageView:
 
         # Labels
         Label(self.chatbot_root, text="Welcome to chatbot. I'm here to help you!\n"
-                                      "Type your question below.", font=('Arial', 12)) \
+                                      "Type your question below.", font=('Arial', 12), bg=self.bg_color) \
             .grid(row=0, column=0, padx=55, pady=5)
 
         Label(self.answer_frame, text="", borderwidth=2, relief="solid", width=40, height=5, font=('Arial', 12)) \
