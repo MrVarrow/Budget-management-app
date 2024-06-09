@@ -63,7 +63,9 @@ class AccountPageController:
 
     # Back from acc page to logged user page
     def back_from_acc_page(self):
-        ...
+        from LoggedUserPage.LoggedUserPageController import LoggedUserPageController
+        self.account_page_view.account_frame_destroy()
+        LoggedUserPageController(self.root, self.user_data, self.bg_color)
 
     # Verify e-mail window buttons methods
 

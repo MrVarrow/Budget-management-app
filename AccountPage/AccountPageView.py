@@ -57,7 +57,7 @@ class AccountPageView:
 
         # Close button
         Button(self.acc_page, text="Close", font=('Arial', 15), width=8, bg="light gray",
-               command=lambda: self.account_frame_destroy())\
+               command=lambda: self.controller.back_from_acc_page())\
             .grid(row=4, column=0, sticky=SE, padx=40, pady=50, ipady=5)
 
     # Destroy frame
@@ -106,17 +106,17 @@ class AccountPageView:
         self.change_password_root.resizable(False, False)
 
         # Labels and entries
-        Label(self.change_password_root, text="Old password:", font=('Arial', 10)) \
+        Label(self.change_password_root, text="Old password:", font=('Arial', 10), bg=self.bg_color) \
             .grid(row=0, column=0, sticky=W, padx=90)
         Entry(self.change_password_root, font=('Arial', 15), textvariable=self.old_password_entry) \
             .grid(row=1, column=0, padx=90)
 
-        Label(self.change_password_root, text="New password:", font=('Arial', 10)) \
+        Label(self.change_password_root, text="New password:", font=('Arial', 10), bg=self.bg_color) \
             .grid(row=2, column=0, sticky=W, padx=90)
         Entry(self.change_password_root, font=('Arial', 15), textvariable=self.new_password_entry) \
             .grid(row=3, column=0, padx=90)
 
-        Label(self.change_password_root, text="Repeat new password:", font=('Arial', 10)) \
+        Label(self.change_password_root, text="Repeat new password:", font=('Arial', 10), bg=self.bg_color) \
             .grid(row=4, column=0, sticky=W, padx=90)
         Entry(self.change_password_root, font=('Arial', 15), textvariable=self.new_password_reentry) \
             .grid(row=5, column=0, padx=90)
@@ -143,17 +143,17 @@ class AccountPageView:
         self.change_email_root.resizable(False, False)
 
         # Labels and entries
-        Label(self.change_email_root, text="Old e-mail:", font=('Arial', 10)) \
+        Label(self.change_email_root, text="Old e-mail:", font=('Arial', 10), bg=self.bg_color) \
             .grid(row=0, column=0, sticky=W, padx=90)
         Entry(self.change_email_root, font=('Arial', 15), textvariable=self.old_email_entry) \
             .grid(row=1, column=0, sticky=W, padx=90)
 
-        Label(self.change_email_root, text="New e-mail:", font=('Arial', 10)) \
+        Label(self.change_email_root, text="New e-mail:", font=('Arial', 10), bg=self.bg_color) \
             .grid(row=2, column=0, sticky=W, padx=90)
         Entry(self.change_email_root, font=('Arial', 15), textvariable=self.new_email_entry) \
             .grid(row=3, column=0, sticky=W, padx=90)
 
-        Label(self.change_email_root, text="Repeat new e-mail:", font=('Arial', 10)) \
+        Label(self.change_email_root, text="Repeat new e-mail:", font=('Arial', 10), bg=self.bg_color) \
             .grid(row=4, column=0, sticky=W, padx=90)
         Entry(self.change_email_root, font=('Arial', 15), textvariable=self.new_email_reentry) \
             .grid(row=5, column=0, sticky=W, padx=90)
