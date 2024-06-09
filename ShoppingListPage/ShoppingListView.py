@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-# FIX THE VIEW OF OVERVIEW
+
 class ShoppingListView:
     def __init__(self, master, controller, bg_color):
         self.controller = controller
@@ -22,7 +22,7 @@ class ShoppingListView:
 
         # Labels
         Label(self.shopping_list_frame, text="Your shopping lists", font=('Arial', 40), bg='light gray') \
-            .grid(row=0, column=0, columnspan=2, sticky=EW, padx=220, pady=40, ipadx=210, ipady=50)
+            .grid(row=0, column=0, columnspan=2, sticky=EW, padx=220, pady=46, ipadx=210, ipady=50)
 
         # Choosing receipts combobox
         self.combobox_shopping_lists = ttk.Combobox(self.shopping_list_frame, font=('Arial', 20), textvariable=self.combobox_var, width=20)
