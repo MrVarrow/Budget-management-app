@@ -20,15 +20,15 @@ class UserLoginView:
         Label(self.main_menu_frame, text="Login to your budget manager", font=('Arial', 40), bg='light gray') \
             .grid(row=0, column=0, columnspan=2, sticky=EW, padx=80, pady=20, ipadx=220, ipady=50)
 
-        Label(self.main_menu_frame, text="You don't have an account?", font=('Arial', 15)) \
+        Label(self.main_menu_frame, text="You don't have an account?", font=('Arial', 15), bg=self.bg_color) \
             .grid(row=7, column=0, padx=530, sticky=W, pady=5)
 
-        Label(self.main_menu_frame, text="login:", font=('Arial', 20)) \
+        Label(self.main_menu_frame, text="login:", font=('Arial', 20), bg=self.bg_color) \
             .grid(row=1, column=0, padx=500, sticky=W)
         Entry(self.main_menu_frame, font=('Arial', 20), textvariable=self.login) \
             .grid(row=2, column=0, padx=500, sticky=W, pady=10)
 
-        Label(self.main_menu_frame, text="password:", font=('Arial', 20)) \
+        Label(self.main_menu_frame, text="password:", font=('Arial', 20), bg=self.bg_color) \
             .grid(row=3, column=0, padx=500, sticky=W)
         self.password_entry = Entry(self.main_menu_frame, font=('Arial', 20), show="*", textvariable=self.password)
         self.password_entry.grid(row=4, column=0, padx=500, sticky=W, pady=10)
@@ -41,7 +41,7 @@ class UserLoginView:
 
         # Forgot Password button
         Button(self.main_menu_frame, text="Forgot your password?", fg='blue', font=('Arial', 10, 'underline'), bd=0,
-               command=lambda: controller.forgot_pass(self.login.get())) \
+               command=lambda: controller.forgot_pass(self.login.get()), bg=self.bg_color) \
             .grid(row=5, column=0)
 
         # Login button
