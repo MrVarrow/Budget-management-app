@@ -25,10 +25,10 @@ class RateAppWindowView:
         self.rate_us_stars_frame.grid(row=1, column=0)
 
         # Labels
-        Label(self.rate_us_root, text="Rate our app!", font=('Arial', 15)).grid(row=0, column=0, padx=135, pady=15,
-                                                                                sticky=W)
+        Label(self.rate_us_root, text="Rate our app!", font=('Arial', 15), bg=self.bg_color) \
+            .grid(row=0, column=0, padx=135, pady=15, sticky=W)
 
-        self.user_rate_widget = Label(self.rate_us_root, text="Your rating:\n", font=('Arial', 12))
+        self.user_rate_widget = Label(self.rate_us_root, text="Your rating:\n", font=('Arial', 12), bg=self.bg_color)
         self.user_rate_widget.grid(row=2, column=0, sticky=W, padx=150, pady=10)
 
         # Star buttons
