@@ -17,15 +17,15 @@ class MobileAppWindowView:
         mobile_app_root.resizable(False, False)
 
         # Labels
-        Label(mobile_app_root, text="There is a link to our mobile app:", font=('Arial', 15)) \
+        Label(mobile_app_root, text="There is a link to our mobile app:", font=('Arial', 15), bg=self.bg_color) \
             .grid(row=0, column=0, pady=10)
 
-        app_link = Label(mobile_app_root, text="Link", font=('Arial', 15))
+        app_link = Label(mobile_app_root, text="Link", font=('Arial', 15), bg=self.bg_color)
         app_link.grid(row=1, column=0)
         Label(mobile_app_root, text="To download you have to click this link on your mobile device,\n"
                                          "so type it in google\n"
                                          "or copy and sent it to yourself then use on phone", borderwidth=2,
-              relief="solid") \
+              relief="solid", bg=self.bg_color) \
             .grid(row=2, column=0, pady=10, padx=30)
 
         # Copy button
