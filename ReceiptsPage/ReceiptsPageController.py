@@ -31,6 +31,8 @@ class ReceiptsPageController:
 
             self.receipts_page_view.clear_treeview()
             self.receipts_page_view.clear_receipt_data()
+            self.receipts_page_view.receipt_combobox_update(
+                self.receipts_page_model.receipt_list_from_database(self.user_data[0]))
         elif result == "no":
             pass
 

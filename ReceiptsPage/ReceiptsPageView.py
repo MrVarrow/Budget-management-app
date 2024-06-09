@@ -2,7 +2,6 @@ from tkinter import *
 from tkinter import ttk
 
 
-# Add refreshing combobox widget
 class ReceiptsPageView:
     def __init__(self, master, controller, bg_color):
         self.controller = controller
@@ -23,21 +22,22 @@ class ReceiptsPageView:
 
         # Labels
         Label(self.receipts_frame, text="Receipts page", font=('Arial', 40), bg='light gray') \
-            .grid(row=0, column=0, columnspan=2, sticky=EW, padx=250, pady=40, ipadx=210, ipady=50)
+            .grid(row=0, column=0, columnspan=2, sticky=EW, padx=250, pady=40, ipadx=230, ipady=50)
 
-        Label(self.receipts_frame, text="Your receipts:", font=('Arial', 15)) \
+        Label(self.receipts_frame, text="Your receipts:", font=('Arial', 15), bg=self.bg_color) \
             .grid(row=1, column=0, sticky=W, padx=100)
 
-        Label(self.receipts_frame, text="Total:", font=('Arial', 20)) \
+        Label(self.receipts_frame, text="Total:", font=('Arial', 20), bg=self.bg_color) \
             .grid(row=5, column=1, sticky=W)
 
-        self.total_price_widget = Label(self.receipts_frame, text=self.total_price, font=('Arial', 20))
+        self.total_price_widget = Label(self.receipts_frame, text=self.total_price, font=('Arial', 20),
+                                        bg=self.bg_color)
         self.total_price_widget.grid(row=5, column=0, sticky=E, padx=250, columnspan=2)
 
-        self.receipt_name_widget = Label(self.receipts_frame, text="", font=('Arial', 15), width=22)
+        self.receipt_name_widget = Label(self.receipts_frame, text="", font=('Arial', 15), width=22, bg=self.bg_color)
         self.receipt_name_widget.grid(row=3, column=0, columnspan=2, sticky=W, padx=460)
 
-        self.receipt_date_widget = Label(self.receipts_frame, text="", font=('Arial', 15), width=22)
+        self.receipt_date_widget = Label(self.receipts_frame, text="", font=('Arial', 15), width=22, bg=self.bg_color)
         self.receipt_date_widget.grid(row=3, rowspan=2, column=0, columnspan=2, sticky=W, padx=460, pady=40)
 
         # Combobox
@@ -67,7 +67,7 @@ class ReceiptsPageView:
         # Back to logged user page button
         Button(self.receipts_frame, text="Back", font=('Arial', 15), bg='light gray', width=7,
                command=lambda: controller.back_to_logged_user_page()) \
-            .grid(row=6, column=1, columnspan=2, sticky=SE, pady=30, padx=10)
+            .grid(row=6, column=1, columnspan=2, sticky=SE, pady=30, padx=30)
 
     # Overview receipt treeview
     def create_treeview(self, receipt_df):
@@ -113,6 +113,7 @@ class ReceiptsPageView:
     # Updates list of user receipts
     def receipt_combobox_update(self, receipt_list):
         self.combobox_receipts.configure(values=receipt_list)
+        self.combobox_var.set("")
 
     # Destroying receipts page
     def destroy_receipts_page_frame(self):
