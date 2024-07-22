@@ -19,7 +19,7 @@ class SavingsPageController:
         ...
 
     def make_new_goal(self):
-        self.savings_page_view.make_goal_window()
+        self.savings_page_view.make_new_goal_window()
 
     def bank_deposit(self):
         ...
@@ -33,5 +33,7 @@ class SavingsPageController:
         LoggedUserPageController(self.root, self.user_data, self.bg_color)
 
     # Make new goal window buttons
-    def submit_goal(self):
-        ...
+    def submit_goal(self, goal_name, goal_amount, goal_date):
+        self.savings_page_model.save_goal_to_database(goal_name, goal_amount, goal_date)
+        self.savings_page_view.destroy_make_goal_window()
+        messagebox.showinfo("Information", "Your goal has been successfully added!")

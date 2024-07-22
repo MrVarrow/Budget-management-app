@@ -8,3 +8,6 @@ class SavingsPageModel:
         self.connection = mysql.connector.connect(host="localhost", user="root", passwd="AkniLUAp01-",
                                                   database="budgetappdatabase")
         self.cursor = self.connection.cursor()
+
+    def save_goal_to_database(self, goal_name, goal_amount, goal_date):
+        ...

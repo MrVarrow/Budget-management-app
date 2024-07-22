@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkcalendar import DateEntry
 
 
 class SavingsPageView:
@@ -59,30 +60,28 @@ class SavingsPageView:
         self.make_goal_window.resizable(False, False)
 
         # Goal name
-        Label(self.make_goal_window, text="Goal name:").grid(row=0, column=0)
-        Entry(self.make_goal_window).grid(row=1, column=0)
+        Label(self.make_goal_window, text="Goal name:", font=('Arial', 12)).grid(row=0, column=0, padx=100, sticky=W)
+        Entry(self.make_goal_window, font=('Arial', 15)).grid(row=1, column=0, padx=100, sticky=W)
 
         # Goal amount
-        Label(self.make_goal_window, text="Goal amount:").grid(row=2, column=0)
-        Entry(self.make_goal_window).grid(row=3, column=0)
+        Label(self.make_goal_window, text="Goal amount:", font=('Arial', 12)).grid(row=2, column=0, padx=100, sticky=W)
+        Entry(self.make_goal_window, font=('Arial', 15)).grid(row=3, column=0, padx=100, sticky=W)
 
         # Goal date
-        Label(self.make_goal_window, text="Goal date:").grid(row=4, column=0)
+        Label(self.make_goal_window, text="Goal date:", font=('Arial', 12)).grid(row=4, column=0, padx=100, sticky=W)
 
-        # Day choosing
-        ttk.Combobox(self.make_goal_window).grid(row=5, column=0)
-
-        # Month choosing
-        ttk.Combobox(self.make_goal_window).grid(row=5, column=0)
-
-        # Year choosing
-        ttk.Combobox(self.make_goal_window).grid(row=5, column=0)
+        # DateEntry
+        cal = DateEntry(self.make_goal_window, width=12, background='light gray', foreground='black', borderwidth=2, date_pattern='yyyy-mm-dd', font=('Arial', 12))
+        cal.grid(row=5, column=0, padx=145, sticky=W, pady=5)
 
         # Submit goal
-        Button(self.make_goal_window, text="Submit goal").grid(row=6, column=0)
+        Button(self.make_goal_window, text="Submit goal", font=('Arial', 15), bg="light gray").grid(row=6, column=0, padx=150, sticky=W)
 
         # Focus on TopLevel window
         self.make_goal_window.grab_set()
 
     def destroy_savings_frame(self):
         self.savings_frame.destroy()
+
+    def destroy_make_goal_window(self):
+        self.make_goal_window.destroy()
