@@ -60,9 +60,13 @@ class ManageBudgetController:
         self.manage_budget_view.show_chosen_date(date)
         self.manage_budget_view.clear_info_about_month()
         incomes, expenses, free_amount = self.manage_budget_model.get_info_about_budget(self.user_data[0], date)
+        c_incomes, c_expenses, c_free_amount = self.manage_budget_model.get_info_about_const_budget(self.user_data)
         if incomes is None:
-            incomes, expenses, free_amount = self.manage_budget_model.get_info_about_const_budget(self.user_data)
-        if incomes is None:
-            return
-        self.manage_budget_view.show_info_about_budget(incomes, expenses, free_amount)
+            sum_incomes, sum_expenses, sum_free_amount = c_incomes, c_expenses, c_free_amount
+        else:
+            sum_incomes = incomes + c_incomes
+            sum_expenses = expenses + c_expenses
+            sum_free_amount = free_amount + c_free_amount
+
+        self.manage_budget_view.show_info_about_budget(sum_incomes, sum_expenses, sum_free_amount)
 

@@ -59,3 +59,9 @@ class ManageBudgetModel:
             'DELETE FROM `budgettransactions` WHERE Username = %s AND Month = %s', (user_data[0], month)
         )
         self.connection.commit()
+
+    def add_transactions_for_month(self, incomes, expenses, free_amount, c_incomes, c_expenses, c_free_amount):
+        sum_incomes = float(incomes) + float(c_incomes)
+        sum_expenses = float(expenses) + float(c_expenses)
+        sum_free_amount = float(free_amount) + float(c_free_amount)
+        return sum_incomes, sum_expenses, sum_free_amount

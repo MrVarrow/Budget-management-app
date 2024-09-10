@@ -15,10 +15,25 @@ class ManageConstBudgetController:
         self.free_amount = 0
 
         self.manage_const_budget_model = ManageConstBudgetModel()
-        self.incomes_df, self.expenses_df = self.manage_const_budget_model.create_df()
+
+        existing_budget = self.manage_const_budget_model.get_budget_from_db(self.user_data)
+        if existing_budget is None:
+            self.incomes_df, self.expenses_df = self.manage_const_budget_model.create_df()
+        else:
+            self.incomes_df, self.expenses_df = self.manage_const_budget_model.get_budget_info_df(existing_budget)
         self.manage_const_budget_view = ManageConstBudgetView(
             self.root, self, self.bg_color, self.incomes_df, self.expenses_df
         )
+
+        self.total_incomes = self.manage_const_budget_model.calculate_total_incomes(self.incomes_df)
+        self.total_expenses = self.manage_const_budget_model.calculate_total_expenses(self.expenses_df)
+        self.free_amount = self.manage_const_budget_model.calculate_free_amount(self.total_incomes, self.total_expenses)
+
+        self.manage_const_budget_view.update_labels(self.total_incomes, self.total_expenses, self.free_amount)
+        self.manage_const_budget_view.clear_incomes()
+        self.manage_const_budget_view.clear_expenses()
+        self.manage_const_budget_view.add_items_to_incomes(self.incomes_df)
+        self.manage_const_budget_view.add_items_to_expenses(self.expenses_df)
 
     def add_income(self, category, amount):
         if self.manage_const_budget_model.check_category(category):
@@ -97,6 +112,10 @@ class ManageConstBudgetController:
             self.manage_const_budget_model.delete_items_from_database(self.user_data)
         self.manage_const_budget_model.insert_items_to_database(self.user_data, self.incomes_df, self.expenses_df)
         self.incomes_df, self.expenses_df = self.manage_const_budget_model.create_df()
+
+        # update future month budgets
+        curr_month = self.manage_const_budget_model.get_current_month()
+
 
         self.manage_const_budget_view.reset_labels()
         self.manage_const_budget_view.clear_expenses()

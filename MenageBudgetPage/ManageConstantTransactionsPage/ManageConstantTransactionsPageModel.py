@@ -1,6 +1,7 @@
 import mysql.connector
 import re
 import pandas as pd
+from datetime import datetime
 
 
 class ManageConstBudgetModel:
@@ -8,6 +9,49 @@ class ManageConstBudgetModel:
         self.connection = mysql.connector.connect(host="localhost", user="root", passwd="AkniLUAp01-",
                                                   database="budgetappdatabase")
         self.cursor = self.connection.cursor()
+
+    def get_current_month(self):
+        curr_date = datetime.now()
+        curr_month = curr_date.strftime("%m/%Y")
+        print(curr_month)
+        return curr_month
+
+    # sformatowac odpowiednio
+    def update_future_budget_months(self, curr_month):
+        ...
+        while True:
+            self.cursor.execute('SELECT * FROM monthbudget WHERE Month = %s', (curr_month,))
+            result = self.cursor.fetchone()
+
+            if result:
+                total_incomes =
+                total_expenses =
+                free_amount =
+
+            self.connection.commit()
+
+            curr_month += 1
+            if curr_month > 12:
+
+
+
+
+    def get_budget_from_db(self, user_data):
+        self.cursor.execute(
+            'SELECT * FROM consttransactions WHERE Username = %s', (user_data[0],)
+        )
+        rows = self.cursor.fetchall()
+        return rows
+
+    def get_budget_info_df(self, sql_outcome):
+        df = pd.DataFrame(sql_outcome, columns=[col[0] for col in self.cursor.description])
+        income_mask = df['Type'] == 'Income'
+        expense_mask = df['Type'] != 'Income'
+
+        income_df = df.loc[income_mask, ['Category', 'Amount']].reset_index(drop=True)
+        expense_df = df.loc[expense_mask, ['Category', 'Amount']].reset_index(drop=True)
+
+        return income_df, expense_df
 
     def create_df(self):
         incomes_df = pd.DataFrame(columns=["Category", "Amount"])
