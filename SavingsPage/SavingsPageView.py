@@ -17,11 +17,11 @@ class SavingsPageView:
 
         # Overview frame
         self.overview_frame = Frame(self.savings_frame, bg=self.bg_color, borderwidth=2, relief="solid")
-        self.overview_frame.grid(row=1, rowspan=5, column=1)
+        self.overview_frame.grid(row=1, rowspan=5, column=0, columnspan=2, ipady=200, ipadx=320, sticky=E, padx=100)
 
         # Labels
         Label(self.savings_frame, text="Your savings", font=('Arial', 40), bg='light gray') \
-            .grid(row=0, column=0, columnspan=2, sticky=EW, padx=135, pady=23, ipadx=350, ipady=50)\
+            .grid(row=0, column=0, columnspan=2, sticky=EW, padx=135, pady=23, ipadx=350, ipady=50) \
 
         ttk.Combobox(self.savings_frame, font=('Arial', 20), values=self.user_goals,
                      textvariable=self.current_goal) \
@@ -51,7 +51,8 @@ class SavingsPageView:
                command=lambda: self.controller.back()) \
             .grid(row=6, column=1, sticky=E, padx=20)
 
-        Label(self.overview_frame, text="over").grid()
+    def initial_overview(self):
+        Label(self.overview_frame, text="Choose your goal").grid()
 
     def make_new_goal_window(self):
         self.make_goal_window = Toplevel(self.root, bg=self.bg_color)
@@ -71,11 +72,13 @@ class SavingsPageView:
         Label(self.make_goal_window, text="Goal date:", font=('Arial', 12)).grid(row=4, column=0, padx=100, sticky=W)
 
         # DateEntry
-        cal = DateEntry(self.make_goal_window, width=12, background='light gray', foreground='black', borderwidth=2, date_pattern='yyyy-mm-dd', font=('Arial', 12))
+        cal = DateEntry(self.make_goal_window, width=12, background='light gray', foreground='black', borderwidth=2,
+                        date_pattern='yyyy-mm-dd', font=('Arial', 12))
         cal.grid(row=5, column=0, padx=145, sticky=W, pady=5)
 
         # Submit goal
-        Button(self.make_goal_window, text="Submit goal", font=('Arial', 15), bg="light gray").grid(row=6, column=0, padx=150, sticky=W)
+        Button(self.make_goal_window, text="Submit goal", font=('Arial', 15), bg="light gray").grid(row=6, column=0,
+                                                                                                    padx=150, sticky=W)
 
         # Focus on TopLevel window
         self.make_goal_window.grab_set()
