@@ -10,38 +10,18 @@ class ManageConstBudgetModel:
                                                   database="budgetappdatabase")
         self.cursor = self.connection.cursor()
 
-    def get_current_month(self):
-        curr_date = datetime.now()
-        curr_month = curr_date.strftime("%m/%Y")
-        print(curr_month)
-        return curr_month
-
-    # sformatowac odpowiednio
-    def update_future_budget_months(self, curr_month):
-        ...
-        while True:
-            self.cursor.execute('SELECT * FROM monthbudget WHERE Month = %s', (curr_month,))
-            result = self.cursor.fetchone()
-
-            if result:
-                total_incomes =
-                total_expenses =
-                free_amount =
-
-            self.connection.commit()
-
-            curr_month += 1
-            if curr_month > 12:
-
-
-
-
     def get_budget_from_db(self, user_data):
         self.cursor.execute(
             'SELECT * FROM consttransactions WHERE Username = %s', (user_data[0],)
         )
         rows = self.cursor.fetchall()
         return rows
+
+    def update_budget(self, month, total_incomes, total_expenses, free_amount):
+        update_query = 'UPDATE monthbudget SET Incomes = %s, Expenses = %s, FreeAmount = %s WHERE Month = %s'
+        values_to_update = (total_incomes, total_expenses, free_amount, month)
+        self.cursor.execute(update_query, values_to_update)
+        self.connection.commit()
 
     def get_budget_info_df(self, sql_outcome):
         df = pd.DataFrame(sql_outcome, columns=[col[0] for col in self.cursor.description])

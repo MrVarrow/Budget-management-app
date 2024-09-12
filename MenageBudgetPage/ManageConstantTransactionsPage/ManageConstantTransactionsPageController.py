@@ -1,7 +1,9 @@
 from tkinter import messagebox
 from MenageBudgetPage.ManageConstantTransactionsPage.ManageConstantTransactionsPageModel import ManageConstBudgetModel
 from MenageBudgetPage.ManageConstantTransactionsPage.ManageConstantTransactionsPageView import ManageConstBudgetView
-
+from MenageBudgetPage.AdjustBudgetPage.AdjustBudgetPageModel import AdjustBudgetModel
+from MenageBudgetPage.ManageBudgetPageModel import ManageBudgetModel
+from MenageBudgetPage.OpenBudgetPage.OpenBudgetPageModel import OpenBudgetModel
 
 # errors of not selecting dont works
 class ManageConstBudgetController:
@@ -13,6 +15,10 @@ class ManageConstBudgetController:
         self.total_expenses = 0
         self.total_incomes = 0
         self.free_amount = 0
+
+        self.manage_budget_model = ManageBudgetModel()
+        self.adjust_budget_model = AdjustBudgetModel()
+        self.open_budget_model = OpenBudgetModel()
 
         self.manage_const_budget_model = ManageConstBudgetModel()
 
@@ -114,8 +120,20 @@ class ManageConstBudgetController:
         self.incomes_df, self.expenses_df = self.manage_const_budget_model.create_df()
 
         # update future month budgets
-        curr_month = self.manage_const_budget_model.get_current_month()
 
+        months = self.manage_budget_model.get_12_months()
+        for month in months:
+            if self.adjust_budget_model.check_if_budget_exists(month):
+                budget = self.open_budget_model.get_budget_from_db(self.user_data, month)
+                c_incomes_df, c_expenses_df = self.open_budget_model.budget_into_df(budget)
+                combined_incomes_df = self.open_budget_model.add_dfs(c_incomes_df, self.incomes_df)
+                combined_expenses_df = self.open_budget_model.add_dfs(c_expenses_df, self.expenses_df)
+
+                total_incomes = self.open_budget_model.calculate_total_incomes(combined_incomes_df)
+                total_expenses = self.open_budget_model.calculate_total_expenses(combined_expenses_df)
+                free_amount = self.open_budget_model.calculate_free_amount(total_incomes, total_expenses)
+
+                self.adjust_budget_model.update_budget(month, total_incomes, total_expenses, free_amount)
 
         self.manage_const_budget_view.reset_labels()
         self.manage_const_budget_view.clear_expenses()
