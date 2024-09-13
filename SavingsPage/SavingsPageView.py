@@ -54,6 +54,9 @@ class SavingsPageView:
     def initial_overview(self):
         Label(self.overview_frame, text="Choose your goal").grid()
 
+    def update_goal_list(self):
+        ...
+
     def make_new_goal_window(self):
         self.make_goal_window = Toplevel(self.root, bg=self.bg_color)
         self.make_goal_window.geometry("400x200")
