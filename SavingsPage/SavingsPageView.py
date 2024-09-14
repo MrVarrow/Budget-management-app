@@ -4,11 +4,11 @@ from tkcalendar import DateEntry
 
 
 class SavingsPageView:
-    def __init__(self, master, controller, bg_color):
+    def __init__(self, master, controller, bg_color, user_goals):
         self.controller = controller
         self.root = master
         self.bg_color = bg_color
-        self.user_goals = []
+        self.user_goals = user_goals
         self.current_goal = StringVar()
 
         # Savings frame
@@ -16,43 +16,100 @@ class SavingsPageView:
         self.savings_frame.grid()
 
         # Overview frame
-        self.overview_frame = Frame(self.savings_frame, bg=self.bg_color, borderwidth=2, relief="solid")
-        self.overview_frame.grid(row=1, rowspan=5, column=0, columnspan=2, ipady=200, ipadx=320, sticky=E, padx=100)
+        self.overview_frame_creation()
 
         # Labels
         Label(self.savings_frame, text="Your savings", font=('Arial', 40), bg='light gray') \
-            .grid(row=0, column=0, columnspan=2, sticky=EW, padx=135, pady=23, ipadx=350, ipady=50) \
+            .grid(row=0, column=0, columnspan=3, sticky=EW, padx=135, pady=23, ipadx=350, ipady=50) \
 
-        ttk.Combobox(self.savings_frame, font=('Arial', 20), values=self.user_goals,
-                     textvariable=self.current_goal) \
-            .grid(row=1, column=0, sticky=W, padx=100, pady=40)
+        goals = ttk.Combobox(self.savings_frame, font=('Arial', 20), values=self.user_goals,
+                             textvariable=self.current_goal)
+        goals.grid(row=1, column=0, columnspan=2, sticky=W, padx=50, pady=40)
 
         Button(self.savings_frame, text="Submit", font=('Arial', 15), bg="light gray", width=10,
-               command=lambda: self.controller.submit_open_goal()) \
-            .grid(row=2, column=0, sticky=W, padx=100)
+               command=lambda: self.controller.submit_open_goal(goals.get())) \
+            .grid(row=2, column=0, sticky=W, padx=50)
 
         Button(self.savings_frame, text="Delete", font=('Arial', 15), bg="light gray", width=10,
                command=lambda: self.controller.delete_goal()) \
-            .grid(row=2, column=0, sticky=W, padx=305)
+            .grid(row=2, column=0, columnspan=2, sticky=E, padx=55)
 
         Button(self.savings_frame, text="Make new goal", font=('Arial', 15), bg="light gray", width=20,
                command=lambda: self.controller.make_new_goal()) \
-            .grid(row=3, column=0, sticky=W, padx=150, pady=60)
+            .grid(row=3, column=0, columnspan=2, sticky=W, padx=100, pady=60)
 
         Button(self.savings_frame, text="Investments", font=('Arial', 15), bg="light gray", width=20,
                command=lambda: self.controller.investments()) \
-            .grid(row=4, column=0, sticky=W, padx=150)
+            .grid(row=4, column=0, columnspan=2, sticky=W, padx=100)
 
         Button(self.savings_frame, text="Bank deposit", font=('Arial', 15), bg="light gray", width=20,
                command=lambda: self.controller.bank_deposit()) \
-            .grid(row=5, column=0, sticky=W, padx=150, pady=30)
+            .grid(row=5, column=0, columnspan=2, sticky=W, padx=100, pady=30)
 
         Button(self.savings_frame, text="Back", font=('Arial', 15), bg="light gray", width=8,
                command=lambda: self.controller.back()) \
-            .grid(row=6, column=1, sticky=E, padx=20)
+            .grid(row=6, column=2, sticky=E, padx=20, pady=5)
+
+        self.initial_overview()
+
+    def overview_frame_creation(self):
+        self.overview_frame = Frame(self.savings_frame, bg=self.bg_color, borderwidth=2, relief="solid")
+        self.overview_frame.grid(row=1, rowspan=5, column=2, sticky=NSEW, padx=80)
+
+        self.savings_frame.grid_rowconfigure(1, weight=1)
+        self.savings_frame.grid_columnconfigure(2, weight=2)
 
     def initial_overview(self):
         Label(self.overview_frame, text="Choose your goal").grid()
+
+    def destroy_overview_frame(self):
+        self.overview_frame.destroy()
+
+    def open_goal_overview(self, goal_info, time_left):
+        self.overview_frame_creation()
+        automatic_deposit = StringVar()
+        automatic_deposit.set(goal_info[5])
+
+        # Name
+        Label(self.overview_frame, text=goal_info[1], font=('Arial', 25), bg="light gray", width=30) \
+            .grid(row=0, column=0, pady=25, padx=55, sticky=W, ipady=5)
+
+        # Goal amount
+        Label(self.overview_frame, text=f"Goal amount: {goal_info[2]}", font=('Arial', 15)) \
+            .grid(row=1, column=0, sticky=W, padx=50, pady=10)
+
+        # Goal date
+        Label(self.overview_frame, text=f"Goal date: {goal_info[3]}", font=('Arial', 15)) \
+            .grid(row=2, column=0, sticky=W, padx=50, pady=10)
+
+        Button(self.overview_frame, text="Deposit", font=('Arial', 15), bg="light gray", width=10) \
+            .grid(row=3, column=0, sticky=W, padx=20, pady=10)
+
+        Button(self.overview_frame, text="Withdraw", font=('Arial', 15), bg="light gray", width=10) \
+            .grid(row=3, column=0, sticky=W, padx=170, pady=10)
+
+        Label(self.overview_frame, text=f"Your actual automatic deposit: {goal_info[5]}", font=('Arial', 15)) \
+            .grid(row=4, column=0, sticky=W, padx=20, pady=10)
+
+        Entry(self.overview_frame, textvariable=automatic_deposit, font=('Arial', 15), width=15) \
+            .grid(row=5, column=0, sticky=W, padx=30, pady=10)
+
+        Label(self.overview_frame, text="per month", font=('Arial', 15)) \
+            .grid(row=5, column=0, sticky=W, padx=200, pady=10)
+
+        Button(self.overview_frame, text="Save", font=('Arial', 15), bg="light gray", width=10) \
+            .grid(row=6, column=0, sticky=W, padx=100, pady=10)
+
+        ttk.Progressbar(self.overview_frame, orient=HORIZONTAL, length=300, mode="determinate", variable=goal_info[4],
+                        maximum=100) \
+            .grid(row=1, column=0, sticky=E, padx=50, pady=10)
+
+        Label(self.overview_frame, text=f"You have achieved 80% of your goal.\nCongratulations!"
+              , font=('Arial', 15)) \
+            .grid(row=2, column=0, sticky=E, padx=30, pady=10)
+
+        Label(self.overview_frame, text=f"Time left: \n{time_left}", font=('Arial', 15)) \
+            .grid(row=3, rowspan=3, column=0, sticky=E, padx=140, pady=40)
 
     def update_goal_list(self):
         ...
@@ -63,13 +120,20 @@ class SavingsPageView:
         self.make_goal_window.title("Make new goal")
         self.make_goal_window.resizable(False, False)
 
+        goal_name_var = StringVar()
+        goal_amount_var = StringVar()
+
         # Goal name
-        Label(self.make_goal_window, text="Goal name:", font=('Arial', 12)).grid(row=0, column=0, padx=100, sticky=W)
-        Entry(self.make_goal_window, font=('Arial', 15)).grid(row=1, column=0, padx=100, sticky=W)
+        Label(self.make_goal_window, text="Goal name:", font=('Arial', 12)) \
+            .grid(row=0, column=0, padx=100, sticky=W)
+        Entry(self.make_goal_window, font=('Arial', 15), textvariable=goal_name_var) \
+            .grid(row=1, column=0, padx=100, sticky=W)
 
         # Goal amount
-        Label(self.make_goal_window, text="Goal amount:", font=('Arial', 12)).grid(row=2, column=0, padx=100, sticky=W)
-        Entry(self.make_goal_window, font=('Arial', 15)).grid(row=3, column=0, padx=100, sticky=W)
+        Label(self.make_goal_window, text="Goal amount:", font=('Arial', 12)) \
+            .grid(row=2, column=0, padx=100, sticky=W)
+        Entry(self.make_goal_window, font=('Arial', 15), textvariable=goal_amount_var) \
+            .grid(row=3, column=0, padx=100, sticky=W)
 
         # Goal date
         Label(self.make_goal_window, text="Goal date:", font=('Arial', 12)).grid(row=4, column=0, padx=100, sticky=W)
@@ -80,8 +144,9 @@ class SavingsPageView:
         cal.grid(row=5, column=0, padx=145, sticky=W, pady=5)
 
         # Submit goal
-        Button(self.make_goal_window, text="Submit goal", font=('Arial', 15), bg="light gray").grid(row=6, column=0,
-                                                                                                    padx=150, sticky=W)
+        Button(self.make_goal_window, text="Submit goal", font=('Arial', 15), bg="light gray",
+               command=lambda: self.controller.submit_goal(goal_name_var.get(), goal_amount_var.get(), cal.get_date())) \
+            .grid(row=6, column=0, padx=150, sticky=W)
 
         # Focus on TopLevel window
         self.make_goal_window.grab_set()

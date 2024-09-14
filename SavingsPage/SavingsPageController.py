@@ -10,12 +10,17 @@ class SavingsPageController:
         self.user_data = user_data
 
         self.savings_page_model = SavingsPageModel()
-        self.savings_page_view = SavingsPageView(self.root, self, self.bg_color)
+
+        self.savings_page_view = SavingsPageView(
+            self.root, self, self.bg_color, self.savings_page_model.get_user_goals(self.user_data)
+        )
 
     def submit_open_goal(self, goal_name):
         goal_info = self.savings_page_model.get_info_about_goal(self.user_data, goal_name)
-
+        time_left = self.savings_page_model.calculate_time_left_for_goal(goal_info[3])
         # fill the overview
+        self.savings_page_view.destroy_overview_frame()
+        self.savings_page_view.open_goal_overview(goal_info, time_left)
 
     def delete_goal(self, goal_name):
         result = messagebox.askquestion(title='Warning', message="Do you want to delete this goal?")
@@ -54,3 +59,13 @@ class SavingsPageController:
         self.savings_page_model.save_goal_to_database(self.user_data, goal_name, goal_amount, goal_date, progress=0, automatic_deposit=0)
         self.savings_page_view.destroy_make_goal_window()
         messagebox.showinfo("Information", "Your goal has been successfully added!")
+
+    # Goal Overview buttons
+    def deposit(self):
+        ...
+
+    def withdraw(self):
+        ...
+
+    def save_auto_deposit(self):
+        ...

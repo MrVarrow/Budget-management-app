@@ -38,6 +38,21 @@ class SavingsPageModel:
             return False
         return True
 
+    def goal_date_validation(self, goal_date):
+        ...
+
+    def get_user_goals(self, user_data):
+        self.cursor.execute('SELECT GoalName FROM savingsgoals WHERE username = %s', (user_data[0],))
+        rows = self.cursor.fetchall()
+        goals = list(rows)
+        return goals
+
+    def calculate_time_left_for_goal(self, goal_date):
+        ...
+
+    def calculate_percent_of_goal_accomplished(self):
+        ...
+
     def investments_calculator(self, entry_payment, future_payments, frequency_of_payments, investing_time, rate_of_return):
         ...
 
