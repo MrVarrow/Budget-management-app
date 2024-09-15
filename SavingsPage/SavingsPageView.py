@@ -10,6 +10,8 @@ class SavingsPageView:
         self.bg_color = bg_color
         self.user_goals = user_goals
         self.current_goal = StringVar()
+        self.automatic_deposit = StringVar()
+        self.new_auto_deposit = StringVar()
 
         # Savings frame
         self.savings_frame = Frame(self.root, bg=self.bg_color)
@@ -65,10 +67,11 @@ class SavingsPageView:
     def destroy_overview_frame(self):
         self.overview_frame.destroy()
 
-    def open_goal_overview(self, goal_info, time_left):
+    def open_goal_overview(self, goal_info, time_left, progress):
         self.overview_frame_creation()
-        automatic_deposit = StringVar()
-        automatic_deposit.set(goal_info[5])
+        self.automatic_deposit.set(f"Your actual automatic deposit: {goal_info[5]}")
+        self.new_auto_deposit.set(goal_info[5])
+
 
         # Name
         Label(self.overview_frame, text=goal_info[1], font=('Arial', 25), bg="light gray", width=30) \
@@ -88,28 +91,38 @@ class SavingsPageView:
         Button(self.overview_frame, text="Withdraw", font=('Arial', 15), bg="light gray", width=10) \
             .grid(row=3, column=0, sticky=W, padx=170, pady=10)
 
-        Label(self.overview_frame, text=f"Your actual automatic deposit: {goal_info[5]}", font=('Arial', 15)) \
+        Label(self.overview_frame, textvariable=self.automatic_deposit, font=('Arial', 15)) \
             .grid(row=4, column=0, sticky=W, padx=20, pady=10)
 
-        Entry(self.overview_frame, textvariable=automatic_deposit, font=('Arial', 15), width=15) \
+        Entry(self.overview_frame, textvariable=self.new_auto_deposit, font=('Arial', 15), width=15) \
             .grid(row=5, column=0, sticky=W, padx=30, pady=10)
 
         Label(self.overview_frame, text="per month", font=('Arial', 15)) \
             .grid(row=5, column=0, sticky=W, padx=200, pady=10)
 
-        Button(self.overview_frame, text="Save", font=('Arial', 15), bg="light gray", width=10) \
+        Button(self.overview_frame, text="Save", font=('Arial', 15), bg="light gray", width=10,
+               command=lambda: self.controller.save_auto_deposit(goal_info[1], self.new_auto_deposit.get())) \
             .grid(row=6, column=0, sticky=W, padx=100, pady=10)
 
         ttk.Progressbar(self.overview_frame, orient=HORIZONTAL, length=300, mode="determinate", variable=goal_info[4],
-                        maximum=100) \
+                        maximum=100, value=progress) \
             .grid(row=1, column=0, sticky=E, padx=50, pady=10)
 
-        Label(self.overview_frame, text=f"You have achieved 80% of your goal.\nCongratulations!"
+        Label(self.overview_frame, text=f"You have achieved {progress}% of your goal.\nCongratulations!"
               , font=('Arial', 15)) \
             .grid(row=2, column=0, sticky=E, padx=30, pady=10)
 
-        Label(self.overview_frame, text=f"Time left: \n{time_left}", font=('Arial', 15)) \
-            .grid(row=3, rowspan=3, column=0, sticky=E, padx=140, pady=40)
+        Label(self.overview_frame, text=f"Collected {goal_info[4]} from {goal_info[2]}", font=('Arial', 15), width=30)\
+            .grid(row=3, column=0, sticky=E, padx=30, pady=10)
+
+        Label(self.overview_frame, text=f"Time left: \n{time_left} days", font=('Arial', 15)) \
+            .grid(row=4, rowspan=3, column=0, sticky=E, padx=140, pady=40)
+
+    def update_auto_deposit_label(self, automatic_deposit):
+        self.automatic_deposit.set(f"Your actual automatic deposit: {automatic_deposit}")
+
+    def update_progress(self):
+        ...
 
     def update_goal_list(self):
         ...
@@ -156,3 +169,9 @@ class SavingsPageView:
 
     def destroy_make_goal_window(self):
         self.make_goal_window.destroy()
+
+    def deposit_window(self):
+        ...
+
+    def withdraw_window(self):
+        ...

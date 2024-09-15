@@ -1,6 +1,7 @@
 import mysql.connector
 import pandas as pd
 import re
+from datetime import datetime
 
 
 class SavingsPageModel:
@@ -47,11 +48,32 @@ class SavingsPageModel:
         goals = list(rows)
         return goals
 
-    def calculate_time_left_for_goal(self, goal_date):
-        ...
+    def update_progress_in_database(self, user_data, goal_name, progress):
+        self.cursor.execute('UPDATE savingsgoals SET Progress = %s WHERE username = %s AND GoalName = %s',
+                            (progress, user_data[0], goal_name))
+        self.connection.commit()
 
-    def calculate_percent_of_goal_accomplished(self):
-        ...
+    def update_automatic_deposit_in_database(self, user_data, goal_name, automatic_deposit):
+        self.cursor.execute('UPDATE savingsgoals SET AutomaticDeposit = %s WHERE username = %s AND GoalName = %s',
+                            (automatic_deposit, user_data[0], goal_name))
+
+    def calculate_time_left_for_goal(self, goal_date):
+        today = datetime.now()
+        today = datetime.date(today)
+        time_left = goal_date - today
+
+        if time_left.total_seconds() < 0:
+            return "Expired"
+
+        return time_left.days
+
+    def calculate_percent_of_goal_accomplished(self, goal_amount, progress):
+        percent = 0
+        if progress == 0:
+            return int(percent)
+        else:
+            percent = (progress / goal_amount) * 100
+            return int(percent)
 
     def investments_calculator(self, entry_payment, future_payments, frequency_of_payments, investing_time, rate_of_return):
         ...
