@@ -12,6 +12,7 @@ class SavingsPageView:
         self.current_goal = StringVar()
         self.automatic_deposit = StringVar()
         self.new_auto_deposit = StringVar()
+        self.goal_info = []
 
         # Savings frame
         self.savings_frame = Frame(self.root, bg=self.bg_color)
@@ -68,6 +69,7 @@ class SavingsPageView:
         self.overview_frame.destroy()
 
     def open_goal_overview(self, goal_info, time_left, progress):
+        self.goal_info = goal_info
         self.overview_frame_creation()
         self.automatic_deposit.set(f"Your actual automatic deposit: {goal_info[5]}")
         self.new_auto_deposit.set(goal_info[5])
@@ -85,10 +87,11 @@ class SavingsPageView:
         Label(self.overview_frame, text=f"Goal date: {goal_info[3]}", font=('Arial', 15)) \
             .grid(row=2, column=0, sticky=W, padx=50, pady=10)
 
-        Button(self.overview_frame, text="Deposit", font=('Arial', 15), bg="light gray", width=10) \
+        Button(self.overview_frame, text="Deposit", font=('Arial', 15), bg="light gray", width=10,
+               command=lambda: self.controller.deposit()) \
             .grid(row=3, column=0, sticky=W, padx=20, pady=10)
 
-        Button(self.overview_frame, text="Withdraw", font=('Arial', 15), bg="light gray", width=10) \
+        Button(self.overview_frame, text="Withdraw", font=('Arial', 15), bg="light gray", width=10, command=lambda: self.controller.withdraw()) \
             .grid(row=3, column=0, sticky=W, padx=170, pady=10)
 
         Label(self.overview_frame, textvariable=self.automatic_deposit, font=('Arial', 15)) \
@@ -149,7 +152,8 @@ class SavingsPageView:
             .grid(row=3, column=0, padx=100, sticky=W)
 
         # Goal date
-        Label(self.make_goal_window, text="Goal date:", font=('Arial', 12)).grid(row=4, column=0, padx=100, sticky=W)
+        Label(self.make_goal_window, text="Goal date:", font=('Arial', 12)) \
+            .grid(row=4, column=0, padx=100, sticky=W)
 
         # DateEntry
         cal = DateEntry(self.make_goal_window, width=12, background='light gray', foreground='black', borderwidth=2,
@@ -171,7 +175,49 @@ class SavingsPageView:
         self.make_goal_window.destroy()
 
     def deposit_window(self):
-        ...
+        self.deposit_window = Toplevel(self.root, bg=self.bg_color)
+        self.deposit_window.geometry("400x200")
+        self.deposit_window.title("Make new goal")
+        self.deposit_window.resizable(False, False)
+
+        deposit_amount = StringVar()
+
+        Label(self.deposit_window, text="Enter deposit amount:", font=('Arial', 15))\
+            .grid(row=0, column=0, sticky=W, padx=100, pady=20)
+
+        Entry(self.deposit_window, textvariable=deposit_amount, font=('Arial', 15), width=15) \
+            .grid(row=1, column=0, sticky=W, padx=115, pady=10)
+
+        Button(self.deposit_window, text="Submit", font=('Arial', 15), bg="light gray", width=10,
+               command=lambda: self.controller.submit_deposit(deposit_amount.get(), self.goal_info[1]))\
+            .grid(row=2, column=0, sticky=W, padx=140, pady=30)
+
+        # Focus on TopLevel window
+        self.deposit_window.grab_set()
 
     def withdraw_window(self):
-        ...
+        self.withdraw_window = Toplevel(self.root, bg=self.bg_color)
+        self.withdraw_window.geometry("400x200")
+        self.withdraw_window.title("Make new goal")
+        self.withdraw_window.resizable(False, False)
+
+        withdraw_amount = StringVar()
+
+        Label(self.deposit_window, text="Enter withdraw amount:", font=('Arial', 15)) \
+            .grid(row=0, column=0, sticky=W, padx=100, pady=20)
+
+        Entry(self.deposit_window, textvariable=withdraw_amount, font=('Arial', 15)) \
+            .grid(row=1, column=0, sticky=W, padx=115, pady=10)
+
+        Button(self.deposit_window, text="Submit", font=('Arial', 15), bg="light gray",
+               command=lambda: self.controller.submit_withdraw(withdraw_amount.get(), self.goal_info[1])) \
+            .grid(row=2, column=0, sticky=W, padx=140, pady=30)
+
+        # Focus on TopLevel window
+        self.withdraw_window.grab_set()
+
+    def destroy_deposit_window(self):
+        self.deposit_window.destroy()
+
+    def destroy_withdraw_window(self):
+        self.withdraw_window.destroy()

@@ -50,11 +50,11 @@ class SavingsPageController:
     # Make new goal window buttons
     def submit_goal(self, goal_name, goal_amount, goal_date):
         if not self.savings_page_model.goal_name_validation(goal_name):
-            messagebox.showinfo("Information", "Your goal has been successfully added!")
+            messagebox.showinfo("Information", "Wrong name.")
             return
 
         if not self.savings_page_model.goal_amount_validation(goal_amount):
-            messagebox.showinfo("Information", "Your goal has been successfully added!")
+            messagebox.showinfo("Information", "Wrong amount.")
             return
 
         self.savings_page_model.save_goal_to_database(self.user_data, goal_name, goal_amount, goal_date, progress=0, automatic_deposit=0)
@@ -63,13 +63,38 @@ class SavingsPageController:
 
     # Goal Overview buttons
     def deposit(self):
-        ...
+        self.savings_page_view.deposit_window()
 
     def withdraw(self):
-        ...
+        self.savings_page_view.withdraw_window()
 
     def save_auto_deposit(self, goal_name, automatic_deposit):
         self.savings_page_model.update_automatic_deposit_in_database(self.user_data, goal_name, automatic_deposit)
         # self.savings_page_model.save_automatic_deposit_to_constants()
 
         self.savings_page_view.update_auto_deposit_label(automatic_deposit)
+
+    # Deposit submit button
+
+    def submit_deposit(self, deposit_amount, goal_name):
+        if not self.savings_page_model.goal_amount_validation(deposit_amount):
+            messagebox.showinfo("Information", "Wrong amount.")
+            return
+
+        new_progress = self.savings_page_model.deposit_to_progress(
+            self.savings_page_model.get_progress_from_database(), deposit_amount
+        )
+        self.savings_page_model.update_progress_in_database(self.user_data, goal_name, new_progress)
+        self.savings_page_view.update_progress()
+
+    # Withdraw submit button
+    def submit_withdraw(self, withdraw_amount, goal_name):
+        if not self.savings_page_model.goal_amount_validation(withdraw_amount):
+            messagebox.showinfo("Information", "Wrong amount.")
+            return
+
+        new_progress = self.savings_page_model.withdraw_from_progress(
+            self.savings_page_model.get_progress_from_database(), withdraw_amount
+        )
+        self.savings_page_model.update_progress_in_database(self.user_data, goal_name, new_progress)
+        self.savings_page_view.update_progress()

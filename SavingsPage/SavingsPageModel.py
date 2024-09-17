@@ -75,6 +75,17 @@ class SavingsPageModel:
             percent = (progress / goal_amount) * 100
             return int(percent)
 
+    def get_progress_from_database(self):
+        ...
+
+    def deposit_to_progress(self, old_progress, deposit_amount):
+        new_progress = old_progress + deposit_amount
+        return new_progress # check if its larger than 10 digits (cant be)
+
+    def withdraw_from_progress(self, old_progress, withdraw_amount):
+        new_progress = old_progress - withdraw_amount
+        return new_progress # check if its negative (cant be)
+
     def investments_calculator(self, entry_payment, future_payments, frequency_of_payments, investing_time, rate_of_return):
         ...
 
