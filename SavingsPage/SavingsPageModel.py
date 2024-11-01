@@ -29,6 +29,32 @@ class SavingsPageModel:
             goal_info = list(row)
         return goal_info
 
+    def insert_automatic_deposit_to_constants(self, user_data, goal_name, automatic_deposit):
+        self.cursor.execute('INSERT INTO consttransactions (Username, Type, Category, Amount) VALUES (%s, %s, %s, %s)',
+                            (user_data[0], 'Expense', f'Savings: {goal_name}', automatic_deposit))
+        self.connection.commit()
+        self.cursor.reset()
+
+    def update_automatic_deposit_to_constants(self, automatic_deposit, goal_name, user_data):
+        update_query = 'UPDATE consttransactions SET Amount = %s WHERE Username = %s AND Category = %s'
+        values_to_insert = (automatic_deposit, user_data[0], f'Savings: {goal_name}')
+        print(
+            f"Updating Amount to {int(automatic_deposit)} for Username: {user_data[0]} and Category: Savings{goal_name}")
+        try:
+            self.cursor.execute(update_query, values_to_insert)
+            self.connection.commit()
+            print(f"Updated {self.cursor.rowcount} row(s).")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+    def check_if_deposit_exists(self, user_data, goal_name):
+        self.cursor.execute('SELECT Category FROM consttransactions WHERE Category = %s AND Username = %s', (f'Savings: {goal_name}', user_data[0]))
+        row = self.cursor.fetchone()
+        self.cursor.reset()
+        if row is None:
+            return False
+        return True
+
     def goal_amount_validation(self, goal_amount):
         if not re.search(r'^(?!0$)[1-9]\d{0,9}$', goal_amount):
             return False
@@ -39,8 +65,21 @@ class SavingsPageModel:
             return False
         return True
 
+    def goal_amount_deposit_validation(self, deposit_amount, goal_amount, progress):
+        if int(deposit_amount) > int(goal_amount) - int(progress):
+            return False
+        return True
+
+    def goal_amount_withdraw_validation(self, withdraw_amount, progress):
+        if int(withdraw_amount) > int(progress):
+            return False
+        return True
+
     def goal_date_validation(self, goal_date):
-        ...
+        today = datetime.now().date()
+        if goal_date < today:
+            return False
+        return True
 
     def get_user_goals(self, user_data):
         self.cursor.execute('SELECT GoalName FROM savingsgoals WHERE username = %s', (user_data[0],))
@@ -56,6 +95,8 @@ class SavingsPageModel:
     def update_automatic_deposit_in_database(self, user_data, goal_name, automatic_deposit):
         self.cursor.execute('UPDATE savingsgoals SET AutomaticDeposit = %s WHERE username = %s AND GoalName = %s',
                             (automatic_deposit, user_data[0], goal_name))
+        self.connection.commit()
+        self.cursor.reset()
 
     def calculate_time_left_for_goal(self, goal_date):
         today = datetime.now()
@@ -73,10 +114,19 @@ class SavingsPageModel:
             return int(percent)
         else:
             percent = (progress / goal_amount) * 100
-            return int(percent)
+            return round(float(percent), 2)
 
-    def get_progress_from_database(self):
-        ...
+    def get_progress_from_database(self, user_data, goal_name):
+        self.cursor.execute('SELECT Progress FROM savingsgoals WHERE username = %s AND GoalName = %s', (user_data[0],goal_name))
+        rows = self.cursor.fetchone()
+        self.cursor.reset()
+        return rows[0]
+
+    def get_goal_amount_from_database(self, user_data, goal_name):
+        self.cursor.execute('SELECT GoalAmount FROM savingsgoals WHERE username = %s AND GoalName = %s', (user_data[0], goal_name))
+        rows = self.cursor.fetchone()
+        self.cursor.reset()
+        return rows[0]
 
     def deposit_to_progress(self, old_progress, deposit_amount):
         new_progress = old_progress + deposit_amount
