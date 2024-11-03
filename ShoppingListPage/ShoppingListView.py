@@ -10,14 +10,15 @@ class ShoppingListView:
 
         # Define variables
         self.combobox_var = StringVar()
-        self.check_vars = []
+        self.checklist_vars = []
 
         # Shopping list frame
         self.shopping_list_frame = Frame(self.root, bg=self.bg_color)
         self.shopping_list_frame.grid(row=0, column=0)
 
         # Item list frame
-        self.list_items_frame = Frame(self.shopping_list_frame, bg=self.bg_color, borderwidth=2, relief="solid", width=600, height=400)
+        self.list_items_frame = Frame(self.shopping_list_frame, bg=self.bg_color, borderwidth=2, relief="solid",
+                                      width=600, height=400)
         self.list_items_frame.grid(row=1, rowspan=5, column=0, columnspan=2, sticky=E, padx=200)
 
         # Labels
@@ -25,7 +26,8 @@ class ShoppingListView:
             .grid(row=0, column=0, columnspan=2, sticky=EW, padx=220, pady=46, ipadx=210, ipady=50)
 
         # Choosing receipts combobox
-        self.combobox_shopping_lists = ttk.Combobox(self.shopping_list_frame, font=('Arial', 20), textvariable=self.combobox_var, width=20)
+        self.combobox_shopping_lists = ttk.Combobox(self.shopping_list_frame, font=('Arial', 20),
+                                                    textvariable=self.combobox_var, width=20)
         self.combobox_shopping_lists.grid(row=1, column=0, sticky=W, padx=100, pady=40)
 
         # Open shopping list button
@@ -54,7 +56,7 @@ class ShoppingListView:
             .grid(row=6, column=0, columnspan=2, sticky=E, padx=50)
 
     # Updates list of user receipts
-    def shopping_lists_combobox_update(self, shopping_lists):
+    def shopping_lists_combobox_update(self, shopping_lists: list):
         self.combobox_shopping_lists.configure(values=shopping_lists)
         self.combobox_var.set("")
 
@@ -63,7 +65,7 @@ class ShoppingListView:
         self.shopping_list_frame.destroy()
 
     # Creates overview of shopping list
-    def create_overview(self, shopping_list_name, items_df, shopping_list_date):
+    def create_overview(self, shopping_list_name: str, items_df, shopping_list_date):
         canvas = Canvas(self.list_items_frame, width=600, height=400)
         canvas.pack(side="left", fill="both", expand=True)
 
@@ -74,17 +76,20 @@ class ShoppingListView:
         canvas.create_window((0, 0), window=labels_frame, anchor="nw")
 
         # Create heading label
-        Label(labels_frame, text=f"Shopping list name: {shopping_list_name}, Creation date: {shopping_list_date}", font=('Arial', 15)).pack(pady=5)
+        Label(labels_frame, text=f"Shopping list name: {shopping_list_name}, Creation date: {shopping_list_date}",
+              font=('Arial', 15)) \
+            .pack(pady=5)
 
         # Create the labels inside the labels_frame
         for index, row in items_df.iterrows():
             item_name = row['Item name']
             item_quantity = row['Item quantity']
             check_var = BooleanVar()
-            self.check_vars.append(check_var.get())
-            item_checkbutton = Checkbutton(labels_frame, text=f"{item_name}, Quantity {item_quantity}", font=('Arial', 13),
-                        bg="light gray", width=63, anchor="w", variable=check_var,
-                        command=lambda i=index: self.controller.check_box(i, self.check_vars))
+            self.checklist_vars.append(check_var.get())
+            item_checkbutton = Checkbutton(labels_frame, text=f"{item_name}, Quantity {item_quantity}",
+                                           font=('Arial', 13),
+                                           bg="light gray", width=63, anchor="w", variable=check_var,
+                                           command=lambda i=index: self.controller.check_box(i, self.checklist_vars))
             item_checkbutton.pack(pady=10, anchor="w")
 
         # Button for checking if list is complete
