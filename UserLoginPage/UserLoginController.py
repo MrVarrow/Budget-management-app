@@ -2,6 +2,7 @@ from UserLoginPage.UserLoginView import UserLoginView
 from UserLoginPage.UserLoginModel import UserLoginModel
 from LoggedUserPage.LoggedUserPageController import LoggedUserPageController
 from CreateAccountPage.CreateAccountController import CreateAccountPageController
+from Validations.Validations import empty_string_inside_widget, sql_outcome_is_none, two_strings_are_the_same
 from tkinter import messagebox
 
 
@@ -12,21 +13,21 @@ class UserLoginController:
         self.login_user_page_view = UserLoginView(self.root, self, self.bg_color)
         self.login_user_page_model = UserLoginModel()
 
-    def user_login(self, login_input, password_input):
+    def user_login(self, login_input: str, password_input: str):
         # Check if user entered both login and password
-        if login_input == '' or password_input == '':
+        if empty_string_inside_widget(login_input) or empty_string_inside_widget(password_input):
             messagebox.showinfo(title="Information", message="Please enter both username and password.")
             return
-        user_data = self.login_user_page_model.user_input_is_not_empty(login_input)
+        user_data = self.login_user_page_model.get_user_data(login_input)
 
         # Check if user is registered
-        if user_data is None:
+        if sql_outcome_is_none(user_data):
             messagebox.showinfo(title="Information", message="User does not exist.")
             return
         password = user_data[2]
 
         # Check if password entered by user is correct
-        if password == password_input:
+        if two_strings_are_the_same(password, password_input):
             self.login_user_page_view.destroy_login_page_frame()
             LoggedUserPageController(self.root, user_data, self.bg_color)
         else:
@@ -40,15 +41,15 @@ class UserLoginController:
         elif result == "no":
             pass
 
-    def forgot_pass(self, login_input):
+    def forgot_pass(self, login_input: str):
         # Check if user entered a login
-        if login_input == '':
+        if empty_string_inside_widget(login_input):
             messagebox.showinfo(title="Information", message="Please enter username")
             return
-        user_data = self.login_user_page_model.user_input_is_not_empty(login_input)
+        user_data = self.login_user_page_model.get_user_data(login_input)
 
         # Check if user is registered
-        if user_data is None:
+        if sql_outcome_is_none(user_data):
             messagebox.showinfo(title="Information", message="User does not exist.")
             return
         self.login_user_page_model.email_with_password(user_data)
