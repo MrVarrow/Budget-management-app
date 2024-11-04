@@ -56,10 +56,12 @@ class SavingsPageController:
         self.savings_page_view.make_new_goal_window()
 
     def bank_deposit(self):
-        ...
+        self.savings_page_view.destroy_overview_frame()
+        self.savings_page_view.bank_deposit_overview()
 
     def investments(self):
-        ...
+        self.savings_page_view.destroy_overview_frame()
+        self.savings_page_view.investments_overview()
 
     def back(self):
         from LoggedUserPage.LoggedUserPageController import LoggedUserPageController

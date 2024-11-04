@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkcalendar import DateEntry
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 class SavingsPageView:
@@ -226,3 +227,109 @@ class SavingsPageView:
 
     def destroy_withdraw_window(self):
         self.withdraw_window_1.destroy()
+
+    def investments_overview(self):
+        self.overview_frame_creation()
+
+        Label(self.overview_frame, text="Investments calculator", font=('Arial', 25), bg="light gray", width=30) \
+            .grid(row=0, column=0, pady=25, padx=55, sticky=W, ipady=5)
+
+        Label(self.overview_frame, text="Entry payment:", font=('Arial', 12), width=20) \
+            .grid(row=1, column=0, padx=50, sticky=W)
+        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+            .grid(row=2, column=0, padx=50, sticky=W, pady=10)
+
+        Label(self.overview_frame, text="Future payments:", font=('Arial', 12), width=20) \
+            .grid(row=1, column=0)
+        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+            .grid(row=2, column=0, pady=10)
+
+        Label(self.overview_frame, text="Frequency of payments:", font=('Arial', 12), width=20) \
+            .grid(row=1, column=0, padx=50, sticky=E)
+        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+            .grid(row=2, column=0, padx=50, sticky=E, pady=10)
+
+        Label(self.overview_frame, text="Investing time:", font=('Arial', 12), width=20) \
+            .grid(row=3, column=0, padx=150, sticky=W, pady=10)
+        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+            .grid(row=4, column=0, padx=150, sticky=W)
+
+        Label(self.overview_frame, text="Rate of return per year:", font=('Arial', 12), width=20) \
+            .grid(row=3, column=0, padx=150, sticky=E, pady=10)
+        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+            .grid(row=4, column=0, padx=150, sticky=E)
+
+        Label(self.overview_frame, text="At the end you will make:\n 50pln", font=('Arial', 15), width=45, height=2) \
+            .grid(row=6, column=0)
+
+        Button(self.overview_frame, text="Calculate", font=('Arial', 15), bg="light gray", width=10) \
+            .grid(row=5, column=0, pady=20)
+        Button(self.overview_frame, text="Check graph", font=('Arial', 15), bg="light gray", width=10) \
+            .grid(row=7, column=0, pady=10, padx=150, sticky=W)
+        Button(self.overview_frame, text="Check table", font=('Arial', 15), bg="light gray", width=10) \
+            .grid(row=7, column=0, pady=10, padx=150, sticky=E)
+
+    def bank_deposit_overview(self):
+        self.overview_frame_creation()
+
+
+
+        Label(self.overview_frame, text="Bank deposit calculator", font=('Arial', 25), bg="light gray", width=30) \
+            .grid(row=0, column=0, pady=25, padx=55, sticky=W, ipady=5)
+
+        Label(self.overview_frame, text="Amount:", font=('Arial', 12), width=20) \
+            .grid(row=1, column=0, padx=100, sticky=W)
+        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+            .grid(row=2, column=0, padx=100, sticky=W, pady=10)
+
+        Label(self.overview_frame, text="Bank deposit time", font=('Arial', 12), width=20) \
+            .grid(row=1, column=0, padx=100, sticky=E)
+        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+            .grid(row=2, column=0, padx=100, sticky=E, pady=10)
+
+        Label(self.overview_frame, text="Interest rate:", font=('Arial', 12), width=20) \
+            .grid(row=3, column=0, padx=100, sticky=W, pady=10)
+        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+            .grid(row=4, column=0, padx=100, sticky=W)
+
+        Label(self.overview_frame, text="capitalization time:", font=('Arial', 12), width=20) \
+            .grid(row=3, column=0, padx=100, sticky=E, pady=10)
+        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+            .grid(row=4, column=0, padx=100, sticky=E)
+
+        Label(self.overview_frame, text="At the end you will make:\n 50pln", font=('Arial', 15), width=45, height=2)\
+            .grid(row=6, column=0)
+
+        Button(self.overview_frame, text="Calculate", font=('Arial', 15), bg="light gray", width=10) \
+            .grid(row=5, column=0, pady=20)
+        Button(self.overview_frame, text="Check graph", font=('Arial', 15), bg="light gray", width=10) \
+            .grid(row=7, column=0, pady=10, padx=150, sticky=W)
+        Button(self.overview_frame, text="Check table", font=('Arial', 15), bg="light gray", width=10) \
+            .grid(row=7, column=0, pady=10, padx=150, sticky=E)
+
+    def create_graph(self, fig):
+        graph_window = Toplevel(self.root, bg=self.bg_color)
+
+        canvas = FigureCanvasTkAgg(fig, master=graph_window)
+        canvas_widget = canvas.get_tk_widget()
+        canvas_widget.pack()
+
+        canvas.draw()
+
+    def create_table(self, profit_df):
+        table_window = Toplevel(self.root, bg=self.bg_color)
+
+        columns = list(profit_df.columns)
+        table_treeview = ttk.Treeview(table_window, columns=columns, show='headings')
+        for col in columns:
+            table_treeview.heading(col, text=col)  # Set column headings
+            table_treeview.column(col, anchor=CENTER)
+
+        table_treeview.pack(fill=BOTH, expand=True)
+
+        for item in table_treeview.get_children():
+            table_treeview.delete(item)
+
+            # Insert new data into the treeview
+        for index, row in profit_df.iterrows():
+            table_treeview.insert("", END, values=list(row))

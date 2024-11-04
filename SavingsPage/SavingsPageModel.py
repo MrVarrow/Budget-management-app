@@ -2,6 +2,7 @@ import mysql.connector
 import pandas as pd
 import re
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 
 class SavingsPageModel:
@@ -142,5 +143,26 @@ class SavingsPageModel:
     def bank_deposit_calculator(self, amount, bank_deposit_time, interest_rate, capitalization_type):
         ...
 
+    def create_plot_dataframe_investments(self, profit_df: pd.DataFrame):
+        fig, ax = plt.subplots()
+        profit_df.plot(x='year', y='amount', kind='line', ax=ax)
+        plt.title('Value of your investments')
+        plt.xlabel('Year')
+        plt.ylabel('Investments Value')
+        return fig
 
+    def create_plot_dataframe_bank_deposit(self, profit_df):
+        fig, ax = plt.subplots()
+        profit_df.plot(x='year', y='amount', kind='line', ax=ax)
+        plt.title('Value of your bank deposit')
+        plt.xlabel('Year')
+        plt.ylabel('Bank deposit Value')
+        return fig
 
+    def create_profit_dataframe(self, years: list, amounts: list) -> pd.DataFrame:
+        data = {
+            "year": years,
+            "amount": amounts
+        }
+        profit_df = pd.DataFrame(data)
+        return profit_df
