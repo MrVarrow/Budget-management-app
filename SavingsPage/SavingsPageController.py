@@ -63,6 +63,9 @@ class SavingsPageController:
         self.savings_page_view.destroy_overview_frame()
         self.savings_page_view.investments_overview()
 
+        x = self.savings_page_model.investments_calculator(1000,1000, 12, 10, 0.07)
+        print(x)
+
     def back(self):
         from LoggedUserPage.LoggedUserPageController import LoggedUserPageController
         self.savings_page_view.destroy_savings_frame()

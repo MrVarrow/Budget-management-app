@@ -24,7 +24,8 @@ class SavingsPageModel:
 
     def get_info_about_goal(self, user_data, goal_name):
         goal_info = []
-        self.cursor.execute('SELECT * FROM savingsgoals WHERE username = %s AND GoalName = %s', (user_data[0], goal_name))
+        self.cursor.execute('SELECT * FROM savingsgoals WHERE username = %s AND GoalName = %s',
+                            (user_data[0], goal_name))
         row = self.cursor.fetchone()
         if row is not None:
             goal_info = list(row)
@@ -49,7 +50,8 @@ class SavingsPageModel:
             print(f"An error occurred: {e}")
 
     def check_if_deposit_exists(self, user_data, goal_name):
-        self.cursor.execute('SELECT Category FROM consttransactions WHERE Category = %s AND Username = %s', (f'Savings: {goal_name}', user_data[0]))
+        self.cursor.execute('SELECT Category FROM consttransactions WHERE Category = %s AND Username = %s',
+                            (f'Savings: {goal_name}', user_data[0]))
         row = self.cursor.fetchone()
         self.cursor.reset()
         if row is None:
@@ -118,30 +120,56 @@ class SavingsPageModel:
             return round(float(percent), 2)
 
     def get_progress_from_database(self, user_data, goal_name):
-        self.cursor.execute('SELECT Progress FROM savingsgoals WHERE username = %s AND GoalName = %s', (user_data[0],goal_name))
+        self.cursor.execute('SELECT Progress FROM savingsgoals WHERE username = %s AND GoalName = %s',
+                            (user_data[0], goal_name))
         rows = self.cursor.fetchone()
         self.cursor.reset()
         return rows[0]
 
     def get_goal_amount_from_database(self, user_data, goal_name):
-        self.cursor.execute('SELECT GoalAmount FROM savingsgoals WHERE username = %s AND GoalName = %s', (user_data[0], goal_name))
+        self.cursor.execute('SELECT GoalAmount FROM savingsgoals WHERE username = %s AND GoalName = %s',
+                            (user_data[0], goal_name))
         rows = self.cursor.fetchone()
         self.cursor.reset()
         return rows[0]
 
     def deposit_to_progress(self, old_progress, deposit_amount):
         new_progress = old_progress + deposit_amount
-        return new_progress # check if its larger than 10 digits (cant be)
+        return new_progress  # check if its larger than 10 digits (cant be)
 
     def withdraw_from_progress(self, old_progress, withdraw_amount):
         new_progress = old_progress - withdraw_amount
-        return new_progress # check if its negative (cant be)
+        return new_progress  # check if its negative (cant be)
 
-    def investments_calculator(self, entry_payment, future_payments, frequency_of_payments, investing_time, rate_of_return):
-        ...
+    def investments_calculator(self, entry_payment, future_payments, frequency_of_payments, investing_time,
+                               rate_of_return) -> float:
+
+        entry_payment = float(entry_payment)
+        future_payments = float(future_payments)
+        frequency_of_payments = int(frequency_of_payments)
+        investing_time = int(investing_time)
+        rate_of_return = float(rate_of_return)
+
+        future_value_of_entry = entry_payment * pow((1 + rate_of_return / frequency_of_payments),
+                                                    frequency_of_payments * investing_time)
+        future_value_of_payments = future_payments * (pow((1 + rate_of_return / frequency_of_payments),
+                                                          frequency_of_payments *
+                                                          investing_time) - 1) / (rate_of_return /
+                                                                                  frequency_of_payments)
+
+        total_future_value = future_value_of_entry + future_value_of_payments
+
+        return round(total_future_value, 2)
 
     def bank_deposit_calculator(self, amount, bank_deposit_time, interest_rate, capitalization_type):
-        ...
+        amount = float(amount)  # Principal amount
+        bank_deposit_time = int(bank_deposit_time)  # Duration in years
+        interest_rate = float(interest_rate)  # Annual interest rate
+        capitalization_type = int(capitalization_type)  # Compounding
+
+        future_value = amount * (1 + interest_rate / capitalization_type) ** (capitalization_type * bank_deposit_time)
+
+        return round(future_value, 2)
 
     def create_plot_dataframe_investments(self, profit_df: pd.DataFrame):
         fig, ax = plt.subplots()
