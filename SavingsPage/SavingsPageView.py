@@ -230,44 +230,62 @@ class SavingsPageView:
 
     def investments_overview(self):
         self.overview_frame_creation()
+        # Entry variables define
+        entry_payment = StringVar()
+        future_payments = StringVar()
+        frequency_of_payments = StringVar()
+        investing_time = StringVar()
+        rate_of_return = StringVar()
+        self.total_value_info = StringVar()
+
+        self.total_value_info.set("At the end you will make:")
 
         Label(self.overview_frame, text="Investments calculator", font=('Arial', 25), bg="light gray", width=30) \
             .grid(row=0, column=0, pady=25, padx=55, sticky=W, ipady=5)
 
         Label(self.overview_frame, text="Entry payment:", font=('Arial', 12), width=20) \
             .grid(row=1, column=0, padx=50, sticky=W)
-        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+        Entry(self.overview_frame, font=('Arial', 12), width=20, textvariable=entry_payment) \
             .grid(row=2, column=0, padx=50, sticky=W, pady=10)
 
         Label(self.overview_frame, text="Future payments:", font=('Arial', 12), width=20) \
             .grid(row=1, column=0)
-        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+        Entry(self.overview_frame, font=('Arial', 12), width=20, textvariable=future_payments) \
             .grid(row=2, column=0, pady=10)
 
         Label(self.overview_frame, text="Frequency of payments:", font=('Arial', 12), width=20) \
             .grid(row=1, column=0, padx=50, sticky=E)
-        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+        Entry(self.overview_frame, font=('Arial', 12), width=20, textvariable=frequency_of_payments) \
             .grid(row=2, column=0, padx=50, sticky=E, pady=10)
 
         Label(self.overview_frame, text="Investing time:", font=('Arial', 12), width=20) \
             .grid(row=3, column=0, padx=150, sticky=W, pady=10)
-        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+        Entry(self.overview_frame, font=('Arial', 12), width=20, textvariable=investing_time) \
             .grid(row=4, column=0, padx=150, sticky=W)
 
         Label(self.overview_frame, text="Rate of return per year:", font=('Arial', 12), width=20) \
             .grid(row=3, column=0, padx=150, sticky=E, pady=10)
-        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+        Entry(self.overview_frame, font=('Arial', 12), width=20, textvariable=rate_of_return) \
             .grid(row=4, column=0, padx=150, sticky=E)
 
-        Label(self.overview_frame, text="At the end you will make:\n 50pln", font=('Arial', 15), width=45, height=2) \
+        Label(self.overview_frame, textvariable=self.total_value_info, font=('Arial', 15), width=45, height=2) \
             .grid(row=6, column=0)
 
-        Button(self.overview_frame, text="Calculate", font=('Arial', 15), bg="light gray", width=10) \
+        Button(self.overview_frame, text="Calculate", font=('Arial', 15), bg="light gray", width=10,
+               command=lambda: self.controller.confirm_calculate_investments(
+                   str(entry_payment.get()), str(future_payments.get()), str(frequency_of_payments.get()),
+                   str(investing_time.get()),  str(rate_of_return.get())
+               )) \
             .grid(row=5, column=0, pady=20)
-        Button(self.overview_frame, text="Check graph", font=('Arial', 15), bg="light gray", width=10) \
+        Button(self.overview_frame, text="Check graph", font=('Arial', 15), bg="light gray", width=10,
+               command=lambda: self.controller.create_graph()) \
             .grid(row=7, column=0, pady=10, padx=150, sticky=W)
-        Button(self.overview_frame, text="Check table", font=('Arial', 15), bg="light gray", width=10) \
+        Button(self.overview_frame, text="Check table", font=('Arial', 15), bg="light gray", width=10,
+               command=lambda: self.controller.create_table()) \
             .grid(row=7, column=0, pady=10, padx=150, sticky=E)
+
+    def update_total_value_label(self, total_value):
+        self.total_value_info.set(f"At the end you will make:\n {total_value}")
 
     def bank_deposit_overview(self):
         self.overview_frame_creation()

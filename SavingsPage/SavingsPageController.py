@@ -63,8 +63,6 @@ class SavingsPageController:
         self.savings_page_view.destroy_overview_frame()
         self.savings_page_view.investments_overview()
 
-        x = self.savings_page_model.investments_calculator(1000,1000, 12, 10, 0.07)
-        print(x)
 
     def back(self):
         from LoggedUserPage.LoggedUserPageController import LoggedUserPageController
@@ -184,3 +182,27 @@ class SavingsPageController:
         self.savings_page_view.destroy_withdraw_window()
 
         messagebox.showinfo("Information", "Withdrawn deposit from goal.")
+
+
+    def confirm_calculate_investments(self, entry_payment: str, future_payments: str, frequency_of_payments: str, investing_time: str,
+                               rate_of_return: str):
+        # Add inputs validations
+
+
+
+        list_of_values, list_of_years, list_of_money_deposited = self.savings_page_model.investments_calculator(
+            float(entry_payment), float(future_payments), int(frequency_of_payments), int(investing_time),
+            float(rate_of_return)
+        )
+        print(list_of_values, list_of_years, list_of_money_deposited)
+        self.profit_df = self.savings_page_model.create_profit_dataframe(list_of_years, list_of_values)
+        self.money_deposit_df = self.savings_page_model.create_profit_dataframe(list_of_years, list_of_money_deposited)
+
+
+        self.savings_page_view.update_total_value_label(self.savings_page_model.get_total_investments_value(list_of_values))
+
+    def create_table(self):
+        self.savings_page_view.create_table(self.profit_df)
+
+    def create_graph(self):
+        self.savings_page_view.create_graph(self.savings_page_model.create_plot_dataframe_investments(self.profit_df, self.money_deposit_df))

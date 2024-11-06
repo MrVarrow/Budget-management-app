@@ -142,24 +142,32 @@ class SavingsPageModel:
         return new_progress  # check if its negative (cant be)
 
     def investments_calculator(self, entry_payment, future_payments, frequency_of_payments, investing_time,
-                               rate_of_return) -> float:
+                               rate_of_return) -> tuple:
+        list_of_future_values = []
+        list_of_years = []
+        list_of_money_deposited = []
+        money_deposited = entry_payment
+        for i in range(investing_time + 1):
 
-        entry_payment = float(entry_payment)
-        future_payments = float(future_payments)
-        frequency_of_payments = int(frequency_of_payments)
-        investing_time = int(investing_time)
-        rate_of_return = float(rate_of_return)
+            future_value_of_entry = entry_payment * pow((1 + rate_of_return / frequency_of_payments),
+                                                        frequency_of_payments * i)
+            future_value_of_payments = future_payments * (pow((1 + rate_of_return / frequency_of_payments),
+                                                              frequency_of_payments *
+                                                              i) - 1) / (rate_of_return /
+                                                                                      frequency_of_payments)
 
-        future_value_of_entry = entry_payment * pow((1 + rate_of_return / frequency_of_payments),
-                                                    frequency_of_payments * investing_time)
-        future_value_of_payments = future_payments * (pow((1 + rate_of_return / frequency_of_payments),
-                                                          frequency_of_payments *
-                                                          investing_time) - 1) / (rate_of_return /
-                                                                                  frequency_of_payments)
+            total_future_value = future_value_of_entry + future_value_of_payments
+            list_of_future_values.append(round(total_future_value, 2))
+            list_of_years.append(i)
 
-        total_future_value = future_value_of_entry + future_value_of_payments
 
-        return round(total_future_value, 2)
+            list_of_money_deposited.append(money_deposited)
+            money_deposited += future_payments * 12
+
+        return list_of_future_values, list_of_years, list_of_money_deposited
+
+    def get_total_investments_value(self, list_of_future_values):
+        return list_of_future_values[-1]
 
     def bank_deposit_calculator(self, amount, bank_deposit_time, interest_rate, capitalization_type):
         amount = float(amount)  # Principal amount
@@ -171,12 +179,13 @@ class SavingsPageModel:
 
         return round(future_value, 2)
 
-    def create_plot_dataframe_investments(self, profit_df: pd.DataFrame):
+    def create_plot_dataframe_investments(self, profit_df: pd.DataFrame, deposited_amount_df):
         fig, ax = plt.subplots()
-        profit_df.plot(x='year', y='amount', kind='line', ax=ax)
+        profit_df.plot(x='year', y='amount', kind='line', ax=ax, label='Investment Value', color='blue')
+        deposited_amount_df.plot(x='year', y='amount', kind='line', ax=ax, label='Deposited Amount', color='orange')
         plt.title('Value of your investments')
         plt.xlabel('Year')
-        plt.ylabel('Investments Value')
+        plt.ylabel('Value')
         return fig
 
     def create_plot_dataframe_bank_deposit(self, profit_df):
