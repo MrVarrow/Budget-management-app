@@ -7,8 +7,8 @@ def empty_string_inside_widget(contents: str) -> bool:
     return False
 
 
-def sql_outcome_is_none(sql_outcome: tuple) -> bool:
-    if sql_outcome is None:
+def variable_is_none(variable) -> bool:
+    if variable is None:
         return True
     return False
 
@@ -48,3 +48,19 @@ def tuple_is_empty(given_tuple):
     if given_tuple == ():
         return True
     return False
+
+
+# Check if string match format: xx.xx or xx
+def correct_price_format(string):
+    if re.search(r'^\d{1,10}(\.\d{1,2})?$', string):
+        return True
+    return False
+
+
+# Check if str had int format with 1 to 3 digits
+def string_has_int_format(string):
+    if re.search(r'^\d{1,2}$', string):
+        return True
+    return False
+
+
