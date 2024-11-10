@@ -234,6 +234,7 @@ class SavingsPageView:
         entry_payment = StringVar()
         future_payments = StringVar()
         frequency_of_payments = StringVar()
+        frequency_vals = {"Yearly": 1, "Monthly": 12}
         investing_time = StringVar()
         rate_of_return = StringVar()
         self.total_value_info = StringVar()
@@ -255,10 +256,11 @@ class SavingsPageView:
 
         Label(self.overview_frame, text="Frequency of payments:", font=('Arial', 12), width=20) \
             .grid(row=1, column=0, padx=50, sticky=E)
-        Entry(self.overview_frame, font=('Arial', 12), width=20, textvariable=frequency_of_payments) \
+        ttk.Combobox(self.overview_frame, font=('Arial', 12), width=18, textvariable=frequency_of_payments,
+                     values=list(frequency_vals.keys()), state='readonly') \
             .grid(row=2, column=0, padx=50, sticky=E, pady=10)
 
-        Label(self.overview_frame, text="Investing time:", font=('Arial', 12), width=20) \
+        Label(self.overview_frame, text="Investing time in years:", font=('Arial', 12), width=20) \
             .grid(row=3, column=0, padx=150, sticky=W, pady=10)
         Entry(self.overview_frame, font=('Arial', 12), width=20, textvariable=investing_time) \
             .grid(row=4, column=0, padx=150, sticky=W)
@@ -273,7 +275,7 @@ class SavingsPageView:
 
         Button(self.overview_frame, text="Calculate", font=('Arial', 15), bg="light gray", width=10,
                command=lambda: self.controller.confirm_calculate_investments(
-                   str(entry_payment.get()), str(future_payments.get()), str(frequency_of_payments.get()),
+                   str(entry_payment.get()), str(future_payments.get()), str(frequency_vals[frequency_of_payments.get()]),
                    str(investing_time.get()),  str(rate_of_return.get())
                )) \
             .grid(row=5, column=0, pady=20)
@@ -290,6 +292,16 @@ class SavingsPageView:
     def bank_deposit_overview(self):
         self.overview_frame_creation()
 
+        self.overview_frame_creation()
+        # Entry variables define
+        amount = StringVar()
+        capitalization_time = StringVar()
+        capitalization_vals = {"Yearly": 1, "Monthly": 12, "Quarter": 4, "At the end": 0}
+        bank_deposit_time = StringVar()
+        interest_rate = StringVar()
+        self.total_value_info = StringVar()
+
+        self.total_value_info.set("At the end you will make:")
 
 
         Label(self.overview_frame, text="Bank deposit calculator", font=('Arial', 25), bg="light gray", width=30) \
@@ -297,36 +309,42 @@ class SavingsPageView:
 
         Label(self.overview_frame, text="Amount:", font=('Arial', 12), width=20) \
             .grid(row=1, column=0, padx=100, sticky=W)
-        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+        Entry(self.overview_frame, font=('Arial', 12), width=20, textvariable=amount) \
             .grid(row=2, column=0, padx=100, sticky=W, pady=10)
 
-        Label(self.overview_frame, text="Bank deposit time", font=('Arial', 12), width=20) \
+        Label(self.overview_frame, text="Bank deposit time in years:", font=('Arial', 12), width=20) \
             .grid(row=1, column=0, padx=100, sticky=E)
-        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+        Entry(self.overview_frame, font=('Arial', 12), width=20, textvariable=bank_deposit_time) \
             .grid(row=2, column=0, padx=100, sticky=E, pady=10)
 
         Label(self.overview_frame, text="Interest rate:", font=('Arial', 12), width=20) \
             .grid(row=3, column=0, padx=100, sticky=W, pady=10)
-        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+        Entry(self.overview_frame, font=('Arial', 12), width=20, textvariable=interest_rate) \
             .grid(row=4, column=0, padx=100, sticky=W)
 
         Label(self.overview_frame, text="capitalization time:", font=('Arial', 12), width=20) \
             .grid(row=3, column=0, padx=100, sticky=E, pady=10)
-        Entry(self.overview_frame, font=('Arial', 12), width=20) \
+        ttk.Combobox(self.overview_frame, font=('Arial', 12), width=18, textvariable=capitalization_time, values=list(capitalization_vals.keys()), state='readonly') \
             .grid(row=4, column=0, padx=100, sticky=E)
 
-        Label(self.overview_frame, text="At the end you will make:\n 50pln", font=('Arial', 15), width=45, height=2)\
+        Label(self.overview_frame, textvariable=self.total_value_info, font=('Arial', 15), width=45, height=2)\
             .grid(row=6, column=0)
 
-        Button(self.overview_frame, text="Calculate", font=('Arial', 15), bg="light gray", width=10) \
+        Button(self.overview_frame, text="Calculate", font=('Arial', 15), bg="light gray", width=10,
+               command=lambda: self.controller.confirm_calculate_bank_deposit(
+                   str(amount.get()), str(bank_deposit_time.get()), str(interest_rate.get()),
+                   str(capitalization_vals[capitalization_time.get()]))
+               ) \
             .grid(row=5, column=0, pady=20)
-        Button(self.overview_frame, text="Check graph", font=('Arial', 15), bg="light gray", width=10) \
+        Button(self.overview_frame, text="Check graph", font=('Arial', 15), bg="light gray", width=10, command=lambda: self.controller.create_graph()) \
             .grid(row=7, column=0, pady=10, padx=150, sticky=W)
-        Button(self.overview_frame, text="Check table", font=('Arial', 15), bg="light gray", width=10) \
+        Button(self.overview_frame, text="Check table", font=('Arial', 15), bg="light gray", width=10, command=lambda: self.controller.create_table()) \
             .grid(row=7, column=0, pady=10, padx=150, sticky=E)
 
     def create_graph(self, fig):
         graph_window = Toplevel(self.root, bg=self.bg_color)
+        graph_window.resizable(False, False)
+        graph_window.title("Investments value graph")
 
         canvas = FigureCanvasTkAgg(fig, master=graph_window)
         canvas_widget = canvas.get_tk_widget()
@@ -334,14 +352,31 @@ class SavingsPageView:
 
         canvas.draw()
 
+        graph_window.grab_set()
+
     def create_table(self, profit_df):
         table_window = Toplevel(self.root, bg=self.bg_color)
+        table_window.resizable(False, False)
+        table_window.title("Investments value table")
 
         columns = list(profit_df.columns)
-        table_treeview = ttk.Treeview(table_window, columns=columns, show='headings')
+
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure("Treeview.Heading", background="light green", foreground='black')
+
+        table_treeview = ttk.Treeview(table_window, columns=columns, show='headings', height=len(list(profit_df.iterrows())))
+
+        table_treeview.tag_configure('oddrow', background='light blue')
+        table_treeview.tag_configure('evenrow', background='lightgrey')
         for col in columns:
+            if col == "year":
+                table_treeview.column(col, anchor=CENTER, width=50)
+            else:
+                table_treeview.column(col, anchor=CENTER, width=200)
+
             table_treeview.heading(col, text=col)  # Set column headings
-            table_treeview.column(col, anchor=CENTER)
+
 
         table_treeview.pack(fill=BOTH, expand=True)
 
@@ -350,4 +385,10 @@ class SavingsPageView:
 
             # Insert new data into the treeview
         for index, row in profit_df.iterrows():
-            table_treeview.insert("", END, values=list(row))
+            row = [int(row[0]), row[1]]
+            if index % 2 == 0:
+                table_treeview.insert("", END, values=list(row), tags=('oddrow',))
+            else:
+                table_treeview.insert("", END, values=list(row), tags=('evenrow',))
+
+        table_window.grab_set()

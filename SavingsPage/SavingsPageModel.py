@@ -169,20 +169,58 @@ class SavingsPageModel:
     def get_total_investments_value(self, list_of_future_values):
         return list_of_future_values[-1]
 
-    def bank_deposit_calculator(self, amount, bank_deposit_time, interest_rate, capitalization_type):
-        amount = float(amount)  # Principal amount
-        bank_deposit_time = int(bank_deposit_time)  # Duration in years
-        interest_rate = float(interest_rate)  # Annual interest rate
-        capitalization_type = int(capitalization_type)  # Compounding
+    def bank_deposit_calculator_capitalization(self, amount, bank_deposit_time, interest_rate, capitalization_type):
+        list_of_future_values = []
+        list_of_years = []
+        list_of_money_deposited = []
+        for i in range(bank_deposit_time + 1):
 
-        future_value = amount * (1 + interest_rate / capitalization_type) ** (capitalization_type * bank_deposit_time)
+            future_value = amount * (1 + interest_rate / capitalization_type) ** (capitalization_type * i)
+            list_of_future_values.append(round(future_value, 2))
+            list_of_years.append(i)
+            list_of_money_deposited.append(amount)
 
-        return round(future_value, 2)
+        return list_of_future_values, list_of_years, list_of_money_deposited
+
+    def bank_deposit_calculator_no_capitalization(self, amount, bank_deposit_time, interest_rate):
+
+        list_of_future_values = [amount]
+        list_of_years = [0, bank_deposit_time]
+        list_of_money_deposited = [amount, amount]
+
+        profit = amount * interest_rate * bank_deposit_time
+        future_value = amount + profit
+        list_of_future_values.append(round(future_value, 2))
+
+        return list_of_future_values, list_of_years, list_of_money_deposited
 
     def create_plot_dataframe_investments(self, profit_df: pd.DataFrame, deposited_amount_df):
         fig, ax = plt.subplots()
-        profit_df.plot(x='year', y='amount', kind='line', ax=ax, label='Investment Value', color='blue')
-        deposited_amount_df.plot(x='year', y='amount', kind='line', ax=ax, label='Deposited Amount', color='orange')
+        profit_df.plot(x='year', y='amount', kind='line', ax=ax, label='Investment Value', color='blue', marker='o')
+
+        # Annotating the profit line
+        for i in range(len(profit_df)):
+            ax.annotate(f'{int(profit_df["amount"].iloc[i]):,}',
+                        (profit_df['year'].iloc[i], profit_df['amount'].iloc[i]),
+                        textcoords="offset points",
+                        xytext=(0, 10),
+                        ha='center',
+                        fontsize=8,
+                        color='black')
+
+        deposited_amount_df.plot(x='year', y='amount', kind='line', ax=ax, label='Deposited Amount', color='orange',
+                                 marker='o')
+
+        # Annotating the deposited amount line
+        for i in range(len(deposited_amount_df)):
+            ax.annotate(f'{int(deposited_amount_df["amount"].iloc[i]):,}',
+                        (deposited_amount_df['year'].iloc[i], deposited_amount_df['amount'].iloc[i]),
+                        textcoords="offset points",
+                        xytext=(0, -10),
+                        ha='center',
+                        fontsize=8,
+                        color='black')
+
         plt.title('Value of your investments')
         plt.xlabel('Year')
         plt.ylabel('Value')
@@ -203,3 +241,7 @@ class SavingsPageModel:
         }
         profit_df = pd.DataFrame(data)
         return profit_df
+
+    def convert_percent_to_float(self, percent):
+        converted = percent / 100
+        return round(converted, 2)

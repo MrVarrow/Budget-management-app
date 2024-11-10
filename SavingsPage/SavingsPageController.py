@@ -5,6 +5,7 @@ from MenageBudgetPage.ManageConstantTransactionsPage.ManageConstantTransactionsP
 from MenageBudgetPage.AdjustBudgetPage.AdjustBudgetPageModel import AdjustBudgetModel
 from MenageBudgetPage.ManageBudgetPageModel import ManageBudgetModel
 from MenageBudgetPage.OpenBudgetPage.OpenBudgetPageModel import OpenBudgetModel
+from Validations.Validations import correct_price_format, string_has_int_format, variable_is_none
 
 
 class SavingsPageController:
@@ -56,10 +57,14 @@ class SavingsPageController:
         self.savings_page_view.make_new_goal_window()
 
     def bank_deposit(self):
+        self.profit_df = None
+        self.money_deposit_df = None
         self.savings_page_view.destroy_overview_frame()
         self.savings_page_view.bank_deposit_overview()
 
     def investments(self):
+        self.profit_df = None
+        self.money_deposit_df = None
         self.savings_page_view.destroy_overview_frame()
         self.savings_page_view.investments_overview()
 
@@ -187,22 +192,70 @@ class SavingsPageController:
     def confirm_calculate_investments(self, entry_payment: str, future_payments: str, frequency_of_payments: str, investing_time: str,
                                rate_of_return: str):
         # Add inputs validations
+        if not correct_price_format(entry_payment):
+            messagebox.showinfo("Information", "Entry payment has Wrong value")
+            return
 
+        if not correct_price_format(future_payments):
+            messagebox.showinfo("Information", "Future payments has Wrong Value")
+            return
+
+        if not string_has_int_format(investing_time):
+            messagebox.showinfo("Information", "Value of investing time has to be natural number.")
+            return
+
+        if not correct_price_format(rate_of_return) or not 0 < int(rate_of_return) <= 20:
+            messagebox.showinfo("Information", "Value rate of return has to be maximum 20%")
+            return
 
 
         list_of_values, list_of_years, list_of_money_deposited = self.savings_page_model.investments_calculator(
             float(entry_payment), float(future_payments), int(frequency_of_payments), int(investing_time),
-            float(rate_of_return)
+            float(self.savings_page_model.convert_percent_to_float(int(rate_of_return)))
         )
-        print(list_of_values, list_of_years, list_of_money_deposited)
         self.profit_df = self.savings_page_model.create_profit_dataframe(list_of_years, list_of_values)
         self.money_deposit_df = self.savings_page_model.create_profit_dataframe(list_of_years, list_of_money_deposited)
 
 
         self.savings_page_view.update_total_value_label(self.savings_page_model.get_total_investments_value(list_of_values))
 
+    def confirm_calculate_bank_deposit(self, amount, bank_deposit_time, interest_rate, capitalization_time):
+        if not correct_price_format(amount):
+            messagebox.showinfo("Information", "Amount has Wrong value")
+            return
+
+        if not string_has_int_format(bank_deposit_time):
+            messagebox.showinfo("Information", "Value of bank deposit time has to be natural number.")
+            return
+
+        if not correct_price_format(interest_rate) or not 0 < int(interest_rate) <= 20:
+            messagebox.showinfo("Information", "Value rate of return has to be maximum 20%")
+            return
+
+        if capitalization_time == "1" or capitalization_time == "12" or capitalization_time == "4":
+            list_of_values, list_of_years, list_of_money_deposited =\
+                self.savings_page_model.bank_deposit_calculator_capitalization(
+                    float(amount), int(bank_deposit_time), float(self.savings_page_model.convert_percent_to_float(int(interest_rate))),
+                    int(capitalization_time)
+                )
+        else:
+            list_of_values, list_of_years, list_of_money_deposited =\
+                self.savings_page_model.bank_deposit_calculator_no_capitalization(
+                    float(amount), int(bank_deposit_time), float(self.savings_page_model.convert_percent_to_float(int(interest_rate)))
+                )
+        self.profit_df = self.savings_page_model.create_profit_dataframe(list_of_years, list_of_values)
+        self.money_deposit_df = self.savings_page_model.create_profit_dataframe(list_of_years, list_of_money_deposited)
+
+        self.savings_page_view.update_total_value_label(
+            self.savings_page_model.get_total_investments_value(list_of_values))
+
     def create_table(self):
+        if variable_is_none(self.profit_df):
+            messagebox.showinfo("Information", "You have to make calculations to see a table")
         self.savings_page_view.create_table(self.profit_df)
 
     def create_graph(self):
+        if variable_is_none(self.profit_df) or variable_is_none(self.money_deposit_df):
+            messagebox.showinfo("Information", "You have to make calculations to see a graph")
+
         self.savings_page_view.create_graph(self.savings_page_model.create_plot_dataframe_investments(self.profit_df, self.money_deposit_df))
