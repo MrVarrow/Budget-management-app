@@ -7,6 +7,7 @@ from MobileAppWindow.MobileAppWindowController import MobileAppWindowController
 from ReceiptsPage.ReceiptsPageController import ReceiptsPageController
 from ShoppingListPage.ShoppingListController import ShoppingListController
 from MenageBudgetPage.ManageBudgetPageController import ManageBudgetController
+from SavingsPage.SavingsPageController import SavingsPageController
 from tkinter import messagebox
 
 
@@ -17,6 +18,9 @@ class LoggedUserPageController:
         self.user_data = user_data
         self.logged_user_page_view = LoggedUserPageView(self.root, self, self.bg_color)
         self.logged_user_page_model = LoggedUserPageModel()
+
+        today = self.logged_user_page_model.get_today_date()
+        last_login = self.logged_user_page_model.get_last_login_date(self.user_data)
 
     # Go into settings
     def settings(self):
@@ -44,7 +48,8 @@ class LoggedUserPageController:
 
     # Go into savings page
     def savings(self):
-        ...
+        self.logged_user_page_view.destroy_logged_user_frame()
+        SavingsPageController(self.root, self.user_data, self.bg_color)
 
     # Go into receipts page
     def receipts(self):
@@ -63,7 +68,6 @@ class LoggedUserPageController:
     def logout(self):
         result = messagebox.askquestion(title='Warning', message="Do you want to logout from Budget manager?")
         if result == "yes":
-            # this import look strange for me but i cannot find other way to make this work because of circular import error
             self.logged_user_page_view.destroy_logged_user_frame()
             from UserLoginPage.UserLoginController import UserLoginController
             UserLoginController(self.root, self.bg_color)

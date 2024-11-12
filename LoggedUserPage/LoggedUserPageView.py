@@ -5,6 +5,7 @@ class LoggedUserPageView:
     def __init__(self, master, controller, bg_color):
         self.bg_color = bg_color
         self.controller = controller
+
         # Loading icons and scaling them
         self.acc_icon = PhotoImage(file="Icons/user.png")
         self.acc_icon = self.acc_icon.subsample(20, 20)
@@ -55,7 +56,8 @@ class LoggedUserPageView:
             .grid(row=4, column=0, columnspan=2, pady=65)
 
         # Logout button
-        Button(self.logged_usr_page, text="Logout", font=('Arial', 20), bg='light gray', command=self.controller.logout) \
+        Button(self.logged_usr_page, text="Logout", font=('Arial', 20), bg='light gray',
+               command=self.controller.logout) \
             .grid(row=4, column=2, sticky=NE, padx=20, pady=50, ipadx=10)
 
         # Exit button
