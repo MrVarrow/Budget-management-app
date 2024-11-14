@@ -21,6 +21,20 @@ class LoggedUserPageController:
 
         today = self.logged_user_page_model.get_today_date()
         last_login = self.logged_user_page_model.get_last_login_date(self.user_data)
+        goals_list = self.logged_user_page_model.get_user_goals_list(self.user_data)
+        count = self.logged_user_page_model.count_1st_days_between_months(last_login, today)
+        # Add auto deposit amount to savings goal if needed
+        if not count == 0:
+            for goal in goals_list:
+                goal_info = self.logged_user_page_model.get_info_about_goal(self.user_data, goal[0])
+                progress = goal_info[4]
+                auto_depo = goal_info[5]
+                if not auto_depo == 0:
+                    new_progress = self.logged_user_page_model.count_amount_added_to_goal(progress, auto_depo, count)
+                    self.logged_user_page_model.update_amount_in_goal(new_progress, self.user_data, goal[0])
+
+        # Update last seen date
+        self.logged_user_page_model.update_last_seen(self.user_data, today)
 
     # Go into settings
     def settings(self):

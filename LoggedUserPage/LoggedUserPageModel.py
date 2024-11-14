@@ -1,5 +1,5 @@
 import mysql.connector
-from datetime import datetime, timedelta
+from datetime import timedelta, date
 
 
 class LoggedUserPageModel:
@@ -11,11 +11,9 @@ class LoggedUserPageModel:
     # Get today's date
     @staticmethod
     def get_today_date():
-        today = datetime.now()
-        today = datetime.date(today)
-
+        today = date.today()
         return today
-
+    # check case if its first day month and last seen is also first date
     def count_1st_days_between_months(self, date_1, date_2):
         if date_1 > date_2:
             date_1, date_2 = date_2, date_1
@@ -42,16 +40,45 @@ class LoggedUserPageModel:
 
     def get_last_login_date(self, user_data: tuple):
         self.cursor.execute('SELECT lastseen FROM user WHERE username = %s',
-                            (user_data[0]))
+                            (user_data[0],))
+        row = self.cursor.fetchone()
+        self.cursor.reset()
+        self.connection.commit()
+        return row[0]
 
-    def get_user_goals_list(self):
-        ...
+    def get_user_goals_list(self, user_data):
 
+        self.cursor.execute('SELECT GoalName FROM savingsgoals WHERE username = %s', (user_data[0],))
+        rows = self.cursor.fetchall()
+        goals = list(rows)
+        self.cursor.reset()
+        self.connection.commit()
 
-    def count_amount_added_to_goal(self):
-        ...
+        return goals
 
-    def update_amount_in_goal(self):
-        ...
+    def count_amount_added_to_goal(self, progress, auto_deposit, count):
+        if not count == 0:
+            new_progress = progress + (auto_deposit * count)
+            return new_progress
+        else:
+            return progress
 
+    def update_amount_in_goal(self, new_progress, user_data, goal_name):
+        self.cursor.execute('UPDATE savingsgoals SET Progress = %s WHERE username = %s AND GoalName = %s',
+                            (new_progress, user_data[0], goal_name))
+        self.connection.commit()
 
+# Get info about goal with given name from database
+    def get_info_about_goal(self, user_data, goal_name):
+        goal_info = []
+        self.cursor.execute('SELECT * FROM savingsgoals WHERE username = %s AND GoalName = %s',
+                            (user_data[0], goal_name))
+        row = self.cursor.fetchone()
+        if row is not None:
+            goal_info = list(row)
+        return goal_info
+
+    def update_last_seen(self, user_data, today):
+        self.cursor.execute('UPDATE user SET lastseen = %s WHERE username = %s',
+                            (today, user_data[0]))
+        self.connection.commit()
