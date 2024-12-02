@@ -80,7 +80,12 @@ class StatisticsPageView:
     General stats
     '''
 
-    def general_stats_overview(self, all_money_spent, all_money_earned, all_free_amount_left):
+    def general_stats_overview(self, all_money_spent, all_money_earned, all_free_amount_left, categories_incomes,
+                               categories_expenses):
+        self.overview_frame_creation()
+        self.chosen_type = StringVar()
+        self.chosen_category = StringVar()
+        self.chosen_type.set("Choose type")
         Label(self.overview_frame, text=f"All money spent: {all_money_spent}").grid()
 
         Label(self.overview_frame, text=f"All money earned: {all_money_earned}").grid()
@@ -88,15 +93,48 @@ class StatisticsPageView:
         Label(self.overview_frame, text=f"All Free amount left: {all_free_amount_left}").grid()
 
         Label(self.overview_frame, text="Calculate money").grid()
-        ttk.Combobox(self.overview_frame).grid()
+        self.type_combobox = ttk.Combobox(self.overview_frame, values=["spent", "earned"], textvariable=self.chosen_type, state="readonly")
+        self.type_combobox.grid()
+        self.type_combobox.bind('<<ComboboxSelected>>', lambda event: self.update_second_combobox(categories_incomes,
+                               categories_expenses))
 
         Label(self.overview_frame, text="with category").grid()
-        ttk.Combobox(self.overview_frame).grid()
+        self.category_combobox = ttk.Combobox(self.overview_frame, state="disabled", textvariable=self.chosen_category)
+        self.category_combobox.set('Choose type first')
+        self.category_combobox.grid()
 
-        Button(self.overview_frame, text="Submit").grid()
 
-        Label(self.overview_frame, text="Calculate money").grid()
+        Button(self.overview_frame, text="Submit", command=lambda: self.controller.submit_category(self.chosen_type.get(), self.chosen_category.get())).grid()
 
+        self.result_label = Label(self.overview_frame, text="Result of Calculations")
+        self.result_label.grid()
+
+    def update_second_combobox(self, categories_incomes,
+                               categories_expenses):
+        self.category_combobox.set('choose category')
+        self.category_combobox.configure(state="readonly")
+
+        # Get selected value from the first combo box
+        selected_value = self.chosen_type.get()
+
+        # Update second combo box based on selection
+        if selected_value == 'spent':
+            self.category_combobox['values'] = categories_expenses
+        elif selected_value == 'earned':
+            self.category_combobox['values'] = categories_incomes
+
+        # Optionally, set the first item as selected in the second combo box if available
+        if self.category_combobox['values']:
+            self.category_combobox.current(0)
+
+
+    def display_result(self, result, type, category):
+        type_info = ""
+        if type == "spent":
+            type_info = "spending"
+        elif type == "earned":
+            type_info = "earnings"
+        self.result_label.configure(text=f"Yours {type_info} on {category}: {result}")
     '''
     Avg month stats
     '''

@@ -74,9 +74,90 @@ class StatisticsPageModel:
 
 
     def add_all_values(self, months_info):
-        ...
+        combined_values = [sum(values) for values in zip(*months_info)]
+        return combined_values
+
 
     '''
     General stats
     '''
+
+    def get_categories_for_expenses(self, user_data):
+        list_of_expenses_categories = []
+        self.cursor.execute('SELECT Category FROM budgettransactions WHERE username = %s AND type = %s ', (user_data[0], "Expense"))
+        rows_not_const = self.cursor.fetchall()
+        for row in rows_not_const:
+            list_of_expenses_categories.append(row[0])
+        self.cursor.reset()
+
+        self.cursor.execute('SELECT Category FROM consttransactions WHERE username = %s AND type = %s',
+                            (user_data[0], "Expense"))
+        rows_const = self.cursor.fetchall()
+        for row in rows_const:
+            list_of_expenses_categories.append(row[0])
+        self.cursor.reset()
+
+        list_of_expenses_categories = list(set(list_of_expenses_categories))
+
+        return list_of_expenses_categories
+
+
+
+    def get_categories_for_incomes(self, user_data):
+        list_of_incomes_categories = []
+        self.cursor.execute('SELECT Category FROM budgettransactions WHERE username = %s AND type = %s',
+                            (user_data[0], "Income"))
+        rows_not_const = self.cursor.fetchall()
+        for row in rows_not_const:
+            list_of_incomes_categories.append(row[0])
+        self.cursor.reset()
+
+        self.cursor.execute('SELECT Category FROM consttransactions WHERE username = %s AND type = %s',
+                            (user_data[0], "Income"))
+        rows_const = self.cursor.fetchall()
+        for row in rows_const:
+            list_of_incomes_categories.append(row[0])
+        self.cursor.reset()
+
+        list_of_incomes_categories = list(set(list_of_incomes_categories))
+
+        return list_of_incomes_categories
+
+    def get_values_from_database(self, user_data, type, category, month):
+        if type == "spent":
+            type_info = "Expense"
+        elif type == "earned":
+            type_info = "Income"
+        print(type)
+        print(category)
+        list_of_values = []
+        self.cursor.execute(
+            '''
+            SELECT Amount FROM budgettransactions 
+            WHERE username = %s 
+            AND Type = %s 
+            AND Category = %s
+            AND CONCAT(SUBSTRING(Month, 4, 4), SUBSTRING(Month, 1, 2)) >= CONCAT(SUBSTRING(%s, 4, 4), SUBSTRING(%s, 1, 2)) 
+            AND CONCAT(SUBSTRING(Month, 4, 4), SUBSTRING(Month, 1, 2)) < CONCAT(SUBSTRING(%s, 4, 4), SUBSTRING(%s, 1, 2))
+            ''',
+            (user_data[0], type_info, category, month, month, self.get_current_month()[-1], self.get_current_month()[-1]))
+        rows = self.cursor.fetchall()
+        print(rows)
+        if not rows is None:
+            for row in rows:
+                list_of_values.append(row[0])
+        self.cursor.reset()
+
+        self.cursor.execute('SELECT Amount FROM consttransactions WHERE username = %s AND Type = %s AND Category = %s',
+                            (user_data[0], type_info, category))
+        rows = self.cursor.fetchall()
+        print(rows)
+        if not rows is None:
+            for row in rows:
+                list_of_values.append(row[0])
+                print(list_of_values)
+        return list_of_values
+
+    def calculate_sum_of_values(self, values: list):
+        return sum(values)
 

@@ -15,15 +15,19 @@ class StatisticPageController:
     def submit_stat(self, time_period, stat_type):
         print(time_period)
         if not time_period == "All time":
-            months = self.statistics_page_model.get_list_of_months(self.statistics_page_model.get_time_period_in_int(time_period))
+            self.months = self.statistics_page_model.get_list_of_months(self.statistics_page_model.get_time_period_in_int(time_period))
         else:
-            months = self.statistics_page_model.get_current_month()
+            self.months = self.statistics_page_model.get_current_month()
 
         if stat_type == "General stats":
-            months_info = self.statistics_page_model.get_budget_month_info(self.user_data, months[-1])
-            self.statistics_page_model.add_all_values(months_info)
+            months_info = self.statistics_page_model.get_budget_month_info(self.user_data, self.months[-1])
+            expenses_categories = self.statistics_page_model.get_categories_for_expenses(self.user_data)
+            incomes_categories = self.statistics_page_model.get_categories_for_incomes(self.user_data)
+
+            combined_values = self.statistics_page_model.add_all_values(months_info)
+
             self.statistics_page_view.destroy_overview_frame()
-            self.statistics_page_view.general_stats_overview()
+            self.statistics_page_view.general_stats_overview(combined_values[1], combined_values[0], combined_values[2], incomes_categories, expenses_categories)
         elif stat_type == "Avg month stats":
             self.statistics_page_view.destroy_overview_frame()
             self.statistics_page_view.avg_month_stats_overview()
@@ -41,5 +45,15 @@ class StatisticPageController:
             self.statistics_page_view.incomes_expanses_on_month_overview()
 
 
+
     def back(self):
         self.statistics_page_view.destroy_statistics_frame()
+
+
+    '''
+    General stats
+    '''
+
+    def submit_category(self, type, category):
+        result = self.statistics_page_model.calculate_sum_of_values(self.statistics_page_model.get_values_from_database(self.user_data, type, category, self.months[-1]))
+        self.statistics_page_view.display_result(result, type, category)
