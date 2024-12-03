@@ -148,8 +148,23 @@ class StatisticsPageModel:
                 list_of_values.append(row[0])
         self.cursor.reset()
 
-        self.cursor.execute('SELECT Amount FROM consttransactions WHERE username = %s AND Type = %s AND Category = %s',
-                            (user_data[0], type_info, category))
+        if type == "spent":
+            type_info = "ConstExpense"
+        elif type == "earned":
+            type_info = "ConstIncome"
+
+
+        self.cursor.execute(
+            '''
+            SELECT Amount FROM budgettransactions 
+            WHERE username = %s 
+            AND Type = %s 
+            AND Category = %s
+            AND CONCAT(SUBSTRING(Month, 4, 4), SUBSTRING(Month, 1, 2)) >= CONCAT(SUBSTRING(%s, 4, 4), SUBSTRING(%s, 1, 2)) 
+            AND CONCAT(SUBSTRING(Month, 4, 4), SUBSTRING(Month, 1, 2)) < CONCAT(SUBSTRING(%s, 4, 4), SUBSTRING(%s, 1, 2))
+            ''',
+            (user_data[0], type_info, category, month, month, self.get_current_month()[-1],
+             self.get_current_month()[-1]))
         rows = self.cursor.fetchall()
         print(rows)
         if not rows is None:
@@ -160,4 +175,23 @@ class StatisticsPageModel:
 
     def calculate_sum_of_values(self, values: list):
         return sum(values)
+
+    '''
+    Avg month stats
+    '''
+
+    def values_from_db(self):
+        self.cursor.execute(
+            '''
+            SELECT * FROM monthbudget 
+            WHERE Username = %s 
+            AND CONCAT(SUBSTRING(Month, 4, 4), SUBSTRING(Month, 1, 2)) >= CONCAT(SUBSTRING(%s, 4, 4), SUBSTRING(%s, 1, 2)) 
+            AND CONCAT(SUBSTRING(Month, 4, 4), SUBSTRING(Month, 1, 2)) < CONCAT(SUBSTRING(%s, 4, 4), SUBSTRING(%s, 1, 2))
+            ''',
+            (user_data[0], month, month, self.get_current_month()[-1], self.get_current_month()[-1])
+        )
+
+
+    def calculate_avg_value(self, values):
+        ...
 

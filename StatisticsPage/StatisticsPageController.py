@@ -29,8 +29,10 @@ class StatisticPageController:
             self.statistics_page_view.destroy_overview_frame()
             self.statistics_page_view.general_stats_overview(combined_values[1], combined_values[0], combined_values[2], incomes_categories, expenses_categories)
         elif stat_type == "Avg month stats":
+
+
             self.statistics_page_view.destroy_overview_frame()
-            self.statistics_page_view.avg_month_stats_overview()
+            self.statistics_page_view.avg_month_stats_overview(avg_spent, avg_earned, avg_free_amount)
         elif stat_type == "Percent stats":
             self.statistics_page_view.destroy_overview_frame()
             self.statistics_page_view.percent_stats_overview()
