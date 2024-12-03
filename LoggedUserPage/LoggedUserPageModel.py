@@ -1,5 +1,6 @@
 import mysql.connector
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
+from dateutil.relativedelta import relativedelta
 
 
 class LoggedUserPageModel:
@@ -13,6 +14,19 @@ class LoggedUserPageModel:
     def get_today_date():
         today = date.today()
         return today
+
+
+    def get_month_values(self, count):
+        months_values = []
+        current_date = datetime.now()
+        for i in range(count):
+            month_date = current_date - relativedelta(months=i + 1)
+            # Format the month and year
+            formatted_month = month_date.strftime("%m/%Y")
+            months_values.append(formatted_month)
+
+        return months_values
+
     # check case if its first day month and last seen is also first date
     def count_1st_days_between_months(self, date_1, date_2):
         if date_1 > date_2:
@@ -35,7 +49,7 @@ class LoggedUserPageModel:
                 current_date = current_date.replace(year=current_date.year + 1, month=1)
             else:
                 current_date = current_date.replace(month=current_date.month + 1)
-
+        print(count)
         return count
 
     def get_last_login_date(self, user_data: tuple):
@@ -81,4 +95,40 @@ class LoggedUserPageModel:
     def update_last_seen(self, user_data, today):
         self.cursor.execute('UPDATE user SET lastseen = %s WHERE username = %s',
                             (today, user_data[0]))
+        self.connection.commit()
+
+
+    def get_const_transactions_info(self, user_data):
+        self.cursor.execute('SELECT * FROM consttransactions WHERE Username = %s', (user_data[0],))
+        rows = self.cursor.fetchall()
+        transactions = list(rows)
+        self.cursor.reset()
+        self.connection.commit()
+
+        return transactions
+
+    def prepare_data(self, transactions, months_values):
+        values_to_insert = []
+        updated_data = [
+            (item[0],
+             'ConstIncome' if item[1] == 'Income' else
+             'ConstExpense' if item[1] == 'Expense' else item[1],
+             item[2],
+             item[3])
+            for item in transactions
+        ]
+
+        for month_value in months_values:
+            for item in updated_data:
+                values_to_insert.append((item[0], month_value, item[1], item[2], item[3]))
+
+        return values_to_insert
+
+    def save_const_transactions(self, values_to_insert):
+        insert_statement = """
+        INSERT INTO budgettransactions (username, month, type, category, amount)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+
+        self.cursor.executemany(insert_statement, values_to_insert)
         self.connection.commit()

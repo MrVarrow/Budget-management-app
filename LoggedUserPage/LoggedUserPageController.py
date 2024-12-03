@@ -8,6 +8,7 @@ from ReceiptsPage.ReceiptsPageController import ReceiptsPageController
 from ShoppingListPage.ShoppingListController import ShoppingListController
 from MenageBudgetPage.ManageBudgetPageController import ManageBudgetController
 from SavingsPage.SavingsPageController import SavingsPageController
+from StatisticsPage.StatisticsPageController import StatisticPageController
 from tkinter import messagebox
 
 
@@ -23,8 +24,15 @@ class LoggedUserPageController:
         last_login = self.logged_user_page_model.get_last_login_date(self.user_data)
         goals_list = self.logged_user_page_model.get_user_goals_list(self.user_data)
         count = self.logged_user_page_model.count_1st_days_between_months(last_login, today)
+
+
         # Add auto deposit amount to savings goal if needed
         if not count == 0:
+            values_to_insert = self.logged_user_page_model.prepare_data(
+                self.logged_user_page_model.get_const_transactions_info(self.user_data),
+                self.logged_user_page_model.get_month_values(count))
+            self.logged_user_page_model.save_const_transactions(values_to_insert)
+
             for goal in goals_list:
                 goal_info = self.logged_user_page_model.get_info_about_goal(self.user_data, goal[0])
                 progress = goal_info[4]
@@ -53,7 +61,8 @@ class LoggedUserPageController:
 
     # Go into statistics page
     def stats(self):
-        ...
+        self.logged_user_page_view.destroy_logged_user_frame()
+        StatisticPageController(self.root, self.user_data, self.bg_color)
 
     # Go into shopping list page
     def shopping_list(self):
