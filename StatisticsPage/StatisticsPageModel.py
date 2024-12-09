@@ -180,7 +180,7 @@ class StatisticsPageModel:
     Avg month stats
     '''
 
-    def values_from_db(self):
+    def values_from_db(self, user_data, month):
         self.cursor.execute(
             '''
             SELECT * FROM monthbudget 
@@ -190,8 +190,56 @@ class StatisticsPageModel:
             ''',
             (user_data[0], month, month, self.get_current_month()[-1], self.get_current_month()[-1])
         )
+        rows = self.cursor.fetchall()
+        values = [[row[i] for i in [2, 3, 4]] for row in rows]
+        return values
+
+    def sort_data(self, values):
+        incomes_list, expenses_list, free_amount_list = zip(*values)
+        return list(incomes_list), list(expenses_list), list(free_amount_list)
 
 
     def calculate_avg_value(self, values):
-        ...
+        return sum(values) / len(values) if values else 0
 
+    '''
+    Percent stats
+    '''
+
+    def calculate_percent_value(self, category_amount_dict, total_amount):
+        category_percentage_dict = {}
+
+        # Calculate percentage for each category
+        for category, amount in category_amount_dict.items():
+            percentage = ((amount / total_amount) * 100) if total_amount > 0 else 0
+            category_percentage_dict[category] = {
+                'amount': amount,
+                'percentage': round(percentage, 2)  # Round to two decimal places
+            }
+
+        return category_percentage_dict
+
+
+    def get_cat_and_amount(self, user_data, type_info, month):
+        category_amount_dict = {}
+        self.cursor.execute(
+            '''
+            SELECT Category, Amount FROM budgettransactions
+            WHERE Username = %s
+            AND Type = %s 
+            AND CONCAT(SUBSTRING(Month, 4, 4), SUBSTRING(Month, 1, 2)) >= CONCAT(SUBSTRING(%s, 4, 4), SUBSTRING(%s, 1, 2)) 
+            AND CONCAT(SUBSTRING(Month, 4, 4), SUBSTRING(Month, 1, 2)) < CONCAT(SUBSTRING(%s, 4, 4), SUBSTRING(%s, 1, 2))
+            ''',
+            (user_data[0], type_info, month, month, self.get_current_month()[-1],
+             self.get_current_month()[-1]))
+        rows = self.cursor.fetchall()
+        for row in rows:
+            category = row[0]
+            amount = row[1]
+
+            if category in category_amount_dict:
+                category_amount_dict[category] += amount
+            else:
+                category_amount_dict[category] = amount
+
+            return category_amount_dict

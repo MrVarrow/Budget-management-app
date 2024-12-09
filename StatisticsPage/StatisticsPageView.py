@@ -1,5 +1,8 @@
 from tkinter import *
 from tkinter import ttk
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 class StatisticsPageView:
@@ -139,14 +142,42 @@ class StatisticsPageView:
     Avg month stats
     '''
 
-    def avg_month_stats_overview(self):
-        ...
+    def avg_month_stats_overview(self, avg_spent, avg_earned, avg_free_amount):
+        self.overview_frame_creation()
+        Label(self.overview_frame, text=f"Average money spent per month: {avg_spent}").grid()
+
+        Label(self.overview_frame, text=f"Average money earned per month: {avg_earned}").grid()
+
+        Label(self.overview_frame, text=f"Average Free amount left per month: {avg_free_amount}").grid()
+
 
     '''
     Percent stats
     '''
 
-    def percent_stats_overview(self):
+    def percent_stats_overview(self, incomes_category_percentage_dict):
+        # Check if there are any categories to display
+        if not incomes_category_percentage_dict:
+            return
+        self.overview_frame_creation()
+
+        # Prepare data for the pie chart
+        categories = list(incomes_category_percentage_dict.keys())
+        amounts = [data['amount'] for data in incomes_category_percentage_dict.values()]
+
+        # Create a Matplotlib figure
+        fig = Figure(figsize=(6, 4), dpi=100)
+        ax = fig.add_subplot(111)
+
+        # Create a pie chart
+        ax.pie(amounts, labels=categories, autopct='%1.1f%%', startangle=140)
+        ax.set_title("Spending by Category")
+
+        # Create a canvas to display the figure in the Tkinter frame
+        canvas = FigureCanvasTkAgg(fig, master=self.overview_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=BOTH, expand=True)
+
         Label(self.overview_frame, text="Percent incomes by category:").grid()
 
         Label(self.overview_frame, text="Percent expenses by category:").grid()
