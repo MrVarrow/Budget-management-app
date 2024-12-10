@@ -150,54 +150,67 @@ class StatisticsPageView:
 
         Label(self.overview_frame, text=f"Average Free amount left per month: {avg_free_amount}").grid()
 
-
     '''
     Percent stats
     '''
 
-    def percent_stats_overview(self, incomes_category_percentage_dict):
+    def percent_stats_overview(self, incomes_category_percentage_dict, expenses_category_percentage_dict):
         # Check if there are any categories to display
-        if not incomes_category_percentage_dict:
+        if not incomes_category_percentage_dict and not expenses_category_percentage_dict:
             return
         self.overview_frame_creation()
 
-        # Prepare data for the pie chart
-        categories = list(incomes_category_percentage_dict.keys())
-        amounts = [data['amount'] for data in incomes_category_percentage_dict.values()]
+        # Prepare data for the income pie chart
+        income_categories = list(incomes_category_percentage_dict.keys())
+        income_amounts = [data['amount'] for data in incomes_category_percentage_dict.values()]
 
-        # Create a Matplotlib figure
-        fig = Figure(figsize=(6, 4), dpi=100)
-        ax = fig.add_subplot(111)
+        # Create a Matplotlib figure with 2 subplots
+        fig, axs = plt.subplots(1, 2, figsize=(7, 4.5), dpi=100)  # Adjust figsize as needed
 
-        # Create a pie chart
-        ax.pie(amounts, labels=categories, autopct='%1.1f%%', startangle=140)
-        ax.set_title("Spending by Category")
+        # Create the income pie chart
+        axs[0].pie(income_amounts, labels=income_categories, autopct='%1.1f%%', startangle=140)
+        axs[0].set_title("Income by Category:")
+
+        # Prepare data for the expense pie chart
+        expense_categories = list(expenses_category_percentage_dict.keys())
+        expense_amounts = [data['amount'] for data in expenses_category_percentage_dict.values()]
+
+        # Create the expense pie chart
+        axs[1].pie(expense_amounts, labels=expense_categories, autopct='%1.1f%%', startangle=140)
+        axs[1].set_title("Expenses by Category:")
+
+        # Adjust spacing between subplots and frame borders
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.85, bottom=0.1,
+                            wspace=0.2)  # Adjust wspace for horizontal spacing
+
+        # Optionally use tight_layout() to further refine spacing
+        fig.tight_layout(pad=2.0)  # You can adjust the padding as needed
 
         # Create a canvas to display the figure in the Tkinter frame
         canvas = FigureCanvasTkAgg(fig, master=self.overview_frame)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=BOTH, expand=True)
 
-        Label(self.overview_frame, text="Percent incomes by category:").grid()
-
-        Label(self.overview_frame, text="Percent expenses by category:").grid()
-
     '''
     The biggest incomes and expenses
     '''
 
-    def biggest_incomes_expenses_overview(self):
-        Label(self.overview_frame, text="Largest amount spent:").grid()
-        Label(self.overview_frame, text="This month you spent the most money:").grid()
-        Label(self.overview_frame, text="This month you spent less money:").grid()
+    def biggest_incomes_expenses_overview(self, max_income_category, max_income_value, max_expenses_category,
+                                          max_expenses_value, max_income_month, max_income, min_income_month,
+                                          min_income, max_expense_month, max_expense, min_expense_month, min_expense,
+                                          max_free_amount_month, max_free_amount, min_free_amount_month,
+                                          min_free_amount):
 
-        Label(self.overview_frame, text="Largest amount gained:").grid()
-        Label(self.overview_frame, text="This month you gained the most money:").grid()
-        Label(self.overview_frame, text="This month you gained less money:").grid()
+        Label(self.overview_frame, text=f"Largest amount spent: {max_expenses_value} at {max_expenses_category}").grid()
+        Label(self.overview_frame, text=f"This month you spent the most money: {max_expense} at {max_expense_month}").grid()
+        Label(self.overview_frame, text=f"This month you spent less money: {min_expense} at {min_expense_month}").grid()
 
-        Label(self.overview_frame, text="Largest free amount :").grid()
-        Label(self.overview_frame, text="This month you have most free amount:").grid()
-        Label(self.overview_frame, text="This month you had less free amount:").grid()
+        Label(self.overview_frame, text=f"Largest amount gained: {max_income_value} at {max_income_category}").grid()
+        Label(self.overview_frame, text=f"This month you gained the most money: {max_income} at {max_income_month}").grid()
+        Label(self.overview_frame, text=f"This month you gained less money: {min_income} at {min_income_month}").grid()
+
+        Label(self.overview_frame, text=f"This month you have most free amount: {max_free_amount} at {max_free_amount_month}").grid()
+        Label(self.overview_frame, text=f"This month you had less free amount: {min_free_amount} at {min_free_amount_month}").grid()
 
     '''
     Month budget stats

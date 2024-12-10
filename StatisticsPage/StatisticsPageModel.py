@@ -220,7 +220,7 @@ class StatisticsPageModel:
         return category_percentage_dict
 
 
-    def get_cat_and_amount(self, user_data, type_info, month):
+    def get_cat_and_amount(self, user_data, month, type_info):
         category_amount_dict = {}
         self.cursor.execute(
             '''
@@ -242,4 +242,67 @@ class StatisticsPageModel:
             else:
                 category_amount_dict[category] = amount
 
-            return category_amount_dict
+        return category_amount_dict
+
+    def combine_dicts(self, dict_1, dict_2):
+        combined_dict = dict_1 | dict_2
+        return combined_dict
+
+    '''
+    The biggest incomes and expenses
+    '''
+
+    def max_value_from_dict(self, given_dict):
+        max_key = max(given_dict, key=given_dict.get)
+        max_value = given_dict[max_key]
+        return max_key, max_value
+
+    def month_info(self, user_data, month):
+        self.cursor.execute(
+            '''
+            SELECT * FROM monthbudget 
+            WHERE Username = %s 
+            AND CONCAT(SUBSTRING(Month, 4, 4), SUBSTRING(Month, 1, 2)) >= CONCAT(SUBSTRING(%s, 4, 4), SUBSTRING(%s, 1, 2)) 
+            AND CONCAT(SUBSTRING(Month, 4, 4), SUBSTRING(Month, 1, 2)) < CONCAT(SUBSTRING(%s, 4, 4), SUBSTRING(%s, 1, 2))
+            ''',
+            (user_data[0], month, month, self.get_current_month()[-1], self.get_current_month()[-1])
+        )
+
+        rows = self.cursor.fetchall()
+        result_dict = {}
+
+        for row in rows:
+            month_name = row[1]  # Assuming the first column is 'Month'
+            incomes = row[2]  # Assuming the second column is 'Incomes'
+            expenses = row[3]  # Assuming the third column is 'Expenses'
+            free_amount = row[4]  # Assuming the fourth column is 'FreeAmount'
+
+            # Store in dictionary
+            result_dict[month_name] = [incomes, expenses, free_amount]
+
+        return result_dict
+
+    def operation_from_dict(self, month_data: dict, operation: str, value_type: int):
+        if not month_data:  # Check if the dictionary is empty
+            return None  # Or raise an exception, depending on your needs
+
+        # Initialize variables based on the operation
+        if operation == 'max':
+            result = float('-inf')  # Initialize to negative infinity for max
+            result_month = None
+        else:  # operation == 'min'
+            result = float('inf')  # Initialize to positive infinity for min
+            result_month = None
+
+        for month, values in month_data.items():
+            value = values[value_type]  # Assuming the first element is incomes
+
+            if operation == 'max' and value > result:
+                result = value
+                result_month = month
+            elif operation == 'min' and value < result:
+                result = value
+                result_month = month
+
+        return result_month, result  # Return as a tuple (month, income)
+
