@@ -1,6 +1,7 @@
 import mysql.connector
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 import pandas as pd
 import re
 
@@ -277,8 +278,15 @@ class StatisticsPageModel:
             expenses = row[3]  # Assuming the third column is 'Expenses'
             free_amount = row[4]  # Assuming the fourth column is 'FreeAmount'
 
-            # Store in dictionary
-            result_dict[month_name] = [incomes, expenses, free_amount]
+            # Check if month_name already exists in result_dict
+            if month_name not in result_dict:
+                # If it doesn't exist, create a new entry
+                result_dict[month_name] = [incomes, expenses, free_amount]
+            else:
+                # If it exists, append the new values (if needed)
+                result_dict[month_name][0] += incomes  # Append incomes
+                result_dict[month_name][1] += expenses  # Append expenses
+                result_dict[month_name][2] += free_amount  # Append free amount
 
         return result_dict
 
@@ -305,4 +313,32 @@ class StatisticsPageModel:
                 result_month = month
 
         return result_month, result  # Return as a tuple (month, income)
+
+    def create_monthly_dict(self):
+        # Create a dictionary with months as keys and lists of Decimal('0.00') as values
+        months_dict = {
+            '01': Decimal('0.00'),  # January
+            '02': Decimal('0.00'),  # February
+            '03': Decimal('0.00'),  # March
+            '04': Decimal('0.00'),  # April
+            '05': Decimal('0.00'),  # May
+            '06': Decimal('0.00'),  # June
+            '07': Decimal('0.00'),  # July
+            '08': Decimal('0.00'),  # August
+            '09': Decimal('0.00'),  # September
+            '10': Decimal('0.00'),  # October
+            '11': Decimal('0.00'),  # November
+            '12': Decimal('0.00')  # December
+        }
+        return months_dict
+
+    def update_data(self, months_dict, existing_data, index):
+        for month_key, values in existing_data.items():
+            month, year = month_key.split('/')  # Split into month and year
+
+            if month in months_dict:
+                # Update the value at the specified index
+                months_dict[month] += values[index]  # Add the value at the specified index
+
+        return months_dict
 

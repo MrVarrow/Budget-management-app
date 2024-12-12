@@ -15,7 +15,7 @@ class StatisticsPageView:
         self.time_period_list = \
             ["Last Month", "Last 6 Months", "Last Year", "Last 5 Years", "Last 10 Years", "All time"]
         self.current_period = StringVar()
-        self.stats_list = ["General stats", "Avg month stats", "Percent stats", "Divided into categories",
+        self.stats_list = ["General stats", "Avg month stats", "Percent stats",
                            "The biggest incomes and expenses", "Month budget stats",
                            "Incomes and expenses depending on the month"]
         self.current_stat = StringVar()
@@ -225,9 +225,40 @@ class StatisticsPageView:
     Incomes and expenses depending on the month
     '''
 
-    def incomes_expanses_on_month_overview(self):
-        Label(self.overview_frame, text="Money spent depending on the month:").grid()
+    def incomes_expanses_on_month_overview(self, incomes_dict, expenses_dict):
+        # Check if there are any categories to display
+        if not incomes_dict and not expenses_dict:
+            return
 
-        Label(self.overview_frame, text="Money gained depending on the month:").grid()
+        self.overview_frame_creation()
 
-        Label(self.overview_frame, text="Free amount left depending on the month:").grid()
+        # Prepare data for the income pie chart
+        income_categories = list(incomes_dict.keys())
+        income_amounts = [float(amount) for amount in incomes_dict.values()]  # Convert Decimal to float
+
+        # Create a Matplotlib figure with 2 subplots
+        fig, axs = plt.subplots(1, 2, figsize=(7, 4.5), dpi=100)  # Adjust figsize as needed
+
+        # Create the income pie chart
+        axs[0].pie(income_amounts, labels=income_categories, autopct='%1.1f%%', startangle=140)
+        axs[0].set_title("Income by Month:")
+
+        # Prepare data for the expense pie chart
+        expense_categories = list(expenses_dict.keys())
+        expense_amounts = [float(amount) for amount in expenses_dict.values()]  # Convert Decimal to float
+
+        # Create the expense pie chart
+        axs[1].pie(expense_amounts, labels=expense_categories, autopct='%1.1f%%', startangle=140)
+        axs[1].set_title("Expenses by Month:")
+
+        # Adjust spacing between subplots and frame borders
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.85, bottom=0.1,
+                            wspace=0.2)  # Adjust wspace for horizontal spacing
+
+        # Optionally use tight_layout() to further refine spacing
+        fig.tight_layout(pad=2.0)  # You can adjust the padding as needed
+
+        # Create a canvas to display the figure in the Tkinter frame
+        canvas = FigureCanvasTkAgg(fig, master=self.overview_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=BOTH, expand=True)

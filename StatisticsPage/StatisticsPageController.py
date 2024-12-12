@@ -71,7 +71,7 @@ class StatisticPageController:
             max_expenses_category, max_expenses_value = self.statistics_page_model.max_value_from_dict(combined_expenses)
 
             month_info_dict = self.statistics_page_model.month_info(self.user_data, self.months[-1])
-
+            print(month_info_dict)
             max_income_month, max_income = self.statistics_page_model.operation_from_dict(
                 month_info_dict, operation="max", value_type=0)  # 0 is for income
             min_income_month, min_income = self.statistics_page_model.operation_from_dict(
@@ -96,8 +96,16 @@ class StatisticPageController:
             self.statistics_page_view.month_budget_stats_overview()
         elif stat_type == "Incomes and expenses depending on the month":
             # circle graph of incomes and expenses by 12 months in year
+            existing_data = self.statistics_page_model.month_info(self.user_data, self.months[-1])
+            months_dict = self.statistics_page_model.create_monthly_dict()
+
+            income_month_dict = self.statistics_page_model.update_data(months_dict, existing_data, index=0)
+            print(income_month_dict)
+            expense_month_dict = self.statistics_page_model.update_data(months_dict, existing_data, index=1)
+            print(expense_month_dict)
+
             self.statistics_page_view.destroy_overview_frame()
-            self.statistics_page_view.incomes_expanses_on_month_overview()
+            self.statistics_page_view.incomes_expanses_on_month_overview(income_month_dict, expense_month_dict)
 
     def back(self):
         self.statistics_page_view.destroy_statistics_frame()
