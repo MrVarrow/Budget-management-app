@@ -2,8 +2,6 @@ import mysql.connector
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-import pandas as pd
-import re
 
 
 class StatisticsPageModel:
@@ -11,11 +9,6 @@ class StatisticsPageModel:
         self.connection = mysql.connector.connect(host="localhost", user="root", passwd="AkniLUAp01-",
                                                   database="budgetappdatabase")
         self.cursor = self.connection.cursor()
-
-    # Converts user time_period input to list of month
-    def user_input_to_date(self, time_period):
-        ...
-
 
     def get_current_month(self):
         current_date = datetime.now()
@@ -42,12 +35,11 @@ class StatisticsPageModel:
             month_date = start_date - relativedelta(months=i)
             formatted_month = month_date.strftime("%m/%Y")
             months.append(formatted_month)
-        print(months)
+
         return months
 
     def get_budget_month_info(self, user_data, month):
         months_info = []
-        print(month)
 
         if month == self.get_current_month()[-1]:
             self.cursor.execute(
@@ -129,8 +121,6 @@ class StatisticsPageModel:
             type_info = "Expense"
         elif type == "earned":
             type_info = "Income"
-        print(type)
-        print(category)
         list_of_values = []
         self.cursor.execute(
             '''
@@ -143,7 +133,7 @@ class StatisticsPageModel:
             ''',
             (user_data[0], type_info, category, month, month, self.get_current_month()[-1], self.get_current_month()[-1]))
         rows = self.cursor.fetchall()
-        print(rows)
+
         if not rows is None:
             for row in rows:
                 list_of_values.append(row[0])
@@ -167,11 +157,11 @@ class StatisticsPageModel:
             (user_data[0], type_info, category, month, month, self.get_current_month()[-1],
              self.get_current_month()[-1]))
         rows = self.cursor.fetchall()
-        print(rows)
+
         if not rows is None:
             for row in rows:
                 list_of_values.append(row[0])
-                print(list_of_values)
+
         return list_of_values
 
     def calculate_sum_of_values(self, values: list):

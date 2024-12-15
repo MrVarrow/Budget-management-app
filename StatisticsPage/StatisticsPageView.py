@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import ttk
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
@@ -16,8 +15,7 @@ class StatisticsPageView:
             ["Last Month", "Last 6 Months", "Last Year", "Last 5 Years", "Last 10 Years", "All time"]
         self.current_period = StringVar()
         self.stats_list = ["General stats", "Avg month stats", "Percent stats",
-                           "The biggest incomes and expenses", "Month budget stats",
-                           "Incomes and expenses depending on the month"]
+                           "The biggest incomes and expenses", "Incomes and expenses depending on the month"]
         self.current_stat = StringVar()
 
         # Savings frame
@@ -89,28 +87,34 @@ class StatisticsPageView:
         self.chosen_type = StringVar()
         self.chosen_category = StringVar()
         self.chosen_type.set("Choose type")
-        Label(self.overview_frame, text=f"All money spent: {all_money_spent}").grid()
+        Label(self.overview_frame, text=f"All money spent: {all_money_spent}", font=('Arial', 15)) \
+            .grid(row=0, rowspan=2, column=0, sticky=W, padx=50, pady=50)
 
-        Label(self.overview_frame, text=f"All money earned: {all_money_earned}").grid()
+        Label(self.overview_frame, text=f"All money earned: {all_money_earned}", font=('Arial', 15)) \
+            .grid(row=1, rowspan=2, column=0, sticky=W, padx=50, pady=50)
 
-        Label(self.overview_frame, text=f"All Free amount left: {all_free_amount_left}").grid()
+        Label(self.overview_frame, text=f"All Free amount left: {all_free_amount_left}", font=('Arial', 15)) \
+            .grid(row=2, rowspan=2, column=0, sticky=W, padx=50, pady=50)
 
-        Label(self.overview_frame, text="Calculate money").grid()
-        self.type_combobox = ttk.Combobox(self.overview_frame, values=["spent", "earned"], textvariable=self.chosen_type, state="readonly")
-        self.type_combobox.grid()
+        Label(self.overview_frame, text="Calculate money", font=('Arial', 15)) \
+            .grid(row=0, column=1, sticky=W, pady=20)
+        self.type_combobox = ttk.Combobox(self.overview_frame, values=["spent", "earned"], textvariable=self.chosen_type, state="readonly", font=('Arial', 15))
+        self.type_combobox.grid(row=1, column=1, sticky=W, pady=20)
         self.type_combobox.bind('<<ComboboxSelected>>', lambda event: self.update_second_combobox(categories_incomes,
                                categories_expenses))
 
-        Label(self.overview_frame, text="with category").grid()
-        self.category_combobox = ttk.Combobox(self.overview_frame, state="disabled", textvariable=self.chosen_category)
+        Label(self.overview_frame, text="with category", font=('Arial', 15)) \
+            .grid(row=2, column=1, sticky=W, pady=20)
+        self.category_combobox = ttk.Combobox(self.overview_frame, state="disabled", textvariable=self.chosen_category, font=('Arial', 15))
         self.category_combobox.set('Choose type first')
-        self.category_combobox.grid()
+        self.category_combobox.grid(row=3, column=1, sticky=W, pady=20)
 
 
-        Button(self.overview_frame, text="Submit", command=lambda: self.controller.submit_category(self.chosen_type.get(), self.chosen_category.get())).grid()
+        Button(self.overview_frame, text="Submit", command=lambda: self.controller.submit_category(self.chosen_type.get(), self.chosen_category.get()), font=('Arial', 15), width=10, bg="light gray") \
+            .grid(row=4, column=1, sticky=W, padx=70, pady=20)
 
-        self.result_label = Label(self.overview_frame, text="Result of Calculations")
-        self.result_label.grid()
+        self.result_label = Label(self.overview_frame, text="Result of Calculations", font=('Arial', 15), width=30)
+        self.result_label.grid(row=5, column=0, columnspan=2, sticky=W, padx=150, pady=35)
 
     def update_second_combobox(self, categories_incomes,
                                categories_expenses):
@@ -144,11 +148,14 @@ class StatisticsPageView:
 
     def avg_month_stats_overview(self, avg_spent, avg_earned, avg_free_amount):
         self.overview_frame_creation()
-        Label(self.overview_frame, text=f"Average money spent per month: {avg_spent}").grid()
+        Label(self.overview_frame, text=f"Average money spent per month: \n\n{avg_spent}", font=('Arial', 15), width=50, height=3) \
+            .grid(row=0, column=0, sticky=W, padx=50, pady=30)
 
-        Label(self.overview_frame, text=f"Average money earned per month: {avg_earned}").grid()
+        Label(self.overview_frame, text=f"Average money earned per month: \n\n{avg_earned}", font=('Arial', 15), width=50, height=3) \
+            .grid(row=1, column=0, sticky=W, padx=50, pady=40)
 
-        Label(self.overview_frame, text=f"Average Free amount left per month: {avg_free_amount}").grid()
+        Label(self.overview_frame, text=f"Average Free amount left per month: \n\n{avg_free_amount}", font=('Arial', 15), width=50, height=3) \
+            .grid(row=2, column=0, sticky=W, padx=50, pady=30)
 
     '''
     Percent stats
@@ -200,26 +207,26 @@ class StatisticsPageView:
                                           min_income, max_expense_month, max_expense, min_expense_month, min_expense,
                                           max_free_amount_month, max_free_amount, min_free_amount_month,
                                           min_free_amount):
+        self.overview_frame_creation()
 
-        Label(self.overview_frame, text=f"Largest amount spent: {max_expenses_value} at {max_expenses_category}").grid()
-        Label(self.overview_frame, text=f"This month you spent the most money: {max_expense} at {max_expense_month}").grid()
-        Label(self.overview_frame, text=f"This month you spent less money: {min_expense} at {min_expense_month}").grid()
+        Label(self.overview_frame, text=f"Largest spending: \n{max_expenses_value} at {max_expenses_category}", font=('Arial', 15), width=50, height=2, justify='left', anchor='w') \
+            .grid(row=0, column=0, sticky=W, padx=50, pady=5)
+        Label(self.overview_frame, text=f"In this month you spent the most money: \n{max_expense} at {max_expense_month}", font=('Arial', 15), width=50, height=2, justify='left', anchor='w') \
+            .grid(row=1, column=0, sticky=W, padx=50)
+        Label(self.overview_frame, text=f"In this month you spent the least amount of money: \n{min_expense} at {min_expense_month}", font=('Arial', 15), width=50, height=2, justify='left', anchor='w') \
+            .grid(row=2, column=0, sticky=W, padx=50, pady=5)
 
-        Label(self.overview_frame, text=f"Largest amount gained: {max_income_value} at {max_income_category}").grid()
-        Label(self.overview_frame, text=f"This month you gained the most money: {max_income} at {max_income_month}").grid()
-        Label(self.overview_frame, text=f"This month you gained less money: {min_income} at {min_income_month}").grid()
+        Label(self.overview_frame, text=f"Largest earning: \n{max_income_value} at {max_income_category}", font=('Arial', 15), width=50, height=2, justify='left', anchor='w') \
+            .grid(row=3, column=0, sticky=W, padx=50)
+        Label(self.overview_frame, text=f"In this month, you earned the most money: \n{max_income} at {max_income_month}", font=('Arial', 15), width=50, height=2, justify='left', anchor='w') \
+            .grid(row=4, column=0, sticky=W, padx=50, pady=5)
+        Label(self.overview_frame, text=f"In this month you earned the least amount of money: \n{min_income} at {min_income_month}", font=('Arial', 15), width=50, height=2, justify='left', anchor='w') \
+            .grid(row=5, column=0, sticky=W, padx=50)
 
-        Label(self.overview_frame, text=f"This month you have most free amount: {max_free_amount} at {max_free_amount_month}").grid()
-        Label(self.overview_frame, text=f"This month you had less free amount: {min_free_amount} at {min_free_amount_month}").grid()
-
-    '''
-    Month budget stats
-    '''
-
-    def month_budget_stats_overview(self):
-        Label(self.overview_frame, text="Money spent").grid()
-        Label(self.overview_frame, text="Income").grid()
-        Label(self.overview_frame, text="Free amount").grid()
+        Label(self.overview_frame, text=f"This month, you have the highest amount of free funds: \n{max_free_amount} at {max_free_amount_month}", font=('Arial', 15), width=50, height=2, justify='left', anchor='w') \
+            .grid(row=6, column=0, sticky=W, padx=50, pady=5)
+        Label(self.overview_frame, text=f"This month, you have the lowest amount of free funds: \n{min_free_amount} at {min_free_amount_month}", font=('Arial', 15), width=50, height=2, justify='left', anchor='w') \
+            .grid(row=7, column=0, sticky=W, padx=50)
 
     '''
     Incomes and expenses depending on the month
