@@ -1,12 +1,44 @@
 {
   "questions": [
     {
-      "question": "anyway",
-      "answer": "good"
+      "question": "How do I create a budget for the month?",
+      "answer": "To create a monthly budget, go to the 'Budget' section, select the month you want to budget for, and enter your income and expense categories."
     },
     {
-      "question": "hello",
-      "answer": "goodbye"
+      "question": "Can I set savings goals?",
+      "answer": "Yes! You can set savings goals by navigating to the 'Savings' section and entering your target amount and deadline."
+    },
+    {
+      "question": "How do I add a receipt?",
+      "answer": "You can add a receipt by selecting 'Add Receipt' in the app. You can either take a photo of the receipt or enter the details manually."
+    },
+    {
+      "question": "What is the statistics page for?",
+      "answer": "The statistics page provides insights into your spending habits, and budget performance over time."
+    },
+    {
+      "question": "Can I use dark mode in the app?",
+      "answer": "Yes! You can enable dark mode in the 'Settings' menu under 'Display Options.'"
+    },
+    {
+      "question": "How do I manage my account settings?",
+      "answer": "To manage your account settings, go to the 'Account Manager' section where you can change your password, verify your email, and adjust notification preferences."
+    },
+    {
+      "question": "What should I do if I forget my password?",
+      "answer": "If you forget your password, click on 'Forgot Password' on the login screen, and follow the instructions to reset it."
+    },
+    {
+      "question": "Can I delete my account?",
+      "answer": "Yes, you can delete your account in the 'Account Manager' section. Please note that this action is permanent."
+    },
+    {
+      "question": "How do I create a shopping list?",
+      "answer": "To create a shopping list, go to the 'Shopping Lists' section and select 'Create New List.' You can then add items manually."
+    },
+    {
+      "question": "Is there a way to track my expenses automatically?",
+      "answer": "Yes! You can set up automatic deposits for recurring expenses or incomes in the 'Budget' section."
     }
   ]
 }
