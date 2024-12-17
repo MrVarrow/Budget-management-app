@@ -1,7 +1,7 @@
 from RateAppWindow.RateAppWindowView import RateAppWindowView
 from RateAppWindow.RateAppWindowModel import RateAppWindowsModel
 from tkinter import messagebox
-
+from SendEmails import send_email_thanks_for_rate
 
 class RateAppWindowController:
     def __init__(self, root, user_data, bg_color):
@@ -38,6 +38,8 @@ class RateAppWindowController:
             return
 
         self.rate_app_window_model.insert_user_rating(self.user_data, final_rating)
+        if self.user_data[3] == "1":
+            send_email_thanks_for_rate(self.user_data[1], self.user_data[0])
         self.rate_app_window_view.close_rate_window()
         messagebox.showinfo(title="Information",
                             message="You has successfully rated application. Thanks!")
