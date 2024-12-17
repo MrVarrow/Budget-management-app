@@ -10,6 +10,7 @@ from MenageBudgetPage.ManageBudgetPageController import ManageBudgetController
 from SavingsPage.SavingsPageController import SavingsPageController
 from StatisticsPage.StatisticsPageController import StatisticPageController
 from tkinter import messagebox
+from SendEmails import send_email_to_rate_the_app, send_email_with_reminder_to_set_budget
 
 
 class LoggedUserPageController:
@@ -43,7 +44,10 @@ class LoggedUserPageController:
 
         # Update last seen date
         self.logged_user_page_model.update_last_seen(self.user_data, today)
-
+        if not self.logged_user_page_model.check_if_user_rated(self.user_data) and self.user_data[3] == "1":
+            send_email_to_rate_the_app(self.user_data[1], self.user_data[0])
+        if self.user_data[3] == "1" and self.logged_user_page_model.is_day_25_or_later():
+            send_email_with_reminder_to_set_budget(self.user_data[1], self.user_data[0])
     # Go into settings
     def settings(self):
         self.logged_user_page_view.destroy_logged_user_frame()

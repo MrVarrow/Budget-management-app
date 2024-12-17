@@ -15,6 +15,17 @@ class LoggedUserPageModel:
         today = date.today()
         return today
 
+    def check_if_user_rated(self, user_data):
+        if user_data[4] == "0":
+            return False
+        return True
+
+    def is_day_25_or_later(self):
+        # Get the current date
+        current_date = datetime.now()
+        # Check if the day of the month is 25 or more
+        return current_date.day >= 25
+
 
     def get_month_values(self, count):
         months_values = []
