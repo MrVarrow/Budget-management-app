@@ -37,7 +37,7 @@ class MobileAppWindowsModel:
         }
 
     def get_questions_with_answers(self):
-        questions_with_answers = {
+        self.questions_with_answers = {
             "What is your full name?": {
                 "type": "short_entry",
                 "answers": None
@@ -218,17 +218,51 @@ class MobileAppWindowsModel:
                 'answers': None
             }
         }
-        return questions_with_answers
+        return self.questions_with_answers
 
 
-    # Copy link to the app to clipboard
-    def copy_app_link(self, link):
-        pyperclip.copy(link)
+    def update_dict(self, answer_list):
+        keys = list(self.user_info.keys())
 
-    # Sends e-mail with link do download the app to user
-    def send_email_with_link(self, link, receiver):
-        send_email_with_link(receiver, link)
+        # Update user_info with provided answers
+        for i in range(min(len(keys), len(answer_list))):
+            self.user_info[keys[i]] = answer_list[i]
+        return self.user_info
 
 
-    def save_answer_to_list(self):
-        ...
+    def get_type_and_answers(self, question):
+        if question in self.questions_with_answers:
+            question_details = self.questions_with_answers[question]
+            question_type = question_details["type"]
+            question_answers = question_details["answers"] if question_details["answers"] is not None else None
+            return question_type, question_answers
+        else:
+            return None, None  # Return None for both if key is not found
+
+
+        # Toggle selected checkbutton and update its value in list
+
+    @staticmethod
+    def toggle_checkbutton(index: int, check_vars: list) -> list:
+        for i, var in enumerate(check_vars):
+            if i == index:
+                if check_vars[i]:
+                    check_vars[i] = False
+                    break
+
+                check_vars[i] = True
+        print(check_vars)
+        return check_vars
+
+    def look_for_true(self, check_list):
+        print(check_list)
+        count = 0
+        index = None
+        for i in range(len(check_list)):
+            if check_list[i]:  # Check if the current element is True
+                count += 1
+                index = i
+
+        if count == 1:
+            return index  # Return the index of the single True value
+        return "Error"  # Return "Error" if there are none or more than one True values
