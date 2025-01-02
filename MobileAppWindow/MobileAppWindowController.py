@@ -26,14 +26,21 @@ class MobileAppWindowController:
 
         if not answer == "":
             self.answer_list.append(answer)  # ENTRY
-            print(self.curr_question_index, len(self.questions_list))
             if self.curr_question_index < len(self.questions_list) - 1:
                 self.curr_question_index += 1
                 self.switch_view()
                 return
             else:
-                user_info_dict = self.mobile_app_window_model.update_dict(self.answer_list)
-                print(user_info_dict)
+                if self.mobile_app_window_model.get_questionnaire_info(self.user_data):
+                    self.mobile_app_window_model.update_data_in_database(self.user_data, self.answer_list)
+                    messagebox.showinfo(title="Information", message="Answers successfully updated. Thank You!")
+
+                    self.mobile_app_window_view.close_window()
+                else:
+                    self.mobile_app_window_model.insert_data_to_database(self.user_data, self.answer_list)
+                    messagebox.showinfo(title="Information", message="Answers successfully send. Thank You!")
+
+                    self.mobile_app_window_view.close_window()
                 return
 
         if not ans == "Error":
@@ -47,7 +54,8 @@ class MobileAppWindowController:
             self.switch_view()
             return
         else:
-            user_info_dict = self.mobile_app_window_model.update_dict(self.answer_list)
+            ...
+            # would only happen if last question is type: select, currently isn't
             return
 
     def switch_view(self):
@@ -58,9 +66,14 @@ class MobileAppWindowController:
         self.mobile_app_window_view.create_question_frame(self.curr_question_type, self.curr_question_answers)
 
     def prev_question(self):
-        ...
-        if self.curr_question_index > 0:
+        if self.curr_question_index == 0:
+            messagebox.showinfo(title="Information", message="That's first question.")
+            return
+        else:
             self.curr_question_index -= 1
+            self.answer_list.pop()
+            self.switch_view()
+            return
 
     def exit(self):
         self.mobile_app_window_view.close_window()

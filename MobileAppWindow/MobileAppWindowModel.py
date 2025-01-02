@@ -1,6 +1,4 @@
 import mysql.connector
-import pyperclip
-from SendEmails import send_email_with_link
 
 
 class MobileAppWindowsModel:
@@ -9,32 +7,6 @@ class MobileAppWindowsModel:
         self.connection = mysql.connector.connect(host="localhost", user="root", passwd="AkniLUAp01-",
                                                   database="budgetappdatabase")
         self.cursor = self.connection.cursor()
-
-        self.user_info = {
-            "full_name": "",
-            "gender": "",
-            "country": "",
-            "education": "",
-            "status": "",
-            "health_condition": "",
-            "city_size": "",  # BIG/ SMALL CITY
-            "monthly_salary_range": "",
-            "has_credit_card": "",
-            "has_consumer_credits": "",
-            "has_house_credit": "",
-            "financial_satisfaction": "",
-            "travel_abroad_frequency": "",
-            "travel_domestic_frequency": "",
-            "online_shopping_frequency": "",
-            "social_media_scrolling_frequency": "",
-            "drinking_frequency": "",
-            "smoking_frequency": "",
-            "yearly_savings_goal": "",
-            "monthly_income_goal": "",
-            "app_discovery_source": "",
-            "improvement_suggestions": "",
-            "most_used_functionality": ""
-        }
 
     def get_questions_with_answers(self):
         self.questions_with_answers = {
@@ -220,16 +192,6 @@ class MobileAppWindowsModel:
         }
         return self.questions_with_answers
 
-
-    def update_dict(self, answer_list):
-        keys = list(self.user_info.keys())
-
-        # Update user_info with provided answers
-        for i in range(min(len(keys), len(answer_list))):
-            self.user_info[keys[i]] = answer_list[i]
-        return self.user_info
-
-
     def get_type_and_answers(self, question):
         if question in self.questions_with_answers:
             question_details = self.questions_with_answers[question]
@@ -266,3 +228,73 @@ class MobileAppWindowsModel:
         if count == 1:
             return index  # Return the index of the single True value
         return "Error"  # Return "Error" if there are none or more than one True values
+
+
+    def insert_data_to_database(self, user_data, user_answers):
+        # SQL Insert query
+        insert_query = """
+                        INSERT INTO UserQuestionnaire (
+                            username, Email, full_name, gender, country, education_level,
+                            marital_status, health_condition, city_size, salary_range,
+                            credit_card, consumer_credits, house_credit,
+                            financial_satisfaction, travel_abroad_frequency,
+                            travel_within_country_frequency, online_shopping_frequency,
+                            social_media_frequency, alcohol_consumption_frequency,
+                            smoking_frequency, yearly_savings_goal,
+                            monthly_income_goal, app_discovery_source,
+                            improvement_suggestions, most_used_functionality
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                                  %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                                  %s, %s, %s, %s, %s);
+                        """
+        data_to_insert = [user_data[0], user_data[1]] + user_answers
+
+        self.cursor.execute(insert_query, data_to_insert)
+        self.connection.commit()  # Commit the transaction
+
+
+    def update_data_in_database(self, user_data, user_answers):
+        # SQL Update query
+        update_query = """
+                        UPDATE UserQuestionnaire
+                        SET 
+                            full_name = %s,
+                            gender = %s,
+                            country = %s,
+                            education_level = %s,
+                            marital_status = %s,
+                            health_condition = %s,
+                            city_size = %s,
+                            salary_range = %s,
+                            credit_card = %s,
+                            consumer_credits = %s,
+                            house_credit = %s,
+                            financial_satisfaction = %s,
+                            travel_abroad_frequency = %s,
+                            travel_within_country_frequency = %s,
+                            online_shopping_frequency = %s,
+                            social_media_frequency = %s,
+                            alcohol_consumption_frequency = %s,
+                            smoking_frequency = %s,
+                            yearly_savings_goal = %s,
+                            monthly_income_goal = %s,
+                            app_discovery_source = %s,
+                            improvement_suggestions = %s,
+                            most_used_functionality = %s
+                        WHERE username = %s AND Email = %s;
+                        """
+        data_to_update = user_answers + [user_data[0], user_data[1]]  # Append username and email
+
+        # Execute the update query with the combined data
+        self.cursor.execute(update_query, data_to_update)
+        self.connection.commit()  # Commit the transaction
+
+    def get_questionnaire_info(self, user_data):
+        select_query = "SELECT COUNT(*) FROM UserQuestionnaire WHERE username = %s;"
+
+        # Execute the select query
+        self.cursor.execute(select_query, (user_data[0],))
+        result = self.cursor.fetchone()  # Fetch the result
+
+        # Check if any record exists
+        return result[0] > 0  # Returns True if count > 0, else False

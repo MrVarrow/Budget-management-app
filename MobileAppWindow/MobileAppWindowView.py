@@ -25,7 +25,7 @@ class MobileAppWindowView:
         Button(self.mobile_app_root, text="Next", font=('Arial', 15), width=6, command=lambda: self.controller.next_question(self.entry_answer.get())) \
             .grid(row=2, column=0, sticky=E)
 
-        Button(self.mobile_app_root, text="Prev", font=('Arial', 15), width=6) \
+        Button(self.mobile_app_root, text="Prev", font=('Arial', 15), width=6, command=lambda: self.controller.prev_question()) \
             .grid(row=2, column=0, sticky=W)
 
         Button(self.mobile_app_root, text="Close", font=('Arial', 15), width=7, command=lambda: self.controller.exit()) \
