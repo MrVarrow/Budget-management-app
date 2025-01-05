@@ -28,6 +28,7 @@ class LoggedUserPageModel:
         # Check if the day of the month is 25 or more
         return current_date.day >= 25
 
+    # Gets list of months
     @staticmethod
     def get_month_values(count: int) -> list:
         months_values = []
