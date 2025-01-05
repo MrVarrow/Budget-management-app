@@ -65,6 +65,10 @@ class SavingsPageView:
         # Display initial overview
         self.initial_overview()
 
+    '''
+    Main savings page
+    '''
+
     # Create overview frame
     def overview_frame_creation(self):
         self.overview_frame = Frame(self.savings_frame, bg=self.bg_color, borderwidth=2, relief="solid")
@@ -78,12 +82,24 @@ class SavingsPageView:
         Label(self.overview_frame, text="Choose your goal", font=('Arial', 35)) \
             .grid(column=0, row=0, sticky=W, padx=150, pady=190)
 
+    # Updates user goals list
+    def update_goal_list(self, user_goals):
+        self.goals.configure(values=user_goals)
+
     # Destroy overview frame
     def destroy_overview_frame(self):
         self.overview_frame.destroy()
 
+    # Destroys savings frame
+    def destroy_savings_frame(self):
+        self.savings_frame.destroy()
+
+    '''
+    Goal overview
+    '''
+
     # Displays given goal overview
-    def open_goal_overview(self, goal_info, time_left, progress):
+    def open_goal_overview(self, goal_info: list, time_left: str, progress: float):
         self.goal_info = goal_info
         self.overview_frame_creation()
 
@@ -119,6 +135,11 @@ class SavingsPageView:
                command=lambda: self.controller.withdraw()) \
             .grid(row=3, column=0, sticky=W, padx=170, pady=10)
 
+        # Display info automatic deposit button
+        Button(self.overview_frame, text="?", font=('Arial', 10), bg="light gray",
+               command=lambda: self.controller.display_info()) \
+            .grid(row=5, column=0, sticky=W, padx=5)
+
         # Save automatic deposit button
         Button(self.overview_frame, text="Save", font=('Arial', 15), bg="light gray", width=10,
                command=lambda: self.controller.save_auto_deposit(goal_info[1], self.new_auto_deposit.get(),
@@ -142,18 +163,18 @@ class SavingsPageView:
             .grid(row=4, rowspan=3, column=0, sticky=E, padx=140, pady=40)
 
     # Updates display value of automatic deposit
-    def update_auto_deposit_label(self, automatic_deposit):
+    def update_auto_deposit_label(self, automatic_deposit: str):
         self.automatic_deposit.set(f"Your actual automatic deposit: {automatic_deposit}")
 
     # Updates display of progress made
-    def update_progress(self, progress, goal_info):
+    def update_progress(self, progress: float, goal_info: list):
         self.progress_label.configure(text=f'You have achieved {progress}% of your goal.\nCongratulations!')
         self.progress_bar.configure(value=progress)
         self.collect_label.configure(text=f'Collected {goal_info[4]} from {goal_info[2]}')
 
-    # Updates user goals list
-    def update_goal_list(self, user_goals):
-        self.goals.configure(values=user_goals)
+    '''
+    New goal window
+    '''
 
     # Displays new goal creation window
     def make_new_goal_window(self):
@@ -193,13 +214,13 @@ class SavingsPageView:
         # Focus on TopLevel window
         self.make_goal_window.grab_set()
 
-    # Destroys savings frame
-    def destroy_savings_frame(self):
-        self.savings_frame.destroy()
-
     # Destroys make new goal window
     def destroy_make_goal_window(self):
         self.make_goal_window.destroy()
+
+    '''
+    Deposit window
+    '''
 
     # Displays deposit window
     def deposit_window(self):
@@ -225,6 +246,14 @@ class SavingsPageView:
         # Focus on TopLevel window
         self.deposit_window_1.grab_set()
 
+    # Destroys deposit window
+    def destroy_deposit_window(self):
+        self.deposit_window_1.destroy()
+
+    '''
+    Withdraw window
+    '''
+
     # Displays withdraw window
     def withdraw_window(self):
         self.withdraw_window_1 = Toplevel(self.root, bg=self.bg_color)
@@ -249,13 +278,13 @@ class SavingsPageView:
         # Focus on TopLevel window
         self.withdraw_window_1.grab_set()
 
-    # Destroys deposit window
-    def destroy_deposit_window(self):
-        self.deposit_window_1.destroy()
-
     # Destroys withdraw window
     def destroy_withdraw_window(self):
         self.withdraw_window_1.destroy()
+
+    '''
+    Investments overview
+    '''
 
     # Displays investments overview
     def investments_overview(self):
@@ -325,9 +354,9 @@ class SavingsPageView:
                command=lambda: self.controller.create_table()) \
             .grid(row=7, column=0, pady=10, padx=150, sticky=E)
 
-    # Updates total value of investments label
-    def update_total_value_label(self, total_value):
-        self.total_value_info.set(f"At the end you will make: \n {total_value}")
+    '''
+    Bank deposit overview
+    '''
 
     # Displays bank deposit overview
     def bank_deposit_overview(self):
@@ -389,6 +418,14 @@ class SavingsPageView:
         Button(self.overview_frame, text="Check table", font=('Arial', 15), bg="light gray", width=10,
                command=lambda: self.controller.create_table()) \
             .grid(row=7, column=0, pady=10, padx=150, sticky=E)
+
+    '''
+    Investments and bank deposit methods
+    '''
+
+    # Updates total value of investments label
+    def update_total_value_label(self, total_value: float):
+        self.total_value_info.set(f"At the end you will make: \n {total_value}")
 
     # Creates graph in new window
     def create_graph(self, fig):

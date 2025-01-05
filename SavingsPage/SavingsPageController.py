@@ -37,8 +37,12 @@ class SavingsPageController:
         self.expenses_df = None
         self.goal_info = None
 
+    '''
+    Savings page menu
+    '''
+
     # Open goal button
-    def submit_open_goal(self, goal_name):
+    def submit_open_goal(self, goal_name: str):
         self.goal_info = self.savings_page_model.get_info_about_goal(self.user_data, goal_name)
         time_left = self.savings_page_model.calculate_time_left_for_goal(self.goal_info[3])
         progress = self.savings_page_model.calculate_percent_of_goal_accomplished(self.goal_info[2], self.goal_info[4])
@@ -47,7 +51,7 @@ class SavingsPageController:
         self.savings_page_view.open_goal_overview(self.goal_info, time_left, progress)
 
     # Delete goal button
-    def delete_goal(self, goal_name):
+    def delete_goal(self, goal_name: str):
         result = messagebox.askquestion(title='Warning', message="Do you want to delete this goal?")
         if result == "yes":
             self.savings_page_model.delete_goal_from_database(self.user_data, goal_name)
@@ -87,6 +91,11 @@ class SavingsPageController:
     Goal overview
     '''
 
+    # Displays automatic deposit info
+    @staticmethod
+    def display_info():
+        messagebox.showinfo("Information", "This amount is added every first day of each month.")
+
     # Deposit button
     def deposit(self):
         self.savings_page_view.deposit_window()
@@ -96,7 +105,7 @@ class SavingsPageController:
         self.savings_page_view.withdraw_window()
 
     # Save auto deposit button
-    def save_auto_deposit(self, goal_name, automatic_deposit, goal_amount):
+    def save_auto_deposit(self, goal_name: str, automatic_deposit: str, goal_amount: str):
         if not correct_price_format(automatic_deposit) \
                 or variable_grater_than_difference(
             automatic_deposit,
@@ -156,7 +165,7 @@ class SavingsPageController:
         messagebox.showinfo("Information", "Auto Deposit Successfully Changed.")
 
     # Deposit submit button
-    def submit_deposit(self, deposit_amount, goal_name, goal_amount):
+    def submit_deposit(self, deposit_amount: str, goal_name: str, goal_amount: str):
         if not correct_price_format(deposit_amount) \
                 or variable_grater_than_difference(
             deposit_amount,
@@ -178,7 +187,7 @@ class SavingsPageController:
         messagebox.showinfo("Information", "Added deposit to goal.")
 
     # Withdraw submit button
-    def submit_withdraw(self, withdraw_amount, goal_name, goal_amount):
+    def submit_withdraw(self, withdraw_amount: str, goal_name: str, goal_amount: str):
         if not correct_price_format(withdraw_amount) \
                 or variable_grater_than_other_variable(
             withdraw_amount, self.savings_page_model.get_progress_from_database(self.user_data, goal_name)
@@ -202,7 +211,7 @@ class SavingsPageController:
     '''
 
     # Make new goal window button
-    def submit_goal(self, goal_name, goal_amount, goal_date):
+    def submit_goal(self, goal_name: str, goal_amount: str, goal_date):
         if not string_with_only_letters_and_spaces(goal_name):
             messagebox.showinfo("Information", "Wrong name.")
             return
@@ -259,7 +268,8 @@ class SavingsPageController:
     '''
 
     # Calculate bank deposit button
-    def confirm_calculate_bank_deposit(self, amount, bank_deposit_time, interest_rate, capitalization_time):
+    def confirm_calculate_bank_deposit(self, amount: str, bank_deposit_time: str, interest_rate: str,
+                                       capitalization_time: str):
         if not correct_price_format(amount):
             messagebox.showinfo("Information", "Amount has Wrong value")
             return
