@@ -10,7 +10,7 @@ class RateAppWindowsModel:
         self.user_rating_from_db = ""
 
     # Check if user has already rated the app
-    def check_if_has_already_rated_app(self, user_data):
+    def check_if_has_already_rated_app(self, user_data: tuple) -> bool:
         username = user_data[0]
         self.cursor.execute("SELECT rating FROM `user` WHERE username = %s", (username,))
         row = self.cursor.fetchone()
@@ -22,20 +22,21 @@ class RateAppWindowsModel:
         return False
 
     # Check if user choose nuber of stars
-    def check_if_user_choose(self, final_rating):
+    @staticmethod
+    def check_if_user_choose(final_rating: str) -> bool:
         if final_rating == "":
             return False
         return True
 
     # Update user rating
-    def update_user_rating(self, user_data, user_rating):
+    def update_user_rating(self, user_data: tuple, user_rating: str):
         self.cursor.execute('UPDATE budgetappdatabase.user SET rating = %s WHERE username = %s',
                             (user_rating, user_data[0]))
         self.connection.commit()
 
     # Insert user rating
-    def insert_user_rating(self, user_data, user_rating):
+    def insert_user_rating(self, user_rating: str):
         insert_rating = 'INSERT INTO `rating` (user_rating) VALUES (%s)'
-        values_to_insert = (user_rating)
+        values_to_insert = user_rating
         self.cursor.execute(insert_rating, values_to_insert)
         self.connection.commit()

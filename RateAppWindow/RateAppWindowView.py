@@ -47,7 +47,7 @@ class RateAppWindowView:
         self.rate_us_root.grab_set()
 
     # Display number of stars which user rated the app
-    def your_rating_widget_configure(self, user_rating):
+    def your_rating_widget_configure(self, user_rating: str):
         self.user_rate_widget.configure(text="Your rating:\n {} star".format(user_rating))
         self.final_rating = user_rating
 
@@ -69,7 +69,7 @@ class RateAppWindowView:
             i += 40
 
     # Getting info about stars that have to be filled/unfilled
-    def get_user_rating(self, user_rating):
+    def get_user_rating(self, user_rating: str):
         self.filled_star_list = []
         self.unfilled_star_list = []
         for i in range(0, int(user_rating)):
