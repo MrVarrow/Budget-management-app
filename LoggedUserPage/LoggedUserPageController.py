@@ -3,7 +3,7 @@ from LoggedUserPage.LoggedUserPageModel import LoggedUserPageModel
 from SettingsPage.SettingsPageController import SettingsPageController
 from AccountPage.AccountPageController import AccountPageController
 from RateAppWindow.RateAppWindowController import RateAppWindowController
-from MobileAppWindow.MobileAppWindowController import MobileAppWindowController
+from QuestionnaireWindow.QuestionnaireWindowController import QuestionnaireWindowController
 from ReceiptsPage.ReceiptsPageController import ReceiptsPageController
 from ShoppingListPage.ShoppingListController import ShoppingListController
 from MenageBudgetPage.ManageBudgetPageController import ManageBudgetController
@@ -26,8 +26,7 @@ class LoggedUserPageController:
         goals_list = self.logged_user_page_model.get_user_goals_list(self.user_data)
         count = self.logged_user_page_model.count_1st_days_between_months(last_login, today)
 
-
-        # Add auto deposit amount to savings goal if needed
+        # Adds auto deposit amount to savings goal if needed
         if not count == 0:
             values_to_insert = self.logged_user_page_model.prepare_data(
                 self.logged_user_page_model.get_const_transactions_info(self.user_data),
@@ -48,6 +47,7 @@ class LoggedUserPageController:
             send_email_to_rate_the_app(self.user_data[1], self.user_data[0])
         if self.user_data[3] == "1" and self.logged_user_page_model.is_day_25_or_later():
             send_email_with_reminder_to_set_budget(self.user_data[1], self.user_data[0])
+
     # Go into settings
     def settings(self):
         self.logged_user_page_view.destroy_logged_user_frame()
@@ -87,9 +87,9 @@ class LoggedUserPageController:
     def rate_us(self):
         RateAppWindowController(self.root, self.user_data, self.bg_color)
 
-    # Go into mobile app window
-    def mobile_app(self):
-        MobileAppWindowController(self.root, self.user_data, self.bg_color)
+    # Go into questionnaire window
+    def questionnaire(self):
+        QuestionnaireWindowController(self.root, self.user_data, self.bg_color)
 
     # Display question if user wants to log out, then takes action based on decision
     def logout(self):

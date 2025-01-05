@@ -51,8 +51,8 @@ class LoggedUserPageView:
             .grid(row=3, column=1, pady=20)
 
         # Mobile app button
-        Button(self.logged_usr_page, text="Mobile app", font=('Arial', 20), bg='light gray', width=15,
-               command=self.controller.mobile_app) \
+        Button(self.logged_usr_page, text="Questionnaire", font=('Arial', 20), bg='light gray', width=15,
+               command=self.controller.questionnaire) \
             .grid(row=4, column=0, columnspan=2, pady=65)
 
         # Logout button
