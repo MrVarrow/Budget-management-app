@@ -37,7 +37,8 @@ class AccountPageView:
             .grid(row=1, column=0, sticky=E, padx=200, pady=40, ipady=5)
 
         # Change e-mail button
-        Button(self.acc_page, text="Change e-mail", font=('Arial', 20), width=15, bg="light gray", command=lambda: controller.change_email()) \
+        Button(self.acc_page, text="Change e-mail", font=('Arial', 20), width=15, bg="light gray",
+               command=lambda: controller.change_email()) \
             .grid(row=2, column=0, sticky=W, padx=200, pady=30, ipady=5)
 
         # Change e-mail notification settings button
@@ -64,8 +65,11 @@ class AccountPageView:
     def account_frame_destroy(self):
         self.acc_page.destroy()
 
-    # Creating e-mail verification window
-    def verify_email_window(self, user_email):
+    '''
+    Creating e-mail verification window
+    '''
+
+    def verify_email_window(self, user_email: str):
         self.verify_email_root = Toplevel(self.root, bg=self.bg_color)
         self.verify_email_root.geometry("400x200")
         self.verify_email_root.title("E-mail verification")
@@ -83,7 +87,8 @@ class AccountPageView:
             .grid(row=1, column=0, padx=80)
 
         # Resend e-mail button
-        Button(self.verify_email_root, image=self.send_email_icon, bg="light gray", font=('Arial', 15), command=lambda: self.controller.send_email()) \
+        Button(self.verify_email_root, image=self.send_email_icon, bg="light gray", font=('Arial', 15),
+               command=lambda: self.controller.send_email()) \
             .grid(row=1, column=0, sticky=E, padx=30)
 
         # Submit code button
@@ -98,7 +103,10 @@ class AccountPageView:
     def verify_email_root_destroy(self):
         self.verify_email_root.destroy()
 
-    # Creating password change window
+    '''
+    Creating password change window
+    '''
+
     def change_password_window(self):
         self.change_password_root = Toplevel(self.root, bg=self.bg_color)
         self.change_password_root.geometry("400x200")
@@ -135,7 +143,10 @@ class AccountPageView:
     def change_password_window_destroy(self):
         self.change_password_root.destroy()
 
-    # Creating e-mail change window
+    '''
+    Creating e-mail change window
+    '''
+
     def change_email_window(self):
         self.change_email_root = Toplevel(self.root, bg=self.bg_color)
         self.change_email_root.geometry("400x200")
