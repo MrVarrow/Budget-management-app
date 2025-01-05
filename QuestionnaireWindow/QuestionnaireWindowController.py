@@ -16,11 +16,14 @@ class QuestionnaireWindowController:
         self.questionnaire_window_model = QuestionnaireWindowsModel()
         self.questions_dict = self.questionnaire_window_model.get_questions_with_answers()
         self.questions_list = list(self.questions_dict.keys())
-        self.curr_question_type, self.curr_question_answers = self.questionnaire_window_model.get_type_and_answers(self.questions_list[self.curr_question_index])
+        self.curr_question_type, self.curr_question_answers = self.questionnaire_window_model.get_type_and_answers(
+            self.questions_list[self.curr_question_index])
 
-        self.questionnaire_window_view = QuestionnaireWindowView(self.root, self, self.bg_color, self.questions_list[self.curr_question_index], self.curr_question_type, self.curr_question_answers)
+        self.questionnaire_window_view = QuestionnaireWindowView(self.root, self, self.bg_color,
+                                                                 self.questions_list[self.curr_question_index],
+                                                                 self.curr_question_type, self.curr_question_answers)
 
-    def next_question(self, answer):
+    def next_question(self, answer: str):
         ans = self.questionnaire_window_model.look_for_true(self.checkbutton_list)
         self.checkbutton_list = []
 
@@ -58,6 +61,7 @@ class QuestionnaireWindowController:
             # would only happen if last question is type: select, currently isn't
             return
 
+    # switching view to next or prev question
     def switch_view(self):
         self.questionnaire_window_view.destroy_question_frame()
         self.questionnaire_window_view.update_question(self.questions_list[self.curr_question_index])

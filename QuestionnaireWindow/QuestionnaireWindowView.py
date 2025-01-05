@@ -9,7 +9,6 @@ class QuestionnaireWindowView:
         self.checklist_vars = [False, False, False, False]
         self.entry_answer = StringVar()
 
-
         # Create TopLevel window
         self.questionnaire_root = Toplevel(master, bg=bg_color)
         self.questionnaire_root.geometry("600x720")
@@ -17,7 +16,8 @@ class QuestionnaireWindowView:
         self.questionnaire_root.resizable(False, False)
 
         # Labels
-        self.question_label = Label(self.questionnaire_root, text=curr_question, font=('Arial', 20), bg=self.bg_color, width=35, height=3, wraplength=340)
+        self.question_label = Label(self.questionnaire_root, text=curr_question, font=('Arial', 20), bg=self.bg_color,
+                                    width=35, height=3, wraplength=340)
         self.question_label.grid(row=0, column=0, pady=30)
 
         self.create_question_frame(question_type, question_answers)
@@ -37,9 +37,9 @@ class QuestionnaireWindowView:
         # Focus on TopLevel window
         self.questionnaire_root.grab_set()
 
-
-    def create_question_frame(self, question_type, question_answers):
-        self.question_frame = Frame(self.questionnaire_root, bg=self.bg_color, highlightbackground="black", highlightthickness=2, width=35, height=10)
+    def create_question_frame(self, question_type: str, question_answers: list):
+        self.question_frame = Frame(self.questionnaire_root, bg=self.bg_color, highlightbackground="black",
+                                    highlightthickness=2, width=35, height=10)
         self.question_frame.grid(row=1, column=0, sticky=NSEW, padx=85, ipady=0)
         self.checklist_vars = [False, False, False, False]
 
@@ -63,7 +63,8 @@ class QuestionnaireWindowView:
                 .grid(row=0, column=0, sticky=W, padx=100, pady=20)
             for i in range(4):
                 check_var = BooleanVar()
-                Checkbutton(self.question_frame, text=question_answers[i], variable=check_var, font=('Arial', 12), width=20, anchor="w", justify="left", height=2, wraplength=190,
+                Checkbutton(self.question_frame, text=question_answers[i], variable=check_var, font=('Arial', 12),
+                            width=20, anchor="w", justify="left", height=2, wraplength=190,
                             command=lambda i=i: self.controller.check_box(i, self.checklist_vars)) \
                     .grid(row=i+1, column=0, sticky=W, padx=100)
 
@@ -73,7 +74,8 @@ class QuestionnaireWindowView:
                 .grid(row=0, column=0, sticky=W, padx=100, pady=20)
             for i in range(2):
                 check_var = BooleanVar()
-                Checkbutton(self.question_frame, text=question_answers[i], variable=check_var, font=('Arial', 12), width=20, anchor="w", justify="left", height=2, wraplength=190,
+                Checkbutton(self.question_frame, text=question_answers[i], variable=check_var, font=('Arial', 12),
+                            width=20, anchor="w", justify="left", height=2, wraplength=190,
                             command=lambda i=i: self.controller.check_box(i, self.checklist_vars)) \
                     .grid(row=i+1, column=0, sticky=W, padx=100)
 
@@ -81,7 +83,7 @@ class QuestionnaireWindowView:
         self.entry_answer.set("")
         self.question_frame.destroy()
 
-    def update_question(self, new_question):
+    def update_question(self, new_question: str):
         self.question_label.configure(text=new_question)
 
     def close_window(self):

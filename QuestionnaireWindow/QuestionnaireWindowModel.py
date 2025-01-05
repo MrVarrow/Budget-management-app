@@ -1,4 +1,5 @@
 import mysql.connector
+from typing import Union
 
 
 class QuestionnaireWindowsModel:
@@ -192,7 +193,7 @@ class QuestionnaireWindowsModel:
         }
         return self.questions_with_answers
 
-    def get_type_and_answers(self, question):
+    def get_type_and_answers(self, question: str) -> tuple:
         if question in self.questions_with_answers:
             question_details = self.questions_with_answers[question]
             question_type = question_details["type"]
@@ -201,9 +202,7 @@ class QuestionnaireWindowsModel:
         else:
             return None, None  # Return None for both if key is not found
 
-
-        # Toggle selected checkbutton and update its value in list
-
+    # Toggle selected checkbutton and update its value in list
     @staticmethod
     def toggle_checkbutton(index: int, check_vars: list) -> list:
         for i, var in enumerate(check_vars):
@@ -213,15 +212,14 @@ class QuestionnaireWindowsModel:
                     break
 
                 check_vars[i] = True
-        print(check_vars)
         return check_vars
 
-    def look_for_true(self, check_list):
-        print(check_list)
+    @staticmethod
+    def look_for_true(check_list: list) -> Union[int, str]:
         count = 0
         index = None
         for i in range(len(check_list)):
-            if check_list[i]:  # Check if the current element is True
+            if check_list[i]:
                 count += 1
                 index = i
 
@@ -229,9 +227,7 @@ class QuestionnaireWindowsModel:
             return index  # Return the index of the single True value
         return "Error"  # Return "Error" if there are none or more than one True values
 
-
-    def insert_data_to_database(self, user_data, user_answers):
-        # SQL Insert query
+    def insert_data_to_database(self, user_data: tuple, user_answers: list):
         insert_query = """
                         INSERT INTO UserQuestionnaire (
                             username, Email, full_name, gender, country, education_level,
@@ -250,11 +246,9 @@ class QuestionnaireWindowsModel:
         data_to_insert = [user_data[0], user_data[1]] + user_answers
 
         self.cursor.execute(insert_query, data_to_insert)
-        self.connection.commit()  # Commit the transaction
+        self.connection.commit()
 
-
-    def update_data_in_database(self, user_data, user_answers):
-        # SQL Update query
+    def update_data_in_database(self, user_data: tuple, user_answers: list):
         update_query = """
                         UPDATE UserQuestionnaire
                         SET 
@@ -283,16 +277,14 @@ class QuestionnaireWindowsModel:
                             most_used_functionality = %s
                         WHERE username = %s AND Email = %s;
                         """
-        data_to_update = user_answers + [user_data[0], user_data[1]]  # Append username and email
+        data_to_update = user_answers + [user_data[0], user_data[1]]
 
-        # Execute the update query with the combined data
         self.cursor.execute(update_query, data_to_update)
-        self.connection.commit()  # Commit the transaction
+        self.connection.commit()
 
-    def get_questionnaire_info(self, user_data):
+    def get_questionnaire_info(self, user_data: tuple) -> bool:
         select_query = "SELECT COUNT(*) FROM UserQuestionnaire WHERE username = %s;"
 
-        # Execute the select query
         self.cursor.execute(select_query, (user_data[0],))
         result = self.cursor.fetchone()  # Fetch the result
 
