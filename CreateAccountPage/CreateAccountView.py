@@ -33,10 +33,6 @@ class CreateAccountPageView:
                                                                                 "except _",
               relief="solid") \
             .grid(row=3, column=1, rowspan=7, sticky=NW, padx=120, pady=45, ipadx=20, ipady=20)
-        Label(self.create_account_page, font=('Arial', 12), borderwidth=2, relief="solid", text="password strength:\n"
-                                                                                                "-----------------\n"
-                                                                                                "strong") \
-            .grid(row=4, column=1, rowspan=3, columnspan=2, sticky=SE, padx=300, pady=25, ipadx=20, ipady=20)
 
         Label(self.create_account_page, text="login:", font=('Arial', 20), bg=self.bg_color) \
             .grid(row=1, column=1, padx=450, sticky=W)
