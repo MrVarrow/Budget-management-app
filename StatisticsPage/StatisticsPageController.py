@@ -12,7 +12,7 @@ class StatisticPageController:
         self.statistics_page_model = StatisticsPageModel()
         self.statistics_page_view = StatisticsPageView(self.root, self, self.bg_color)
 
-    def submit_stat(self, time_period, stat_type):
+    def submit_stat(self, time_period: str, stat_type: str):
         if time_period == "Select time period":
             messagebox.showinfo("Information", "Please select time period first.")
             return
@@ -21,7 +21,9 @@ class StatisticPageController:
             return
 
         if not time_period == "All time":
-            self.months = self.statistics_page_model.get_list_of_months(self.statistics_page_model.get_time_period_in_int(time_period))
+            self.months = self.statistics_page_model.get_list_of_months(
+                self.statistics_page_model.get_time_period_in_int(time_period)
+            )
         else:
             self.months = self.statistics_page_model.get_current_month()
 
@@ -33,7 +35,9 @@ class StatisticPageController:
             combined_values = self.statistics_page_model.add_all_values(months_info)
 
             self.statistics_page_view.destroy_overview_frame()
-            self.statistics_page_view.general_stats_overview(combined_values[1], combined_values[0], combined_values[2], incomes_categories, expenses_categories)
+            self.statistics_page_view.general_stats_overview(combined_values[1], combined_values[0],
+                                                             combined_values[2], incomes_categories,
+                                                             expenses_categories)
         elif stat_type == "Avg month stats":
             incomes, expenses, free_amount = self.statistics_page_model.sort_data(
                 self.statistics_page_model.values_from_db(self.user_data, self.months[-1])
@@ -74,7 +78,8 @@ class StatisticPageController:
                 self.statistics_page_model.get_cat_and_amount(self.user_data, self.months[-1], type_info="Expense"),
                 self.statistics_page_model.get_cat_and_amount(self.user_data, self.months[-1], type_info="ConstExpense")
             )
-            max_expenses_category, max_expenses_value = self.statistics_page_model.max_value_from_dict(combined_expenses)
+            max_expenses_category, max_expenses_value = self.statistics_page_model.max_value_from_dict(
+                combined_expenses)
 
             month_info_dict = self.statistics_page_model.month_info(self.user_data, self.months[-1])
             max_income_month, max_income = self.statistics_page_model.operation_from_dict(
@@ -92,14 +97,11 @@ class StatisticPageController:
             min_free_amount_month, min_free_amount = self.statistics_page_model.operation_from_dict(
                 month_info_dict, operation="min", value_type=2)  # 2 is for free_amount
 
-
-
             self.statistics_page_view.destroy_overview_frame()
-            self.statistics_page_view.biggest_incomes_expenses_overview(max_income_category, max_income_value, max_expenses_category,
-                                          max_expenses_value, max_income_month, max_income, min_income_month,
-                                          min_income, max_expense_month, max_expense, min_expense_month, min_expense,
-                                          max_free_amount_month, max_free_amount, min_free_amount_month,
-                                          min_free_amount)
+            self.statistics_page_view.biggest_incomes_expenses_overview(
+                max_income_category, max_income_value, max_expenses_category, max_expenses_value, max_income_month,
+                max_income, min_income_month, min_income, max_expense_month, max_expense, min_expense_month,
+                min_expense, max_free_amount_month, max_free_amount, min_free_amount_month, min_free_amount)
 
         elif stat_type == "Incomes and expenses depending on the month":
             # circle graph of incomes and expenses by 12 months in year
@@ -109,7 +111,6 @@ class StatisticPageController:
             income_month_dict = self.statistics_page_model.update_data(months_dict, existing_data, index=0)
 
             expense_month_dict = self.statistics_page_model.update_data(months_dict, existing_data, index=1)
-
 
             self.statistics_page_view.destroy_overview_frame()
             self.statistics_page_view.incomes_expanses_on_month_overview(income_month_dict, expense_month_dict)
@@ -121,6 +122,7 @@ class StatisticPageController:
     General stats
     '''
 
-    def submit_category(self, type, category):
-        result = self.statistics_page_model.calculate_sum_of_values(self.statistics_page_model.get_values_from_database(self.user_data, type, category, self.months[-1]))
-        self.statistics_page_view.display_result(result, type, category)
+    def submit_category(self, c_type: str, category: str):
+        result = self.statistics_page_model.calculate_sum_of_values(
+            self.statistics_page_model.get_values_from_database(self.user_data, c_type, category, self.months[-1]))
+        self.statistics_page_view.display_result(result, c_type, category)
