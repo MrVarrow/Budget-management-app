@@ -8,7 +8,7 @@ def main():
     bg_color = "#f0f0f0"
     root.geometry("1280x720")
     root.resizable(False, False)
-    root.title("Budget")
+    root.title("Budget App")
     # Launch App
     UserLoginController(root, bg_color)
     root.mainloop()

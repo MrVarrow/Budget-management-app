@@ -87,7 +87,8 @@ def send_email_with_delete_acc(receiver, username):
     receiver_email = '{}'.format(receiver)
     subject = 'Account Deleted.'
     message = 'You had deleted your account with username\n' \
-              '{}, if you want you can tell us why did you decided to do so in reply to this E-mail. Thanks!'.format(username)
+              '{}, if you want you can tell us why did you decided to do so in reply to this E-mail. Thanks!'\
+        .format(username)
 
     send_email(sender_email, sender_password, receiver_email, subject, message)
 
@@ -98,8 +99,8 @@ def send_email_with_clear_data(receiver, username):
     receiver_email = '{}'.format(receiver)
     subject = 'All data from your account has been cleaned.'
     message = 'You had cleaned data from your account with username\n' \
-              '{}, if you want you can tell us why did you decided to do so in reply to this E-mail. Thanks!'.format(
-        username)
+              '{}, if you want you can tell us why did you decided to do so in reply to this E-mail. Thanks!'\
+        .format(username)
 
     send_email(sender_email, sender_password, receiver_email, subject, message)
 
@@ -139,4 +140,3 @@ def send_email_with_reminder_to_set_budget(receiver, username):
               'over you'.format(username)
 
     send_email(sender_email, sender_password, receiver_email, subject, message)
-
