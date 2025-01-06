@@ -9,12 +9,13 @@ class ReceiptsPageModel:
         self.cursor = self.connection.cursor()
 
     # Crates empty df for treeview template
-    def create_df(self):
+    @staticmethod
+    def create_df():
         items_df = pd.DataFrame(columns=["Item name", "Item price"])
         return items_df
 
     # Gets list of user receipts from database
-    def receipt_list_from_database(self, username):
+    def receipt_list_from_database(self, username: str) -> list:
         self.cursor.reset()
         self.cursor.execute('SELECT ReceiptName FROM `receipts` WHERE UserName = %s', (username,))
         rows = self.cursor.fetchall()
@@ -24,14 +25,14 @@ class ReceiptsPageModel:
         return list_of_receipts
 
     # Returning Receipt ID that user picked
-    def select_receipt(self, receipt_name):
+    def select_receipt(self, receipt_name: str) -> int:
         self.cursor.reset()
         self.cursor.execute('SELECT ReceiptID FROM `receipts` WHERE ReceiptName = %s', (receipt_name,))
         row = self.cursor.fetchone()
         return row[0]
 
     # Get receipts items from database and save it do dataframe
-    def items_from_receipt(self, receipt_id):
+    def items_from_receipt(self, receipt_id: int):
         self.cursor.reset()
         self.cursor.execute('SELECT Item, Price FROM `receiptitems` WHERE ReceiptID = %s', (receipt_id,))
         rows = self.cursor.fetchall()
@@ -39,29 +40,22 @@ class ReceiptsPageModel:
         return items_df
 
     # Get total price of receipt from database
-    def total_price(self, receipt_id):
+    def total_price(self, receipt_id: int) -> float:
         self.cursor.reset()
         self.cursor.execute('SELECT TotalPrice FROM `receiptitems` WHERE ReceiptID = %s', (receipt_id,))
         row = self.cursor.fetchone()
         return row[0]
 
     # Get receipt creation date from database
-    def receipt_date(self, receipt_id):
+    def receipt_date(self, receipt_id: int):
         self.cursor.reset()
         self.cursor.execute('SELECT CreationDate FROM `receipts` WHERE ReceiptID = %s', (receipt_id,))
         row = self.cursor.fetchone()
         return row[0]
 
     # Deletes receipt from database
-    def delete_receipt_from_database(self, receipt_name, receipt_id):
+    def delete_receipt_from_database(self, receipt_name: str, receipt_id: int):
         self.cursor.execute('DELETE FROM `receiptitems` WHERE ReceiptID = %s', (receipt_id,))
         self.connection.commit()
         self.cursor.execute('DELETE FROM `receipts` WHERE ReceiptName = %s', (receipt_name,))
         self.connection.commit()
-
-    # Check if user selected a receipt to edit
-    def check_chosen_receipt(self, chosen_receipt):
-        if not chosen_receipt == "":
-            return True
-        return False
-

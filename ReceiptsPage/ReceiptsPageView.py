@@ -88,7 +88,7 @@ class ReceiptsPageView:
         self.overview.configure(yscrollcommand=scrollbar.set)
 
     # Display receipt data in widgets
-    def display_receipt_data(self, total_price, receipt_name, receipt_date):
+    def display_receipt_data(self, total_price: float, receipt_name: str, receipt_date):
         self.total_price_widget.configure(text=total_price)
         self.receipt_name_widget.configure(text=receipt_name)
         self.receipt_date_widget.configure(text=receipt_date)
@@ -111,7 +111,7 @@ class ReceiptsPageView:
             self.overview.delete(item)
 
     # Updates list of user receipts
-    def receipt_combobox_update(self, receipt_list):
+    def receipt_combobox_update(self, receipt_list: list):
         self.combobox_receipts.configure(values=receipt_list)
         self.combobox_var.set("")
 
