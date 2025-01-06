@@ -63,7 +63,7 @@ class ManageBudgetView:
 
         self.clear_info_about_month()
 
-    def show_chosen_date(self, date):
+    def show_chosen_date(self, date: str):
         self.chosen_month.set(date)
         self.chosen_month_label.configure(text=self.chosen_month.get())
 

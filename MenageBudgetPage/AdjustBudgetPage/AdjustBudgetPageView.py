@@ -156,7 +156,7 @@ class AdjustBudgetView:
         expenses_scrollbar.pack(side=LEFT, fill="y")
         self.expenses_table.configure(yscrollcommand=expenses_scrollbar.set)
 
-    def add_items_to_incomes(self, incomes_df, length):
+    def add_items_to_incomes(self, incomes_df, length: int):
         self.income_table.tag_configure("const", background="light gray")
         for i, row, in incomes_df.iterrows():
             if i < length:
@@ -165,7 +165,7 @@ class AdjustBudgetView:
                 tags = ()
             self.income_table.insert("", "end", text=i, values=list(row), tags=tags)
 
-    def add_items_to_expenses(self, expenses_df, length):
+    def add_items_to_expenses(self, expenses_df, length: int):
         self.expenses_table.tag_configure("const", background="light gray")
         for i, row, in expenses_df.iterrows():
             if i < length:
@@ -184,7 +184,7 @@ class AdjustBudgetView:
         for item in items:
             self.expenses_table.delete(item)
 
-    def update_labels(self, total_incomes, total_expenses, free_amount):
+    def update_labels(self, total_incomes: float, total_expenses: float, free_amount: float):
         self.total_incomes.set(f"Incomes: {total_incomes}")
         self.total_expenses.set(f"Expenses: {total_expenses}")
         self.free_amount.set(f"Free: {free_amount}")

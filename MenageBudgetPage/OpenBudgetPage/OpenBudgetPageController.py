@@ -1,4 +1,3 @@
-from tkinter import messagebox
 from MenageBudgetPage.OpenBudgetPage.OpenBudgetPageModel import OpenBudgetModel
 from MenageBudgetPage.OpenBudgetPage.OpenBudgetPageView import OpenBudgetView
 
@@ -55,4 +54,3 @@ class OpenBudgetController:
         from MenageBudgetPage.ManageBudgetPageController import ManageBudgetController
         self.open_budget_view.destroy_budget_frame()
         ManageBudgetController(self.root, self.user_data, self.bg_color)
-

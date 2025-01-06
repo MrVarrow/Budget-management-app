@@ -171,7 +171,7 @@ class ManageConstBudgetView:
         for item in items:
             self.expenses_table.delete(item)
 
-    def update_labels(self, total_incomes, total_expenses, free_amount):
+    def update_labels(self, total_incomes: float, total_expenses: float, free_amount: float):
         self.total_incomes.set(f"Incomes: {total_incomes}")
         self.total_expenses.set(f"Expenses: {total_expenses}")
         self.free_amount.set(f"Free: {free_amount}")

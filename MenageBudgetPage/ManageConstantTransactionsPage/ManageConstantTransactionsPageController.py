@@ -4,8 +4,9 @@ from MenageBudgetPage.ManageConstantTransactionsPage.ManageConstantTransactionsP
 from MenageBudgetPage.AdjustBudgetPage.AdjustBudgetPageModel import AdjustBudgetModel
 from MenageBudgetPage.ManageBudgetPageModel import ManageBudgetModel
 from MenageBudgetPage.OpenBudgetPage.OpenBudgetPageModel import OpenBudgetModel
+from Validations.Validations import correct_price_format, empty_string_inside_widget
 
-# errors of not selecting dont works
+
 class ManageConstBudgetController:
     def __init__(self, root, user_data, bg_color):
         self.root = root
@@ -41,11 +42,11 @@ class ManageConstBudgetController:
         self.manage_const_budget_view.add_items_to_incomes(self.incomes_df)
         self.manage_const_budget_view.add_items_to_expenses(self.expenses_df)
 
-    def add_income(self, category, amount):
-        if self.manage_const_budget_model.check_category(category):
+    def add_income(self, category: str, amount: str):
+        if empty_string_inside_widget(category):
             messagebox.showinfo("Information", "You have to select category first.")
             return
-        if not self.manage_const_budget_model.check_amount(amount):
+        if not correct_price_format(amount):
             messagebox.showinfo("Information", "Entered amount is incorrect or contains not allowed characters "
                                                "please follow format: xx.xx or xx")
             return
@@ -58,7 +59,7 @@ class ManageConstBudgetController:
         self.manage_const_budget_view.clear_incomes()
         self.manage_const_budget_view.add_items_to_incomes(self.incomes_df)
 
-    def delete_income(self, index):
+    def delete_income(self, index: int):
         try:
             result = messagebox.askquestion("Warning", "Do you want to delete selected item from your"
                                                        " constant incomes?")
@@ -74,11 +75,11 @@ class ManageConstBudgetController:
         except IndexError:
             messagebox.showinfo("Information", "Please select item to delete first, by clicking on it.")
 
-    def add_expense(self, category, amount):
-        if self.manage_const_budget_model.check_category(category):
+    def add_expense(self, category: str, amount: str):
+        if empty_string_inside_widget(category):
             messagebox.showinfo("Information", "You have to select category first.")
             return
-        if not self.manage_const_budget_model.check_amount(amount):
+        if not correct_price_format(amount):
             messagebox.showinfo("Information", "Entered amount is incorrect or contains not allowed characters "
                                                "please follow format: xx.xx or xx")
             return
@@ -90,7 +91,7 @@ class ManageConstBudgetController:
         self.manage_const_budget_view.clear_expenses()
         self.manage_const_budget_view.add_items_to_expenses(self.expenses_df)
 
-    def delete_expense(self, index):
+    def delete_expense(self, index: int):
         try:
             result = messagebox.askquestion("Warning", "Do you want to delete selected item from your"
                                                        " constant expenses?")
@@ -112,7 +113,7 @@ class ManageConstBudgetController:
                 self.user_data, self.total_incomes, self.total_expenses, self.free_amount
             )
         else:
-            self.manage_const_budget_model.update_budget(
+            self.manage_const_budget_model.update_const_budget(
                 self.user_data, self.total_incomes, self.total_expenses, self.free_amount
             )
             self.manage_const_budget_model.delete_items_from_database(self.user_data)

@@ -1,6 +1,7 @@
 from tkinter import messagebox
 from MenageBudgetPage.AdjustBudgetPage.AdjustBudgetPageModel import AdjustBudgetModel
 from MenageBudgetPage.AdjustBudgetPage.AdjustBudgetPageView import AdjustBudgetView
+from Validations.Validations import empty_string_inside_widget, correct_price_format
 
 
 class AdjustBudgetController:
@@ -51,11 +52,11 @@ class AdjustBudgetController:
         self.adjust_budget_view.add_items_to_incomes(self.combined_incomes_df, self.const_incomes_len)
         self.adjust_budget_view.add_items_to_expenses(self.combined_expenses_df, self.const_expenses_len)
 
-    def add_income(self, category, amount):
-        if self.adjust_budget_model.check_category(category):
+    def add_income(self, category: str, amount: str):
+        if empty_string_inside_widget(category):
             messagebox.showinfo("Information", "You have to select category first.")
             return
-        if not self.adjust_budget_model.check_amount(amount):
+        if not correct_price_format(amount):
             messagebox.showinfo("Information", "Entered amount is incorrect or contains not allowed characters "
                                                "please follow format: xx.xx or xx")
             return
@@ -68,16 +69,16 @@ class AdjustBudgetController:
         self.adjust_budget_view.clear_incomes()
         self.adjust_budget_view.add_items_to_incomes(self.combined_incomes_df, self.const_incomes_len)
 
-    def delete_income(self, index):
+    def delete_income(self, index: int):
         try:
             result = messagebox.askquestion("Warning", "Do you want to delete selected item from your"
                                                        " budget incomes?")
             if result == "yes":
                 self.incomes_df = self.adjust_budget_model.delete_from_incomes_df(
-                    index, self.incomes_df, combined=False
+                    index, self.incomes_df, self.const_incomes_len, combined=False
                 )
                 self.combined_incomes_df = self.adjust_budget_model.delete_from_incomes_df(
-                    index, self.combined_incomes_df, combined=True
+                    index, self.combined_incomes_df, self.const_incomes_len, combined=True
                 )
                 self.total_incomes = self.adjust_budget_model.calculate_total_incomes(self.combined_incomes_df)
                 self.free_amount = self.adjust_budget_model.calculate_free_amount(self.total_incomes,
@@ -92,11 +93,11 @@ class AdjustBudgetController:
         except KeyError:
             messagebox.showinfo("Information", "You can't delete constant income")
 
-    def add_expense(self, category, amount):
-        if self.adjust_budget_model.check_category(category):
+    def add_expense(self, category: str, amount: str):
+        if empty_string_inside_widget(category):
             messagebox.showinfo("Information", "You have to select category first.")
             return
-        if not self.adjust_budget_model.check_amount(amount):
+        if not correct_price_format(amount):
             messagebox.showinfo("Information", "Entered amount is incorrect or contains not allowed characters "
                                                "please follow format: xx.xx or xx")
             return
@@ -109,16 +110,16 @@ class AdjustBudgetController:
         self.adjust_budget_view.clear_expenses()
         self.adjust_budget_view.add_items_to_expenses(self.combined_expenses_df, self.const_expenses_len)
 
-    def delete_expense(self, index):
+    def delete_expense(self, index: int):
         try:
             result = messagebox.askquestion("Warning", "Do you want to delete selected item from your"
                                                        " budget expenses?")
             if result == "yes":
                 self.expenses_df = self.adjust_budget_model.delete_from_expenses_df(
-                    index, self.expenses_df, combined=False
+                    index, self.expenses_df, self.const_expenses_len, combined=False
                 )
                 self.combined_expenses_df = self.adjust_budget_model.delete_from_expenses_df(
-                    index, self.combined_expenses_df, combined=True
+                    index, self.combined_expenses_df, self.const_expenses_len, combined=True
                 )
                 self.total_expenses = self.adjust_budget_model.calculate_total_expenses(self.combined_expenses_df)
                 self.free_amount = self.adjust_budget_model.calculate_free_amount(self.total_incomes,
@@ -141,7 +142,7 @@ class AdjustBudgetController:
             self.adjust_budget_model.update_budget(
                 self.month_date, self.total_incomes, self.total_expenses, self.free_amount
             )
-            self.adjust_budget_model.delete_items_from_database(self.month_date)
+            self.adjust_budget_model.delete_items_from_database(self.month_date, self.user_data)
 
         self.adjust_budget_model.insert_items_to_database(
             self.user_data, self.incomes_df, self.expenses_df, self.month_date
@@ -153,4 +154,3 @@ class AdjustBudgetController:
         from MenageBudgetPage.ManageBudgetPageController import ManageBudgetController
         self.adjust_budget_view.destroy_budget_frame()
         ManageBudgetController(self.root, self.user_data, self.bg_color)
-

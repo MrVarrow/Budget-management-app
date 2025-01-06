@@ -14,7 +14,6 @@ class ManageBudgetController:
         self.user_data = user_data
         self.month_date = ""
 
-        # ...
         self.manage_budget_model = ManageBudgetModel()
         self.manage_budget_view = ManageBudgetView(self.root, self, self.bg_color,
                                                    self.manage_budget_model.get_12_months()
@@ -55,7 +54,7 @@ class ManageBudgetController:
         self.manage_budget_view.destroy_manage_budget_frame()
         LoggedUserPageController(self.root, self.user_data, self.bg_color)
 
-    def choosing_month(self, date):
+    def choosing_month(self, date: str):
         self.month_date = date
         self.manage_budget_view.show_chosen_date(date)
         self.manage_budget_view.clear_info_about_month()
@@ -64,9 +63,6 @@ class ManageBudgetController:
         if incomes is None:
             sum_incomes, sum_expenses, sum_free_amount = c_incomes, c_expenses, c_free_amount
         else:
-            sum_incomes = incomes + c_incomes
-            sum_expenses = expenses + c_expenses
-            sum_free_amount = free_amount + c_free_amount
+            sum_incomes, sum_expenses, sum_free_amount = incomes, expenses, free_amount
 
         self.manage_budget_view.show_info_about_budget(sum_incomes, sum_expenses, sum_free_amount)
-

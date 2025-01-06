@@ -1,5 +1,5 @@
 import mysql.connector
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 class ManageBudgetModel:
@@ -8,7 +8,8 @@ class ManageBudgetModel:
                                                   database="budgetappdatabase")
         self.cursor = self.connection.cursor()
 
-    def get_12_months(self):
+    @staticmethod
+    def get_12_months() -> list:
         months = []
         current_date = datetime.now()
         current_month = current_date.month
@@ -27,7 +28,7 @@ class ManageBudgetModel:
             months.append(month_year)
         return months
 
-    def get_info_about_budget(self, username, date):
+    def get_info_about_budget(self, username: str, date: str) -> tuple:
         self.cursor.reset()
         self.cursor.execute('SELECT * FROM `monthbudget` WHERE Username = %s AND Month = %s', (username, date))
         row = self.cursor.fetchone()
@@ -39,7 +40,7 @@ class ManageBudgetModel:
 
         return incomes, expenses, free_amount
 
-    def get_info_about_const_budget(self, user_data):
+    def get_info_about_const_budget(self, user_data: tuple) -> tuple:
         self.cursor.execute('SELECT * FROM `constbudget` WHERE Username = %s', (user_data[0],))
         row = self.cursor.fetchone()
         incomes, expenses, free_amount = None, None, None
@@ -50,18 +51,12 @@ class ManageBudgetModel:
 
         return incomes, expenses, free_amount
 
-    def delete_budget_month(self, user_data, month):
+    def delete_budget_month(self, user_data: tuple, month: str):
         self.cursor.execute('DELETE FROM `monthbudget` WHERE Username = %s AND Month = %s', (user_data[0], month))
         self.connection.commit()
 
-    def delete_budget_transactions(self, user_data, month):
+    def delete_budget_transactions(self, user_data: tuple, month: str):
         self.cursor.execute(
             'DELETE FROM `budgettransactions` WHERE Username = %s AND Month = %s', (user_data[0], month)
         )
         self.connection.commit()
-
-    def add_transactions_for_month(self, incomes, expenses, free_amount, c_incomes, c_expenses, c_free_amount):
-        sum_incomes = float(incomes) + float(c_incomes)
-        sum_expenses = float(expenses) + float(c_expenses)
-        sum_free_amount = float(free_amount) + float(c_free_amount)
-        return sum_incomes, sum_expenses, sum_free_amount
