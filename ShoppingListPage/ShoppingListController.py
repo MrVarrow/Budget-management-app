@@ -65,6 +65,16 @@ class ShoppingListController:
         AddShoppingListController(self.root, self.user_data, self.bg_color, self.items_df, state="ADD",
                                   shopping_list_name=None)
 
+    # Back to main page
+    def back_to_logged_usr_page(self):
+        self.shopping_list_view.destroy_shopping_list_frame()
+        from LoggedUserPage.LoggedUserPageController import LoggedUserPageController
+        LoggedUserPageController(self.root, self.user_data, self.bg_color)
+
+    '''
+    Overview methods
+    '''
+
     # Check if user checked all the boxes
     def check_list(self, shopping_list_name: str):
         if false_in_bool_list(self.checkbutton_list):
@@ -75,11 +85,3 @@ class ShoppingListController:
     # Tracks state of every checkbox state and update its value in list
     def check_box(self, index: int, check_vars: list):
         self.checkbutton_list = self.shopping_list_model.toggle_checkbutton(index, check_vars)
-
-    # Back to main page
-    def back_to_logged_usr_page(self):
-        self.shopping_list_view.destroy_shopping_list_frame()
-        from LoggedUserPage.LoggedUserPageController import LoggedUserPageController
-        LoggedUserPageController(self.root, self.user_data, self.bg_color)
-
-

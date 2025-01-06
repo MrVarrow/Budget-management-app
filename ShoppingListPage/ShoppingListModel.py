@@ -8,15 +8,19 @@ class ShoppingListModel:
                                                   database="budgetappdatabase")
         self.cursor = self.connection.cursor()
 
+    '''
+    Database operations
+    '''
+
     # Gets list of user shopping lists from database
     def shopping_list_list_from_database(self, user_data: tuple) -> list:
         self.cursor.reset()
         self.cursor.execute('SELECT ListName FROM `shoppinglists` WHERE Username = %s', (user_data[0],))
         rows = self.cursor.fetchall()
-        list_of_receipts = []
+        list_of_shopping_lists = []
         for row in rows:
-            list_of_receipts.append(row[0])
-        return list_of_receipts
+            list_of_shopping_lists.append(row[0])
+        return list_of_shopping_lists
 
     # Returning shopping list ID that user picked
     def select_shopping_list(self, shopping_list_name: str) -> int:
@@ -46,6 +50,10 @@ class ShoppingListModel:
         self.connection.commit()
         self.cursor.execute('DELETE FROM `shoppinglists` WHERE ListName = %s', (shopping_list_name,))
         self.connection.commit()
+
+    '''
+    Other methods
+    '''
 
     # Toggle selected checkbutton and update its value in list
     @staticmethod

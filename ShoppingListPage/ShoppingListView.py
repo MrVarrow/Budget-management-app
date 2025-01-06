@@ -25,7 +25,7 @@ class ShoppingListView:
         Label(self.shopping_list_frame, text="Your shopping lists", font=('Arial', 40), bg='light gray') \
             .grid(row=0, column=0, columnspan=2, sticky=EW, padx=220, pady=46, ipadx=210, ipady=50)
 
-        # Choosing receipts combobox
+        # Pick shopping lists combobox
         self.combobox_shopping_lists = ttk.Combobox(self.shopping_list_frame, font=('Arial', 20),
                                                     textvariable=self.combobox_var, width=20)
         self.combobox_shopping_lists.grid(row=1, column=0, sticky=W, padx=100, pady=40)
@@ -55,7 +55,7 @@ class ShoppingListView:
                command=lambda: self.controller.back_to_logged_usr_page()) \
             .grid(row=6, column=0, columnspan=2, sticky=E, padx=50)
 
-    # Updates list of user receipts
+    # Updates list of user shopping lists
     def shopping_lists_combobox_update(self, shopping_lists: list):
         self.combobox_shopping_lists.configure(values=shopping_lists)
         self.combobox_var.set("")
@@ -63,6 +63,10 @@ class ShoppingListView:
     # Destroys shopping list frame
     def destroy_shopping_list_frame(self):
         self.shopping_list_frame.destroy()
+
+    '''
+    Overview of selected shopping list
+    '''
 
     # Creates overview of shopping list
     def create_overview(self, shopping_list_name: str, items_df, shopping_list_date):
