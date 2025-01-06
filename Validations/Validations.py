@@ -3,6 +3,7 @@ from datetime import datetime
 from email_validator import validate_email
 
 
+# Checks if string is empty
 def empty_string_inside_widget(contents: str) -> bool:
     if contents == "":
         return True
