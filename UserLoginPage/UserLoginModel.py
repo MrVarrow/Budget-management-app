@@ -10,10 +10,11 @@ class UserLoginModel:
         self.cursor = self.connection.cursor()
 
     # Sending E-mail with password to the user on E-mail assigned to username that user provided
-    def email_with_password(self, user_data: tuple):
+    @staticmethod
+    def email_with_password(user_data: tuple):
         receiver = user_data[1]
         password = user_data[2]
-        SendEmails.forgot_password_email(self, receiver, password)
+        SendEmails.forgot_password_email(receiver, password)
 
     # Takes entered login from user and looking for them in database, then returning all data stored for that user
     def get_user_data(self, login_input: str) -> tuple:

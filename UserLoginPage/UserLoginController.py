@@ -2,7 +2,7 @@ from UserLoginPage.UserLoginView import UserLoginView
 from UserLoginPage.UserLoginModel import UserLoginModel
 from LoggedUserPage.LoggedUserPageController import LoggedUserPageController
 from CreateAccountPage.CreateAccountController import CreateAccountPageController
-from Validations.Validations import empty_string_inside_widget, sql_outcome_is_none, two_strings_are_the_same
+from Validations.Validations import empty_string_inside_widget, variable_is_none, two_strings_are_the_same
 from tkinter import messagebox
 
 
@@ -21,7 +21,7 @@ class UserLoginController:
         user_data = self.login_user_page_model.get_user_data(login_input)
 
         # Check if user is registered
-        if sql_outcome_is_none(user_data):
+        if variable_is_none(user_data):
             messagebox.showinfo(title="Information", message="User does not exist.")
             return
         password = user_data[2]
@@ -49,7 +49,7 @@ class UserLoginController:
         user_data = self.login_user_page_model.get_user_data(login_input)
 
         # Check if user is registered
-        if sql_outcome_is_none(user_data):
+        if variable_is_none(user_data):
             messagebox.showinfo(title="Information", message="User does not exist.")
             return
         self.login_user_page_model.email_with_password(user_data)
