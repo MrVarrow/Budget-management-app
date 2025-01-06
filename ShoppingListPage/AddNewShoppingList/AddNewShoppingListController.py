@@ -90,7 +90,7 @@ class AddShoppingListController:
             self.user_data,
             self.items_df,
         )
-        self.add_new_shopping_list_view.reset_receipt()
+        self.add_new_shopping_list_view.reset_shopping_list()
         self.items_df = self.add_new_shopping_list_model.create_df()
         messagebox.showinfo("Information", "Shopping list has been added successfully!")
 

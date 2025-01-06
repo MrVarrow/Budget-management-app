@@ -67,7 +67,7 @@ class AddShoppingListModel:
 
     # Gets item name and its price
     @staticmethod
-    def get_item_and_quantity(row: pd.Series):
+    def get_item_and_quantity(row: pd.Series) -> tuple:
         name = row["Item name"]
         quantity = row["Item quantity"]
 

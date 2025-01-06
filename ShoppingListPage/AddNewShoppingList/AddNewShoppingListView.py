@@ -90,6 +90,55 @@ class AddNewShoppingListView:
                command=lambda: self.controller.clear_shopping_list_list()) \
             .grid(row=8, column=0, sticky=W, padx=120, pady=5)
 
+    # Creating treeview table and scrollbar
+    def create_treeview(self, treeview_df):
+        self.table = ttk.Treeview(self.items_frame, height=15)
+        self.table["columns"] = list(treeview_df.columns)
+        self.table.column("#0", width=50)
+
+        for col in treeview_df.columns:
+            self.table.column(col, width=100)
+
+        self.table.heading("#0", text="Index", anchor="w")
+        for col in treeview_df.columns:
+            self.table.heading(col, text=col, anchor="w")
+
+        self.table.pack(fill="both", expand=True, side=LEFT)
+
+        scrollbar = ttk.Scrollbar(self.items_frame, command=self.table.yview)
+        scrollbar.pack(side=LEFT, fill="y")
+        self.table.configure(yscrollcommand=scrollbar.set)
+
+    # Update values in treeview
+    def update_treeview(self, updated_df):
+        for i, row in updated_df.iterrows():
+            self.table.insert("", "end", text=i, values=list(row))
+
+    # Deleting old values in treeview
+    def delete_items_in_treeview(self):
+        items = self.table.get_children()
+        for item in items:
+            self.table.delete(item)
+
+    # Resets all after adding shopping list
+    def reset_shopping_list(self):
+        self.product_name_entry.delete(0, END)
+        self.product_name_entry.delete(0, END)
+        self.product_quantity_entry.delete(0, END)
+        self.item_name.set("ex. Tomato")
+        self.item_quantity.set("ex. 3")
+        self.shopping_list_name.set("Your shopping list name")
+        self.clear_treeview()
+
+    # Clear treeview
+    def clear_treeview(self):
+        for item in self.table.get_children():
+            self.table.delete(item)
+
+    '''
+    Edit element window
+    '''
+
     # Edit element window
     def edit_element_window(self, product_name: str, product_price: str):
         name = StringVar()
@@ -132,48 +181,3 @@ class AddNewShoppingListView:
     # Destroying edit element window
     def edit_element_window_destroy(self):
         self.edit_window.destroy()
-
-    # Creating treeview table and scrollbar
-    def create_treeview(self, treeview_df):
-        self.table = ttk.Treeview(self.items_frame, height=15)
-        self.table["columns"] = list(treeview_df.columns)
-        self.table.column("#0", width=50)
-
-        for col in treeview_df.columns:
-            self.table.column(col, width=100)
-
-        self.table.heading("#0", text="Index", anchor="w")
-        for col in treeview_df.columns:
-            self.table.heading(col, text=col, anchor="w")
-
-        self.table.pack(fill="both", expand=True, side=LEFT)
-
-        scrollbar = ttk.Scrollbar(self.items_frame, command=self.table.yview)
-        scrollbar.pack(side=LEFT, fill="y")
-        self.table.configure(yscrollcommand=scrollbar.set)
-
-    # Update values in treeview
-    def update_treeview(self, updated_df):
-        for i, row in updated_df.iterrows():
-            self.table.insert("", "end", text=i, values=list(row))
-
-    # Deleting old values in treeview
-    def delete_items_in_treeview(self):
-        items = self.table.get_children()
-        for item in items:
-            self.table.delete(item)
-
-    # Resets all after adding shopping list
-    def reset_receipt(self):
-        self.product_name_entry.delete(0, END)
-        self.product_name_entry.delete(0, END)
-        self.product_quantity_entry.delete(0, END)
-        self.item_name.set("ex. Tomato")
-        self.item_quantity.set("ex. 3")
-        self.shopping_list_name.set("Your receipt name")
-        self.clear_treeview()
-
-    # Clear treeview
-    def clear_treeview(self):
-        for item in self.table.get_children():
-            self.table.delete(item)
