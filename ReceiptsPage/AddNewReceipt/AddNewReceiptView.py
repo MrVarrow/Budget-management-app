@@ -26,23 +26,23 @@ class AddNewReceiptView:
 
         # Labels and entries
         Label(self.add_new_receipt_frame, text="Add new Receipt", font=('Arial', 40), bg='light gray') \
-            .grid(row=0, column=0, columnspan=3, sticky=EW, padx=225, pady=40, ipadx=210, ipady=50)
+            .grid(row=0, column=0, columnspan=3, sticky=EW, padx=210, pady=43, ipadx=240, ipady=50)
 
-        Label(self.add_new_receipt_frame, text="Enter product name:", font=('Arial', 15)) \
+        Label(self.add_new_receipt_frame, text="Enter product name:", font=('Arial', 15), bg=self.bg_color) \
             .grid(row=1, column=0, sticky=W, padx=50)
         self.product_name_entry = Entry(self.add_new_receipt_frame, font=('Arial', 20), textvariable=self.item_name)
         self.product_name_entry.bind("<Button-1>", lambda e: self.product_name_entry.delete(0, END))
         self.item_name.set("ex. Tomato")
         self.product_name_entry.grid(row=2, column=0, sticky=W, padx=50)
 
-        Label(self.add_new_receipt_frame, text="Enter product price:", font=('Arial', 15)) \
+        Label(self.add_new_receipt_frame, text="Enter product price:", font=('Arial', 15), bg=self.bg_color) \
             .grid(row=3, column=0, sticky=W, padx=50)
         self.product_price_entry = Entry(self.add_new_receipt_frame, font=('Arial', 20), textvariable=self.item_price)
         self.product_price_entry.bind("<Button-1>", lambda e: self.product_price_entry.delete(0, END))
         self.item_price.set("ex. 12.50")
         self.product_price_entry.grid(row=4, column=0, sticky=W, padx=50)
         Label(self.add_new_receipt_frame, font=('Arial', 15), text="Try by uploading a photo:\n"
-                                                                   "Choose photo:") \
+                                                                   "Choose photo:", bg=self.bg_color) \
             .grid(row=1, column=2, sticky=E, padx=70)
 
         self.receipt_name_entry = Entry(self.add_new_receipt_frame, textvariable=self.receipt_name, font=('Arial', 20))
@@ -94,15 +94,18 @@ class AddNewReceiptView:
         # Back to Receipt page
         Button(self.add_new_receipt_frame, text="Back", font=('Arial', 15), bg="light gray", width=7,
                command=lambda: self.controller.back_to_receipt_page()) \
-            .grid(row=8, column=2, sticky=E)
+            .grid(row=8, column=2, sticky=E, padx=40)
 
         # Clear all button
         Button(self.add_new_receipt_frame, text="Clear Receipt", font=('Arial', 20), bg="light gray", width=10,
                command=lambda: self.controller.clear_receipt_data()) \
             .grid(row=8, column=0, sticky=W, padx=120, pady=5)
 
+    def destroy_add_new_receipt_frame(self):
+        self.add_new_receipt_frame.destroy()
+
     # Edit element window
-    def edit_element_window(self, product_name, product_price):
+    def edit_element_window(self, product_name: str, product_price: str):
         name = StringVar()
         price = StringVar()
 
@@ -116,9 +119,9 @@ class AddNewReceiptView:
 
         Label(self.edit_window, text="New name:", font=('Arial', 12)) \
             .grid(row=1, column=0, sticky=W, padx=90)
-        prodduct_name_widget = Entry(self.edit_window, textvariable=name, font=('Arial', 15))
+        product_name_widget = Entry(self.edit_window, textvariable=name, font=('Arial', 15))
         name.set(product_name)
-        prodduct_name_widget.grid(row=2, column=0, sticky=W, padx=90)
+        product_name_widget.grid(row=2, column=0, sticky=W, padx=90)
 
         Label(self.edit_window, text="New price:", font=('Arial', 12)) \
             .grid(row=3, column=0, sticky=W, padx=90)
@@ -134,7 +137,7 @@ class AddNewReceiptView:
             .grid(row=5, column=0, sticky=W, padx=260, pady=5)
 
     # Destroying edit element window
-    def edit_element_widnow_destroy(self):
+    def edit_element_window_destroy(self):
         self.edit_window.destroy()
 
     # Creating treeview table and scrollbar
@@ -168,7 +171,7 @@ class AddNewReceiptView:
             self.table.delete(item)
 
     # Display path to photo on button
-    def configure_file_path_view(self, filepath):
+    def configure_file_path_view(self, filepath: str):
         self.filepath.set(filepath)
 
     # Resets all after adding receipt

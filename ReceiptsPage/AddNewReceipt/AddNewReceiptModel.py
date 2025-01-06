@@ -18,35 +18,41 @@ class AddNewReceiptModel:
     '''
 
     # Creating base of dataframe
-    def create_df(self):
+    @staticmethod
+    def create_df():
         items_df = pd.DataFrame(columns=["Item name", "Item price"])
         return items_df
 
     # Adding items to dataframe
-    def add_items_to_df(self, item_name, item_price, items_df):
+    @staticmethod
+    def add_items_to_df(item_name: str, item_price: str, items_df):
         new_row = {"Item name": item_name, "Item price": item_price}
         new_df = pd.DataFrame([new_row], index=[len(items_df)])
         updated_df = pd.concat([items_df, new_df], ignore_index=False)
         return updated_df
 
     # Delete selected item from dataframe
-    def delete_from_df(self, item_name, items_df):
+    @staticmethod
+    def delete_from_df(item_name: str, items_df):
         items_df.drop(items_df[items_df['Item name'] == item_name].index, inplace=True)
         items_df = items_df.reset_index(drop=True)
         return items_df
 
     # Choose file to photo via filedialog
-    def choose_file(self):
+    @staticmethod
+    def choose_file() -> str:
         filepath = filedialog.askopenfilename()
         return filepath
 
     # Counts number of items in receipt
-    def item_count_in_receipt(self, items_df):
+    @staticmethod
+    def item_count_in_receipt(items_df) -> int:
         num_rows = len(items_df.index)
         return num_rows
 
     # Calculates total price of receipt
-    def calculate_total_price(self, items_df):
+    @staticmethod
+    def calculate_total_price(items_df) -> float:
         prices = items_df['Item price'].tolist()
         total = 0
         for price in prices:
@@ -54,7 +60,7 @@ class AddNewReceiptModel:
         return total
 
     # Adding receipt to database
-    def add_receipt_to_database(self, user_data, receipt_name, item_count, creation_date):
+    def add_receipt_to_database(self, user_data: tuple, receipt_name: str, item_count: int, creation_date):
         insert_query = 'INSERT INTO `receipts` (UserName, ReceiptName, ItemsCount, CreationDate)' \
                        ' VALUES (%s, %s, %s, %s)'
         values_to_insert = (user_data[0], receipt_name, str(item_count), creation_date)
@@ -62,14 +68,14 @@ class AddNewReceiptModel:
         self.connection.commit()
 
     # Gets receipt id from database
-    def get_receipt_id(self, receipt_name):
+    def get_receipt_id(self, receipt_name: str) -> int:
         self.cursor.execute('SELECT ReceiptID FROM `receipts` WHERE ReceiptName = %s', (receipt_name,))
         row = self.cursor.fetchone()
         receipt_id = row[0]
         return receipt_id
 
     # Adding items from receipt to database and assign it to receipt id
-    def add_items_to_database(self, receipt_id, user_data, items_df, total):
+    def add_items_to_database(self, receipt_id: int, user_data: tuple, items_df, total: float):
         for index, row in items_df.iterrows():
             item, price = self.get_items_and_prices(row)
             insert_query = 'INSERT INTO `receiptitems` (ReceiptID, Username, Item, Price, TotalPrice)' \
@@ -79,50 +85,38 @@ class AddNewReceiptModel:
             self.connection.commit()
 
     # Get time of receipt creation in system
-    def get_creation_time(self):
+    @staticmethod
+    def get_creation_time():
         creation_date = date.today()
         return creation_date
 
     # Gets item name and its price
-    def get_items_and_prices(self, row):
+    @staticmethod
+    def get_items_and_prices(row) -> tuple:
         name = row["Item name"]
         price = row["Item price"]
 
         return name, price
 
-    # Check if product name is correct
-    def check_product_name(self, item_name):
-        if re.search(r"\W", item_name) or re.search("[0-9]", item_name):
-            return False
-        return True
-
-    # Check if product price is correct
-    def check_product_price(self, item_price):
-        if not re.search(r'^\d+(?:[.]\d{1,2}|$)$', item_price):
-            return False
-        return True
-
-    # Check if receipt name is correct
-    def check_receipt_name(self, receipt_name):
-        if re.search(r"\W", receipt_name):
-            return False
-        return True
-
     # Check if receipt name is unique
-    def check_for_duplicates(self):
-        ...
+    @staticmethod
+    def check_for_duplicates(receipt_name: str, list_of_user_receipts: list) -> bool:
+        for receipt in list_of_user_receipts:
+            if receipt == receipt_name:
+                return True
+        return False
 
     '''
     UPDATE METHODS
     '''
 
     # Updates item count
-    def update_item_count(self, item_count, receipt_id):
+    def update_item_count(self, item_count: int, receipt_id: int):
         self.cursor.execute('UPDATE `receipts` SET ItemsCount = %s WHERE ReceiptID = %s', (item_count, receipt_id))
         self.connection.commit()
 
     # Delete old items from database before update
-    def delete_items_from_database(self, receipt_id):
+    def delete_items_from_database(self, receipt_id: int):
         self.cursor.execute('DELETE FROM `receiptitems` WHERE ReceiptID = %s', (receipt_id,))
         self.connection.commit()
 
@@ -131,7 +125,8 @@ class AddNewReceiptModel:
     '''
 
     # Preprocessing small images
-    def preprocess_image(self, image):
+    @staticmethod
+    def preprocess_image(image):
         # Load the image
 
         # Scale the image
@@ -152,14 +147,14 @@ class AddNewReceiptModel:
         return enhanced
 
     # Reading text from small images
-    def read_text(self, image1):
+    def read_text(self, image1) -> str:
         # import here bcs on the top program is much slower even when not used ocr
         import easyocr
         image = self.preprocess_image(image1)
         reader = easyocr.Reader(['en'], gpu=False)
         text_detections = reader.readtext(image)
         data = ""
-        has_digits = False
+
         for result in text_detections:
             text = result[1]
             data += text
@@ -170,7 +165,7 @@ class AddNewReceiptModel:
         return data
 
     # Preprocessing whole receipt image
-    def preprocess_receipt_image(self, file_path):
+    def preprocess_receipt_image(self, file_path: str) -> list:
         image = cv2.imread(file_path)
 
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -193,7 +188,8 @@ class AddNewReceiptModel:
         return results
 
     # Use ML model to look for products in ocr results
-    def look_for_products(self, ocr_results):
+    @staticmethod
+    def look_for_products(ocr_results: list) -> list:
         with open('ReceiptsPage/AddNewReceipt/MachineLearning/model_product.pkl', "rb") as file:
             loaded_model = load(file)
         with open("ReceiptsPage/AddNewReceipt/MachineLearning/vectorizer_product.pkl", "rb") as file:
@@ -201,9 +197,8 @@ class AddNewReceiptModel:
 
         products_list = []
         for item in ocr_results:
-            list = []
-            list.append(item)
-            ocr_results_vectorized = loaded_vectorizer.transform(list)
+            p_list = [item]
+            ocr_results_vectorized = loaded_vectorizer.transform(p_list)
             prediction = loaded_model.predict(ocr_results_vectorized)
             if prediction[0] == 1:
                 products_list.append(item)
@@ -211,7 +206,8 @@ class AddNewReceiptModel:
         return products_list
 
     # Use regex to get prices from ocr results
-    def look_for_prices(self, ocr_results):
+    @staticmethod
+    def look_for_prices(ocr_results: list) -> list:
         price_list = []
         for item in ocr_results:
             if re.search(r'^\d+(?:[.]\d{1,2}|$)$', item) or re.search(r'^\d+(?:[,]\d{1,2}|$)$', item):
@@ -220,13 +216,15 @@ class AddNewReceiptModel:
         return price_list
 
     # Create dict from products and prices lists
-    def create_dict(self, products_list, price_list):
+    @staticmethod
+    def create_dict(products_list: list, price_list: list) -> dict:
         zipped_dict = dict(zip(products_list, price_list))
         return zipped_dict
 
     # Write dict to dataframe
-    def dict_to_df(self, items_dict, items_df):
-        data = [(k, v) for k, v in  items_dict.items()]
+    @staticmethod
+    def dict_to_df(items_dict: dict):
+        data = [(k, v) for k, v in items_dict.items()]
         df = pd.DataFrame(data, columns=["Item name", "Item price"])
         return df
 
@@ -234,7 +232,8 @@ class AddNewReceiptModel:
     EDIT ELEMENT METHODS
     '''
 
-    def edit_element_in_df(self, items_df, old_name, new_name, new_price):
+    @staticmethod
+    def edit_element_in_df(items_df, old_name: str, new_name: str, new_price: float):
         row_index = items_df.loc[items_df["Item name"] == old_name].index[0]
         items_df.loc[row_index, 'Item name'] = new_name
         items_df.loc[row_index, "Item price"] = float(new_price)
